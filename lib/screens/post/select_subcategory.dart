@@ -14,37 +14,37 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
       'title': 'House Wiring',
       'desc': 'New wiring, rewiring & maintenance',
       'icon': Icons.bolt,
-      'color': Colors.deepPurple
+      'color': Colors.deepPurple,
     },
     {
       'title': 'Switch Board Repair',
       'desc': 'Installation & repair of switch boards',
       'icon': Icons.power,
-      'color': Colors.indigo
+      'color': Colors.indigo,
     },
     {
       'title': 'Light & Fan Installation',
       'desc': 'Light, fan & chandelier installation',
       'icon': Icons.wb_twilight,
-      'color': Colors.green
+      'color': Colors.green,
     },
     {
       'title': 'MCB / Breaker Repair',
       'desc': 'MCB, fuse, breaker installation & repair',
       'icon': Icons.dataset_linked_outlined,
-      'color': Colors.orange
+      'color': Colors.orange,
     },
     {
       'title': 'Inverter Installation',
       'desc': 'Inverter wiring & installation',
       'icon': Icons.tv,
-      'color': Colors.blue
+      'color': Colors.blue,
     },
     {
       'title': 'Other Electrical Services',
       'desc': 'Other related electrical works',
       'icon': Icons.water_drop_outlined,
-      'color': Colors.teal
+      'color': Colors.teal,
     },
   ];
 
@@ -57,7 +57,9 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.82, // Total screen ka 82% height
+      height:
+          MediaQuery.of(context).size.height *
+          0.82, // Total screen ka 82% height
       margin: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -99,7 +101,9 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 48), // Balance spacing maintaining center alignment
+                const SizedBox(
+                  width: 48,
+                ), // Balance spacing maintaining center alignment
               ],
             ),
           ),
@@ -155,10 +159,14 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
                             color: item['color'].withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Icon(item['icon'], color: item['color'], size: 22),
+                          child: Icon(
+                            item['icon'],
+                            color: item['color'],
+                            size: 22,
+                          ),
                         ),
                         const SizedBox(width: 14),
-                        
+
                         // Text Description center side wala
                         Expanded(
                           child: Column(
@@ -183,7 +191,7 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
                             ],
                           ),
                         ),
-                        
+
                         // Blue Custom Radio Circle Button
                         Container(
                           width: 20,
@@ -191,7 +199,9 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSelected ? const Color(0xFF3F3DFA) : Colors.grey.shade300,
+                              color: isSelected
+                                  ? const Color(0xFF3F3DFA)
+                                  : Colors.grey.shade300,
                               width: isSelected ? 6 : 1.5,
                             ),
                           ),
@@ -214,8 +224,8 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
                   color: Colors.black.withOpacity(0.02),
                   offset: const Offset(0, -4),
                   blurRadius: 10,
-                )
-              ]
+                ),
+              ],
             ),
             child: SafeArea(
               top: false,
@@ -225,7 +235,9 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
                   Navigator.pop(context, subcategories[selectedIndex]);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3F3DFA), // Exact royal blue shade button
+                  backgroundColor: const Color(
+                    0xFF3F3DFA,
+                  ), // Exact royal blue shade button
                   minimumSize: const Size(double.infinity, 48),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),

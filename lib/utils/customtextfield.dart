@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
+import 'package:truxperts/utils/appcolors.dart';
 
 /// A rounded, outlined text field with a leading icon, matching the
 /// input style used throughout the Login / Sign Up screens.

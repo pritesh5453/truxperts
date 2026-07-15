@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
-import 'package:truxperts/logowidget.dart';
+import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/logowidget.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {

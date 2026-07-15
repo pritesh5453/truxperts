@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
-import 'package:truxperts/customtextfield.dart';
-import 'package:truxperts/logowidget.dart';
-import 'package:truxperts/navbar.dart';
+import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/customtextfield.dart';
+import 'package:truxperts/utils/logowidget.dart';
+import 'package:truxperts/utils/navbar.dart';
 import 'signup_screen.dart';
 import 'otp_screen.dart';
 

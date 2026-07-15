@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
+import 'package:truxperts/utils/appcolors.dart';
+
 /// "Section Title" ................. "View All >" row used above
 /// Popular Services / My Requests / Nearby Professionals.
 class SectionHeader extends StatelessWidget {
@@ -35,7 +36,11 @@ class SectionHeader extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 2),
-              Icon(Icons.chevron_right, size: 16, color: AppColors.textSecondary),
+              Icon(
+                Icons.chevron_right,
+                size: 16,
+                color: AppColors.textSecondary,
+              ),
             ],
           ),
         ),

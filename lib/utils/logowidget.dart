@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
+import 'package:truxperts/utils/appcolors.dart';
 
 /// The "TX" mark + "TruXperts" wordmark + tagline, used on
 /// Splash and Login screens.

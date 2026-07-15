@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
+import 'package:truxperts/screens/Requests/my_requests_screen.dart';
+import 'package:truxperts/screens/chat/chatting_screen.dart';
+import 'package:truxperts/screens/cust_profile/cust_profile_screen.dart';
+import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/screens/home/homescreen.dart';
 import 'package:truxperts/screens/post/post_requestScreen.dart';
 
@@ -16,10 +19,10 @@ class _NavBarScreenState extends State<NavBarScreen> {
   // ----- YAHAN SAARE SCREENS KA LIST HAI -----
   final List<Widget> _screens = [
     const HomeScreen(),     // 0 - Home
-    const _PlaceholderScreen(title: 'Chats'),   // 1 - Chats
+    const ChatScreen(),  // 1 - Chats
     const PostRequestScreen(),   // 2 - Post
-    const _PlaceholderScreen(title: 'Favorites'), // 3 - Favorites
-    const _PlaceholderScreen(title: 'Profile'),  // 4 - Profile
+    const MyRequestsScreen(), // 3 - Favorites
+    const CustomerProfileScreen(), // 4 - Profile
   ];
 
   void _onItemTapped(int index) {
@@ -67,7 +70,7 @@ class _NavBarScreenState extends State<NavBarScreen> {
                     _buildNavItem(0, Icons.home_outlined, Icons.home, 'Home'),
                     _buildNavItem(1, Icons.chat_bubble_outline, Icons.chat_bubble, 'Chats'),
                     const SizedBox(width: 40),
-                    _buildNavItem(3, Icons.favorite_border, Icons.favorite, 'Favorites'),
+                    _buildNavItem(3, Icons.request_quote_outlined, Icons.request_quote, 'My Requests'),
                     _buildNavItem(4, Icons.person_outline, Icons.person, 'Profile'),
                   ],
                 ),

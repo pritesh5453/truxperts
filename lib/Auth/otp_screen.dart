@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
+import 'package:truxperts/utils/appcolors.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});

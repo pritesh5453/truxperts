@@ -10,61 +10,61 @@ class CategoryDetailsScreen extends StatelessWidget {
       'title': 'House Wiring',
       'desc': 'New wiring, rewiring & maintenance',
       'icon': Icons.bolt,
-      'color': Colors.deepPurple
+      'color': Colors.deepPurple,
     },
     {
       'title': 'Switch Board Repair',
       'desc': 'Installation & repair of switch boards',
       'icon': Icons.power,
-      'color': Colors.blue
+      'color': Colors.blue,
     },
     {
       'title': 'Light & Fan Installation',
       'desc': 'Light, fan & chandelier installation',
       'icon': Icons.lightbulb_outline,
-      'color': Colors.green
+      'color': Colors.green,
     },
     {
       'title': 'MCB / Breaker Repair',
       'desc': 'MCB, fuse, breaker installation & repair',
       'icon': Icons.published_with_changes,
-      'color': Colors.red
+      'color': Colors.red,
     },
     {
       'title': 'Inverter Installation',
       'desc': 'Inverter wiring & installation',
       'icon': Icons.battery_charging_full,
-      'color': Colors.blueAccent
+      'color': Colors.blueAccent,
     },
     {
       'title': 'Electric Vehicle Charging',
       'desc': 'EV charger installation & repair',
       'icon': Icons.ev_station,
-      'color': Colors.teal
+      'color': Colors.teal,
     },
     {
       'title': 'Electrical Inspection',
       'desc': 'Safety check & electrical inspection',
       'icon': Icons.gavel,
-      'color': Colors.orange
+      'color': Colors.orange,
     },
     {
       'title': 'Generator Repair',
       'desc': 'Generator installation & repair',
       'icon': Icons.wb_iridescent,
-      'color': Colors.indigo
+      'color': Colors.indigo,
     },
     {
       'title': 'Earthing / Grounding',
       'desc': 'Earthing installation & testing',
       'icon': Icons.import_export,
-      'color': Colors.deepOrange
+      'color': Colors.deepOrange,
     },
     {
       'title': 'Other Electrical Services',
       'desc': 'Other related electrical works',
       'icon': Icons.more_horiz,
-      'color': Colors.blueGrey
+      'color': Colors.blueGrey,
     },
   ];
 
@@ -101,7 +101,7 @@ class CategoryDetailsScreen extends StatelessWidget {
                         color: Colors.grey.withOpacity(0.05),
                         spreadRadius: 2,
                         blurRadius: 10,
-                      )
+                      ),
                     ],
                   ),
                   child: Row(
@@ -176,18 +176,26 @@ class CategoryDetailsScreen extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: subCategories.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFF0F0F0)),
+                  separatorBuilder: (context, index) =>
+                      const Divider(height: 1, color: Color(0xFFF0F0F0)),
                   itemBuilder: (context, index) {
                     final item = subCategories[index];
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 4,
+                      ),
                       leading: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: item['color'].withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Icon(item['icon'], color: item['color'], size: 22),
+                        child: Icon(
+                          item['icon'],
+                          color: item['color'],
+                          size: 22,
+                        ),
                       ),
                       title: Text(
                         item['title'],
@@ -201,7 +209,11 @@ class CategoryDetailsScreen extends StatelessWidget {
                         item['desc'],
                         style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                       ),
-                      trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+                      trailing: const Icon(
+                        Icons.chevron_right,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
                       onTap: () {
                         // Subcategory tap action yahan handle karein
                       },
@@ -215,7 +227,9 @@ class CategoryDetailsScreen extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9F9FF), // Halka bluish-white container tint
+                    color: const Color(
+                      0xFFF9F9FF,
+                    ), // Halka bluish-white container tint
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: const Color(0xFFECECFF)),
                   ),
@@ -249,11 +263,17 @@ class CategoryDetailsScreen extends StatelessWidget {
                           icon: const Icon(Icons.send_rounded, size: 18),
                           label: const Text(
                             'Post a Request',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.deepPurple,
-                            side: const BorderSide(color: Colors.deepPurple, width: 1),
+                            side: const BorderSide(
+                              color: Colors.deepPurple,
+                              width: 1,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),

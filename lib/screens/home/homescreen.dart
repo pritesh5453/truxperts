@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
+import 'package:truxperts/screens/Profile/profile_screen.dart';
+import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/screens/home/categories.dart';
 import 'package:truxperts/screens/home/section_header.dart';
 import 'package:truxperts/screens/home/service_icon.dart';
@@ -523,7 +524,7 @@ class _RequestCard extends StatelessWidget {
                         title,
                         style: const TextStyle(
                           fontSize: 13.5,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w500,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -617,15 +618,15 @@ class _RequestAssignedTrailing extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        OutlinedButton(
-          onPressed: () {},
-          style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: AppColors.navy, width: 1.2),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          child: const Text('Chat', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.navy)),
-        ),
+        // OutlinedButton(
+        //   onPressed: () {},
+        //   style: OutlinedButton.styleFrom(
+        //     side: const BorderSide(color: AppColors.navy, width: 1.2),
+        //     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        //   ),
+        //   child: const Text('Chat', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.navy)),
+        // ),
       ],
     );
   }
@@ -640,13 +641,14 @@ class _RequestPendingTrailing extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 90,
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: const [
+          SizedBox(height: 50),
           Icon(Icons.access_time, size: 14, color: AppColors.navy),
           SizedBox(height: 4),
           Text(
-            'Looking for professional...',
+            'Looking for\n professional...',
             textAlign: TextAlign.right,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -697,11 +699,12 @@ class _ProfessionalCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
                         name,
-                        style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                        style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
                       ),
                     ),
                     const Icon(Icons.star, size: 13, color: AppColors.star),
@@ -724,7 +727,11 @@ class _ProfessionalCard extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ProviderProfileScreen()),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.navy,
               foregroundColor: Colors.white,

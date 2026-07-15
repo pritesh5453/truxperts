@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
+import 'package:truxperts/utils/appcolors.dart';
 
 class CustomAppBar extends StatelessWidget
     implements PreferredSizeWidget {

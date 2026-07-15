@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
+import 'package:truxperts/utils/appcolors.dart';
 
 class ServiceIconTile extends StatelessWidget {
   final String icon;
@@ -27,19 +27,19 @@ class ServiceIconTile extends StatelessWidget {
       child: Column(
         children: [
           Container(
-  width: 62,
-  height: 62,
-  decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(15),
-    border: Border.all(
-      color: selected ? AppColors.navy : AppColors.fieldBorder,
-    ),
-    image: DecorationImage(
-      image: AssetImage(icon),
-      fit: BoxFit.contain,
-    ),
-  ),
-),
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: selected ? AppColors.navy : AppColors.fieldBorder,
+              ),
+              image: DecorationImage(
+                image: AssetImage(icon),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
           const SizedBox(height: 8),
           Text(
             label,

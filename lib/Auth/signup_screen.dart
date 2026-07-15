@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:truxperts/appcolors.dart';
-import 'package:truxperts/customtextfield.dart';
+import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/customtextfield.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
