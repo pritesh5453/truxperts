@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/logowidget.dart';
+import 'package:truxperts/utils/maintenance_screen.dart';
 import 'login_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,20 +17,64 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _controller;
 
   @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..forward();
+void initState() {
+  super.initState();
 
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
+  _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 3),
+  )..forward();
+
+  _checkMaintenance();
+}
+
+  
+
+  Future<void> _checkMaintenance() async {
+  try {
+    await Future.delayed(const Duration(seconds: 3));
+
+    final doc = await FirebaseFirestore.instance
+        .collection('app_config')
+        .doc('maintenance')
+        .get();
+
+    final data = doc.data();
+
+    final enabled = data?['enabled'] ?? false;
+
+    if (!mounted) return;
+
+    if (enabled) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MaintenanceScreen(
+            title: data?['title'] ?? 'Server Maintenance',
+            message:
+                data?['message'] ?? 'Please try again later.',
+          ),
+        ),
       );
-    });
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const LoginScreen(),
+        ),
+      );
+    }
+  } catch (e) {
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const LoginScreen(),
+      ),
+    );
   }
+}
 
   @override
   void dispose() {
