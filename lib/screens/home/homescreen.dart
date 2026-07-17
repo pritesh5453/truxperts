@@ -1,747 +1,696 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/screens/Profile/profile_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
-import 'package:truxperts/screens/home/categories.dart';
-import 'package:truxperts/screens/home/section_header.dart';
-import 'package:truxperts/screens/home/service_icon.dart';
 
-/// Home / Dashboard screen.
-///
-/// NOTE: This screen intentionally does NOT include a Scaffold's
-/// bottomNavigationBar — it's built to be dropped into an existing
-/// navbar/IndexedStack setup as-is.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FB),
+      backgroundColor: AppColors.bg,
       body: SafeArea(
-        bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
-          children: [
-            _TopBar(),
-            const SizedBox(height: 16),
-            _SearchBar(),
-            const SizedBox(height: 18),
-            const _PostServiceRequestCard(),
-            const SizedBox(height: 24),
-
-            SectionHeader(title: 'What service do you need?', onViewAll: () {}),
-            const SizedBox(height: 14),
-            _ServiceGrid(),
-            const SizedBox(height: 24),
-
-            SectionHeader(title: 'My Requests', onViewAll: () {}),
-            const SizedBox(height: 12),
-            const _RequestCard(
-              icon: 'assets/icons/electrician.png',
-              iconBg: AppColors.iconElectricianBg,
-              iconFg: AppColors.iconElectricianFg,
-              title: 'Electrician Needed',
-              badgeLabel: 'Assigned',
-              badgeBg: AppColors.badgeAssignedBg,
-              badgeText: AppColors.badgeAssignedText,
-              location: 'Kothrud, Pune',
-              dateTime: '08 Jul 2025  •  04:30 PM',
-              description: 'Need wiring repair in 2BHK flat.',
-              trailing: _RequestAssignedTrailing(),
-            ),
-            const SizedBox(height: 12),
-            const _RequestCard(
-              icon: 'assets/icons/plumber.png',
-              iconBg: AppColors.iconPlumberBg,
-              iconFg: AppColors.iconPlumberFg,
-              title: 'Plumbing Issue',
-              badgeLabel: 'Pending',
-              badgeBg: AppColors.badgePendingBg,
-              badgeText: AppColors.badgePendingText,
-              location: 'Baner, Pune',
-              dateTime: '07 Jul 2025  •  11:00 AM',
-              description: 'Tap leaking in bathroom.',
-              trailing: _RequestPendingTrailing(),
-            ),
-            const SizedBox(height: 24),
-
-            SectionHeader(title: 'Nearby Professionals', onViewAll: () {}),
-            const SizedBox(height: 12),
-            const _ProfessionalCard(
-              name: 'Amit Electricals',
-              role: 'Electrician  •  5 Years Exp.',
-              distance: '1.2 km away',
-              rating: '4.7',
-            ),
-            const SizedBox(height: 12),
-            const _ProfessionalCard(
-              name: 'PowerFix Services',
-              role: 'Electrician  •  8 Years Exp.',
-              distance: '1.5 km away',
-              rating: '4.9',
-            ),
-          ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              _TopBar(),
+              SizedBox(height: 12),
+              _SearchBar(),
+              SizedBox(height: 16),
+              _HeroBanner(),
+              SizedBox(height: 20),
+              _SectionHeader(title: 'Top Instant Services'),
+              SizedBox(height: 12),
+              _TopInstantServices(),
+              SizedBox(height: 20),
+              _SectionHeader(title: 'Popular for Advance Booking'),
+              SizedBox(height: 12),
+              _AdvanceBookingServices(),
+              SizedBox(height: 20),
+              _RewardsBanner(),
+              SizedBox(height: 20),
+              _SectionHeader(title: 'Live Offers 🔥'),
+              SizedBox(height: 12),
+              _LiveOffersRow(),
+              SizedBox(height: 20),
+              _SectionHeader(title: 'Nearby Professionals'),
+              SizedBox(height: 12),
+              _NearbyProfessionalsRow(),
+              SizedBox(height: 20),
+              _StatsRow(),
+              SizedBox(height: 20),
+              _SectionHeader(title: 'Latest Posts from Professionals'),
+              SizedBox(height: 12),
+              _LatestPostsRow(),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Top bar: location + logo + chat/notification icons
-// ---------------------------------------------------------------------------
-
+// ---------------------- TOP BAR (फिक्स्ड) ----------------------
 class _TopBar extends StatelessWidget {
+  const _TopBar();
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: InkWell(
-            onTap: () {},
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        children: [
+          Flexible(
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: const [
-                Icon(Icons.location_on, size: 16, color: AppColors.orange),
-                SizedBox(width: 4),
+                Icon(Icons.location_on, color: AppColors.navy, size: 16),
+                SizedBox(width: 2),
                 Flexible(
                   child: Text(
                     'Pune, Maharashtra',
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textDark),
                   ),
                 ),
-                Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textSecondary),
+                Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textDark),
               ],
             ),
           ),
-        ),
-        Column(
+          const Spacer(),
+          Column(
           children: [
             RichText(
               text: const TextSpan(
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 children: [
-                  TextSpan(text: 'Tru', style: TextStyle(color: AppColors.navy)),
-                  TextSpan(text: 'X', style: TextStyle(color: AppColors.orange)),
-                  TextSpan(text: 'perts', style: TextStyle(color: AppColors.navy)),
+                  TextSpan(
+                    text: 'Tru',
+                    style: TextStyle(color: Color(0xff1C2D5A)),
+                  ),
+                  TextSpan(
+                    text: 'Xperts',
+                    style: TextStyle(color: Color(0xffE65F2B)),
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 2),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(width: 10, height: 1, color: AppColors.orange),
-                const SizedBox(width: 4),
-                const Text(
-                  'Trusted Professionals, One Tap Away.',
-                  style: TextStyle(fontSize: 8, color: AppColors.textSecondary),
-                ),
-                const SizedBox(width: 4),
-                Container(width: 10, height: 1, color: AppColors.orange),
-              ],
+            const Text(
+              "— Trusted Professionals, One Tap Away. —",
+              style: TextStyle(
+                fontSize: 8,
+                color: Color(0xff6C757D),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
-        Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              _IconBadge(
-  icon: 'assets/icons/chats.png',
-  count: '3',
-),
-
-const SizedBox(width: 14),
-
-_IconBadge(
-  icon: 'assets/icons/notification.png',
-  count: '8',
-),
-            ],
-          ),
-        ),
-      ],
+          const Spacer(),
+          _IconBadge(icon: Icons.notifications_none_rounded, badgeCount: 1),
+          const SizedBox(width: 8),
+          _IconBadge(icon: Icons.chat_bubble_outline_rounded, badgeCount: 1),
+        ],
+      ),
     );
   }
 }
 
 class _IconBadge extends StatelessWidget {
-  final String icon;
-  final String count;
-
-  const _IconBadge({
-    required this.icon,
-    required this.count,
-  });
+  final IconData icon;
+  final int badgeCount;
+  const _IconBadge({required this.icon, required this.badgeCount});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Image.asset(
-  icon,
-  width: 24,
-  height: 24,
-  fit: BoxFit.contain,
-),
-        Positioned(
-          right: -4,
-          top: -4,
-          child: Container(
-            padding: const EdgeInsets.all(3),
-            decoration: const BoxDecoration(
-              color: AppColors.badgeNotifBg,
-              shape: BoxShape.circle,
-            ),
-            constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-            child: Text(
-              count,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 9,
-                fontWeight: FontWeight.w700,
-              ),
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 6, offset: const Offset(0, 2))],
+          ),
+          child: Icon(icon, size: 16, color: AppColors.navy),
+        ),
+        if (badgeCount > 0)
+          Positioned(
+            right: -2,
+            top: -2,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: const BoxDecoration(color: AppColors.orange, shape: BoxShape.circle),
+              constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
+              child: Text('$badgeCount', textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold)),
             ),
           ),
-        ),
       ],
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Search bar
-// ---------------------------------------------------------------------------
-
+// ---------------------- SEARCH BAR ----------------------
 class _SearchBar extends StatelessWidget {
+  const _SearchBar();
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.fieldBorder, width: 1.2),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        height: 42,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+        ),
+        child: Row(
+          children: const [
+            Icon(Icons.search, color: AppColors.textGrey, size: 18),
+            SizedBox(width: 6),
+            Expanded(child: Text('Search for services or professionals...',
+                style: TextStyle(color: AppColors.textGrey, fontSize: 12))),
+            Icon(Icons.tune, color: AppColors.navy, size: 18),
+          ],
+        ),
       ),
-      child: Row(
+    );
+  }
+}
+
+// ---------------------- HERO BANNER ----------------------
+// ---------------------- HERO BANNER ----------------------
+// ---------------------- HERO BANNER ----------------------
+class _HeroBanner extends StatelessWidget {
+  const _HeroBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          const Icon(Icons.search, size: 20, color: AppColors.textSecondary),
-          const SizedBox(width: 10),
-          const Expanded(
-            child: Text(
-              'Search services or professionals...',
-              style: TextStyle(fontSize: 13, color: AppColors.hintText),
+          // Banner image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: AspectRatio(
+              aspectRatio: 1536 / 1024, // apni image ke actual ratio se adjust kar lena
+              child: Image.asset(
+                'assets/images/hero_banner.jpeg',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-          const Icon(Icons.tune, size: 18, color: AppColors.textSecondary),
+
+          // Cards jo image ke bottom edge pe "half overlap" karte hain
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 10, // jitna neeche overlap chahiye utna adjust karo
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildOptionCard(
+                    icon: Icons.bolt,
+                    title: 'Need Service Now?',
+                    subtitle: 'Get an expert\nin minutes',
+                    buttonText: 'Get Started',
+                    isOrange: false,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildOptionCard(
+                    icon: Icons.calendar_today,
+                    title: 'Plan for Later?',
+                    subtitle: 'Book for events\nor future date',
+                    buttonText: 'Plan Now',
+                    isOrange: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOptionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String buttonText,
+    required bool isOrange,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppColors.bg, // solid navy card, image pe overlap ke liye opaque hona chahiye
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Icon(icon, color: AppColors.orange, size: 12),
+            const SizedBox(width: 4),
+            Text(title, style: const TextStyle(color: Colors.black, fontSize: 9, fontWeight: FontWeight.w600)),
+          ]),
+          const SizedBox(height: 2),
+          Text(subtitle, style: const TextStyle(color: Colors.black, fontSize: 9)),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(
+              color: isOrange ? AppColors.orange : AppColors.navy ,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(buttonText,
+                    style: TextStyle(color: isOrange ? AppColors.navy: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                const SizedBox(width: 4),
+                Icon(Icons.arrow_forward, size: 10, color: isOrange ? Colors.white : AppColors.navy),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Post a Service Request card
-// ---------------------------------------------------------------------------
-
-class _PostServiceRequestCard extends StatelessWidget {
-  const _PostServiceRequestCard();
+// ---------------------- SECTION HEADER ----------------------
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  const _SectionHeader({required this.title});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.navy,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-                  children: [
-                    TextSpan(text: 'Post a ', style: TextStyle(color: Colors.white)),
-                    TextSpan(text: 'Service Request', style: TextStyle(color: AppColors.orangeLight)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: 170,
-                child: Text(
-                  "Tell us what you need, we'll connect you with trusted professionals nearby.",
-                  style: TextStyle(fontSize: 11.5, color: Colors.white.withOpacity(0.75), height: 1.4),
-                ),
-              ),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.orange,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Post Now', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                    SizedBox(width: 6),
-                    Icon(Icons.arrow_forward, size: 15),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textDark)),
+          const Text('View All', style: TextStyle(fontSize: 12, color: AppColors.orange, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+}
 
-          // Person illustration (simplified iconographic representation)
-          Positioned(
-            right: -6,
-            bottom: -18,
-            child: Container(
-              height: 118,
-              width: 118,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.person, color: Colors.white38, size: 64),
+// ---------------------- SERVICE ITEM (data model) ----------------------
+class _ServiceItem {
+  final IconData icon;
+  final String label;
+  final Color bg;
+  final Color iconColor;
+  const _ServiceItem(this.icon, this.label, this.bg, this.iconColor);
+}
+
+// ---------------------- TOP INSTANT SERVICES (ROW, बिना स्क्रॉल) ----------------------
+class _TopInstantServices extends StatelessWidget {
+  const _TopInstantServices();
+
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      _ServiceItem(Icons.bolt, 'Electrician', Color(0xFFE9ECFB), Color(0xFF4A5AD9)),
+      _ServiceItem(Icons.plumbing, 'Plumber', Color(0xFFDBF0FF), Color(0xFF2196D9)),
+      _ServiceItem(Icons.ac_unit, 'AC Repair', Color(0xFFE3F5FF), Color(0xFF1EA7E0)),
+      _ServiceItem(Icons.cleaning_services, 'Cleaning', Color(0xFFE0F7EF), Color(0xFF2FAE60)),
+      _ServiceItem(Icons.shopping_basket, 'Grocery', Color(0xFFE0F7E9), Color(0xFF2FAE60)),
+      _ServiceItem(Icons.more_horiz, 'More', Color(0xFFEFEFF4), Color(0xFF8A8CA3)),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: items.map((item) {
+          return SizedBox(
+            width: 50,
+            child: Column(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(color: item.bg, borderRadius: BorderRadius.circular(12)),
+                  child: Icon(item.icon, color: item.iconColor, size: 20),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  item.label,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 8, color: AppColors.textDark, fontWeight: FontWeight.w500),
+                ),
+              ],
             ),
-          ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
 
-          // Floating "I need an Electrician" mini card
-          Positioned(
-            right: 0,
-            top: -6,
+// ---------------------- ADVANCE BOOKING (ROW, बिना स्क्रॉल) ----------------------
+class _AdvanceBookingServices extends StatelessWidget {
+  const _AdvanceBookingServices();
+
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      _ServiceItem(Icons.camera_alt, 'Photographer', Color(0xFFF3E8FF), Color(0xFF9B51E0)),
+      _ServiceItem(Icons.diamond_outlined, 'Wedding\nPlanner', Color(0xFFFFF1E0), Color(0xFFFF9800)),
+      _ServiceItem(Icons.restaurant, 'Catering', Color(0xFFFFE7E7), Color(0xFFE53935)),
+      _ServiceItem(Icons.chair_alt, 'Decorator', Color(0xFFE7F0FF), Color(0xFF3F6BE0)),
+      _ServiceItem(Icons.music_note, 'DJ', Color(0xFFF3E8FF), Color(0xFF9B51E0)),
+      _ServiceItem(Icons.more_horiz, 'More', Color(0xFFEFEFF4), Color(0xFF8A8CA3)),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: items.map((item) {
+          return SizedBox(
+            width: 50,
+            child: Column(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(color: item.bg, borderRadius: BorderRadius.circular(12)),
+                  child: Icon(item.icon, color: item.iconColor, size: 20),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  item.label,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 8, color: AppColors.textDark, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+// ---------------------- REWARDS BANNER ----------------------
+class _RewardsBanner extends StatelessWidget {
+  const _RewardsBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [Color(0xFF3B2B8C), Color(0xFF1B2B6B)],
+              begin: Alignment.topLeft, end: Alignment.bottomRight),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('TruXperts Rewards',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 2),
+                  const Text('Book now, earn more!', style: TextStyle(color: Colors.white70, fontSize: 10)),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                    child: const Text('Explore Rewards',
+                        style: TextStyle(color: AppColors.navy, fontSize: 10, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const Text('Your Points', style: TextStyle(color: Colors.white60, fontSize: 9)),
+                Row(children: const [
+                  Icon(Icons.emoji_events, color: Color(0xFFFFC94A), size: 14),
+                  SizedBox(width: 4),
+                  Text('250', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                ]),
+                const SizedBox(height: 6),
+                Icon(Icons.card_giftcard, color: Colors.white.withOpacity(0.5), size: 30),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------- LIVE OFFERS – ROW (बिना स्क्रॉल) ----------------------
+class _LiveOffersRow extends StatelessWidget {
+  const _LiveOffersRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final offers = [
+      {'discount': '20% OFF', 'desc': 'on AC Service', 'code': 'CODE: CDDL20', 'valid': 'Valid till 31 May 2025', 'bg': const Color(0xFFE3F8EA), 'accent': const Color(0xFF2FAE60)},
+      {'discount': '\$100 OFF', 'desc': 'on Fast Booking', 'code': 'CODE: FBSIT100', 'valid': 'Valid till 25 May 2025', 'bg': const Color(0xFFFFEFE3), 'accent': const Color(0xFFFF7A1A)},
+      {'discount': 'UP TO 15% OFF', 'desc': 'on Cleaning Services', 'code': 'CODE: CLEAR15', 'valid': 'Valid till 31 May 2025', 'bg': const Color(0xFFEFE9FF), 'accent': const Color(0xFF7A5AF8)},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: offers.map((o) {
+          return Expanded(
             child: Container(
-              width: 128,
+              margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: o['bg'] as Color, borderRadius: BorderRadius.circular(12)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(o['discount'] as String,
+                      style: TextStyle(color: o['accent'] as Color, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(o['desc'] as String, style: const TextStyle(fontSize: 9, color: AppColors.textDark)),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: (o['accent'] as Color).withOpacity(0.4)),
+                    ),
+                    child: Text(o['code'] as String,
+                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: o['accent'] as Color)),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(o['valid'] as String, style: const TextStyle(fontSize: 7, color: AppColors.textGrey)),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+// ---------------------- NEARBY PROFESSIONALS – ROW (बिना स्क्रॉल) ----------------------
+class _NearbyProfessionalsRow extends StatelessWidget {
+  const _NearbyProfessionalsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final profs = [
+      {'name': 'Amit Bactwala', 'rating': '+4.8 (120)', 'color': const Color(0xFFB9C4FF)},
+      {'name': 'Suresh Pushkar', 'rating': '+4.7 (90)', 'color': const Color(0xFFFFC9A6)},
+      {'name': 'AC Repair Pro', 'rating': '+4.6 (76)', 'color': const Color(0xFFA6D8FF)},
+      {'name': 'Home Cleaning', 'rating': '+4.8 (112)', 'color': const Color(0xFFFFB9D6)},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: profs.map((p) {
+          return Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2))],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(radius: 20, backgroundColor: p['color'] as Color,
+                      child: const Icon(Icons.person, color: Colors.white, size: 18)),
+                  const SizedBox(height: 4),
+                  Text(p['name'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.textDark)),
+                  const SizedBox(height: 2),
+                  Text(p['rating'] as String, style: const TextStyle(fontSize: 8, color: AppColors.textGrey)),
+                  const SizedBox(height: 6),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    decoration: BoxDecoration(color: const Color(0xFFE9ECFB), borderRadius: BorderRadius.circular(6)),
+                    child: const Text('Available now', textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 7, color: AppColors.navy, fontWeight: FontWeight.w600)),
                   ),
                 ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+// ---------------------- STATS ROW ----------------------
+class _StatsRow extends StatelessWidget {
+  const _StatsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final stats = [
+      {'icon': Icons.emoji_emotions, 'value': '50,000+', 'label': 'Happy Customers'},
+      {'icon': Icons.verified_user, 'value': '5,000+', 'label': 'Verified Professionals'},
+      {'icon': Icons.category, 'value': '120+', 'label': 'Service Categories'},
+      {'icon': Icons.task_alt, 'value': '1L+', 'label': 'Service Completed'},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2))],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: stats.map((s) {
+            return Column(
+              children: [
+                Icon(s['icon'] as IconData, color: AppColors.navy, size: 16),
+                const SizedBox(height: 4),
+                Text(s['value'] as String,
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textDark)),
+                const SizedBox(height: 2),
+                SizedBox(width: 60, child: Text(s['label'] as String, textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 7, color: AppColors.textGrey))),
+              ],
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------- LATEST POSTS – ROW (4 कार्ड एक पंक्ति में) ----------------------
+class _LatestPostsRow extends StatelessWidget {
+  const _LatestPostsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final posts = [
+      {'author': 'Amit Photography', 'time': '2h ago', 'caption': 'Pre-wedding shoot available for this season. Book your date!', 'likes': 26, 'comments': 8, 'color': const Color(0xFFE8D9C4)},
+      {'author': 'Drawn Wedding Planners', 'time': '3h ago', 'caption': 'Make your big day memorable with our expert planning.', 'likes': 32, 'comments': 5, 'color': const Color(0xFFF3C9D6)},
+      {'author': 'Bing Ceremony Experts', 'time': '4h ago', 'caption': 'Bing and ceremony services for your special moments.', 'likes': 41, 'comments': 12, 'color': const Color(0xFFD9C9F3)},
+      {'author': 'Shah Etesh Events', 'time': '5h ago', 'caption': 'Book a caterer, decorator, and photographers.', 'likes': 27, 'comments': 6, 'color': const Color(0xFFD6C9B0)},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        children: posts.map((p) {
+          return Expanded(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'I need an',
-                    style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
-                  ),
-                  const Text(
-                    'Electrician',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.navy,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.bolt, size: 14, color: AppColors.orange),
-                      SizedBox(width: 4),
-                      Icon(Icons.location_on, size: 12, color: AppColors.textSecondary),
-                      SizedBox(width: 2),
-                      Text('Near me', style: TextStyle(fontSize: 9.5, color: AppColors.textSecondary)),
+                      CircleAvatar(radius: 8, backgroundColor: p['color'] as Color,
+                          child: const Icon(Icons.person, size: 10, color: Colors.white)),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(p['author'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 7, fontWeight: FontWeight.w600)),
+                      ),
+                      const Icon(Icons.more_vert, size: 10, color: AppColors.textGrey),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.navy,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: const Text('Post', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                    ),
+                  const SizedBox(height: 4),
+                  Container(
+                    height: 60,
+                    decoration: BoxDecoration(color: p['color'] as Color, borderRadius: BorderRadius.circular(8)),
+                    child: const Center(child: Icon(Icons.image, color: Colors.white70, size: 18)),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(p['caption'] as String, maxLines: 2, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 7, color: AppColors.textDark, height: 1.2)),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.favorite_border, size: 9, color: AppColors.textGrey),
+                      const SizedBox(width: 2),
+                      Text('${p['likes']}', style: const TextStyle(fontSize: 6, color: AppColors.textGrey)),
+                      const SizedBox(width: 6),
+                      const Icon(Icons.mode_comment_outlined, size: 9, color: AppColors.textGrey),
+                      const SizedBox(width: 2),
+                      Text('${p['comments']}', style: const TextStyle(fontSize: 6, color: AppColors.textGrey)),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Service grid (Electrician / Plumber / Carpenter / Painter / More)
-// ---------------------------------------------------------------------------
-
-class _ServiceGrid extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        ServiceIconTile(
-          icon: 'assets/icons/electrician.png',
-          label: 'Electrician',
-          iconBg: AppColors.iconElectricianBg,
-          iconColor: AppColors.iconElectricianFg,
-          selected: true,
-          onTap: () {},
-        ),
-        ServiceIconTile(
-          icon: 'assets/icons/plumber.png',
-          label: 'Plumber',
-          iconBg: AppColors.iconPlumberBg,
-          iconColor: AppColors.iconPlumberFg,
-          onTap: () {},
-        ),
-        ServiceIconTile(
-          icon: 'assets/icons/carpenter.png',
-          label: 'Carpenter',
-          iconBg: AppColors.iconCarpenterBg,
-          iconColor: AppColors.iconCarpenterFg,
-          onTap: () {},
-        ),
-        ServiceIconTile(
-          icon: 'assets/icons/painter.png',
-          label: 'Painter',
-          iconBg: AppColors.iconPainterBg,
-          iconColor: AppColors.iconPainterFg,
-          onTap: () {},
-        ),
-        ServiceIconTile(
-          icon: 'assets/icons/more.png',
-          label: 'More',
-          iconBg: AppColors.iconMoreBg,
-          iconColor: AppColors.iconMoreFg,
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const CategoriesScreen()),
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// My Requests card
-// ---------------------------------------------------------------------------
-
-class _RequestCard extends StatelessWidget {
-  final String icon;
-  final Color iconBg;
-  final Color iconFg;
-  final String title;
-  final String badgeLabel;
-  final Color badgeBg;
-  final Color badgeText;
-  final String location;
-  final String dateTime;
-  final String description;
-  final Widget trailing;
-
-  const _RequestCard({
-    required this.icon,
-    required this.iconBg,
-    required this.iconFg,
-    required this.title,
-    required this.badgeLabel,
-    required this.badgeBg,
-    required this.badgeText,
-    required this.location,
-    required this.dateTime,
-    required this.description,
-    required this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.cardBorder, width: 1.2),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-  height: 40,
-  width: 40,
-  decoration: BoxDecoration(
-    color: iconBg,
-    shape: BoxShape.circle,
-  ),
-  child: Center(
-    child: Image.asset(
-      icon,
-      width: 18,
-      height: 18,
-      fit: BoxFit.contain,
-      // color: iconFg, // Agar image black/white hai tab use karo,
-      // agar image already colored hai to is line ko hata do.
-    ),
-  ),
-),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: badgeBg,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        badgeLabel,
-                        style: TextStyle(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w700,
-                          color: badgeText,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 12, color: AppColors.textSecondary),
-                    const SizedBox(width: 3),
-                    Text(location, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                  ],
-                ),
-                const SizedBox(height: 3),
-                Row(
-                  children: [
-                    const Icon(Icons.calendar_today_outlined, size: 11, color: AppColors.textSecondary),
-                    const SizedBox(width: 4),
-                    Text(dateTime, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  description,
-                  style: const TextStyle(fontSize: 11.5, color: AppColors.textPrimary),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          trailing,
-        ],
-      ),
-    );
-  }
-}
-
-/// Right-hand side of the "Electrician Needed / Assigned" card:
-/// avatar, name, rating, and a Chat button.
-class _RequestAssignedTrailing extends StatelessWidget {
-  const _RequestAssignedTrailing();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Row(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text(
-                  'Rahul Sharma',
-                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-                ),
-                const SizedBox(height: 2),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.star, size: 12, color: AppColors.star),
-                    SizedBox(width: 2),
-                    Text('4.8', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(width: 6),
-            const CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColors.chipUnselected,
-              child: Icon(Icons.person, size: 18, color: AppColors.textSecondary),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        // OutlinedButton(
-        //   onPressed: () {},
-        //   style: OutlinedButton.styleFrom(
-        //     side: const BorderSide(color: AppColors.navy, width: 1.2),
-        //     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        //   ),
-        //   child: const Text('Chat', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.navy)),
-        // ),
-      ],
-    );
-  }
-}
-
-/// Right-hand side of the "Plumbing Issue / Pending" card: clock icon
-/// and "Looking for professional..." text.
-class _RequestPendingTrailing extends StatelessWidget {
-  const _RequestPendingTrailing();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 90,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: const [
-          SizedBox(height: 50),
-          Icon(Icons.access_time, size: 14, color: AppColors.navy),
-          SizedBox(height: 4),
-          Text(
-            'Looking for\n professional...',
-            textAlign: TextAlign.right,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Nearby Professionals card
-// ---------------------------------------------------------------------------
-
-class _ProfessionalCard extends StatelessWidget {
-  final String name;
-  final String role;
-  final String distance;
-  final String rating;
-
-  const _ProfessionalCard({
-    required this.name,
-    required this.role,
-    required this.distance,
-    required this.rating,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.cardBorder, width: 1.2),
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 24,
-            backgroundColor: AppColors.chipUnselected,
-            child: Icon(Icons.person, size: 24, color: AppColors.textSecondary),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        name,
-                        style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-                      ),
-                    ),
-                    const Icon(Icons.star, size: 13, color: AppColors.star),
-                    const SizedBox(width: 2),
-                    Text(rating, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                  ],
-                ),
-                const SizedBox(height: 3),
-                Text(role, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                const SizedBox(height: 3),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 12, color: AppColors.textSecondary),
-                    const SizedBox(width: 3),
-                    Text(distance, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ProviderProfileScreen()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.navy,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('View Profile', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700)),
-          ),
-        ],
+          );
+        }).toList(),
       ),
     );
   }

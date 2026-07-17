@@ -40,4 +40,13 @@ class AppColors {
   static const Color iconMoreFg = Color(0xFF8A8FA3);
   static const Color cardBorder = Color(0xFFEDEEF3);
   static const Color badgeNotifBg = Color(0xFFF47B20);
+
+
+
+  static const bg = Color(0xFFF4F5F9);
+  static const cardBg = Colors.white;
+  static const textDark = Color(0xFF1B1B2A);
+  static const textGrey = Color(0xFF8A8CA3);
+  static const green = Color(0xFF2FAE60);
+  static const pink = Color(0xFFFCE7EE);
 }
