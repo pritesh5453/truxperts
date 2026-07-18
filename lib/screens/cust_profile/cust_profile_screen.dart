@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:truxperts/utils/appcolors.dart';
 
 class CustomerProfileScreen extends StatelessWidget {
   const CustomerProfileScreen({Key? key}) : super(key: key);
@@ -265,14 +266,14 @@ class CustomerProfileScreen extends StatelessWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () {},
-        icon: const Icon(Icons.logout, size: 18, color: Color(0xffE65F2B)),
+        icon: const Icon(Icons.logout, size: 18, color: AppColors.navy),
         label: const Text(
           'Log Out Account', 
-          style: TextStyle(color: Color(0xffE65F2B), fontWeight: FontWeight.bold, fontSize: 14),
+          style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold, fontSize: 14),
         ),
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Color(0xffFEEBC8)),
-          backgroundColor: const Color(0xffFFFAF0),
+          backgroundColor: AppColors.navy.withOpacity(0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           padding: const EdgeInsets.symmetric(vertical: 14),
         ),

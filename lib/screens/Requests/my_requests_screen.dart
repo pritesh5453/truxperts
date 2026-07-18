@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:truxperts/screens/Requests/assign_details_screen.dart';
+import 'package:truxperts/utils/appcolors.dart';
 
 class MyRequestsScreen extends StatelessWidget {
   const MyRequestsScreen({Key? key}) : super(key: key);
@@ -111,11 +112,11 @@ class MyRequestsScreen extends StatelessWidget {
                     icon: const Icon(
                       LucideIcons.slidersHorizontal,
                       size: 14,
-                      color: Color(0xff6338E2),
+                      color: AppColors.navy,
                     ),
                     label: const Text(
                       'Filters',
-                      style: TextStyle(color: Color(0xff6338E2), fontSize: 13),
+                      style: TextStyle(color: AppColors.navy, fontSize: 13),
                     ),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xffE2E8F0)),
@@ -155,7 +156,7 @@ class MyRequestsScreen extends StatelessWidget {
                             'All Requests',
                             '12',
                             isSelected: true,
-                            activeColor: const Color(0xff6338E2),
+                            activeColor:  AppColors.navy,
                           ),
                           _buildVerticalDivider(),
                           _buildFilterChip(
@@ -176,7 +177,7 @@ class MyRequestsScreen extends StatelessWidget {
                             'In Progress',
                             '2',
                             countBg: const Color(0xffEAE4FF),
-                            countText: const Color(0xff6338E2),
+                            countText:  AppColors.navy,
                           ),
                         ],
                       ),
@@ -229,7 +230,7 @@ class MyRequestsScreen extends StatelessWidget {
                 statusBg: const Color(0xffE0EFFF),
                 statusTextColor: const Color(0xff007AFF),
                 icon: LucideIcons.zap,
-                iconColor: const Color(0xff6338E2),
+                iconColor:  AppColors.navy,
                 iconBg: const Color(0xffEAE4FF),
                 footerLeftText: '1 Quote Received',
                 actionWidget: _buildChatButton(),
@@ -258,7 +259,7 @@ class MyRequestsScreen extends StatelessWidget {
                   children: [
                     const Icon(
                       LucideIcons.clock,
-                      color: Color(0xff6338E2),
+                      color: AppColors.navy,
                       size: 15,
                     ),
                     const SizedBox(width: 8),
@@ -297,7 +298,7 @@ class MyRequestsScreen extends StatelessWidget {
                 reqId: 'REQ125675',
                 statusText: 'In Progress',
                 statusBg: const Color(0xffEAE4FF),
-                statusTextColor: const Color(0xff6338E2),
+                statusTextColor:  AppColors.navy,
                 icon: LucideIcons.airplay,
                 iconColor: const Color(0xff007AFF),
                 iconBg: const Color(0xffE0EFFF),
@@ -327,7 +328,7 @@ class MyRequestsScreen extends StatelessWidget {
                   child: const Text(
                     'Rate Now',
                     style: TextStyle(
-                      color: Color(0xff6338E2),
+                      color: AppColors.navy,
                       fontWeight: FontWeight.bold,
                       fontSize: 10,
                     ),
@@ -415,7 +416,7 @@ class MyRequestsScreen extends StatelessWidget {
           : const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
       decoration: BoxDecoration(
         color: isSelected
-            ? (activeColor ?? const Color(0xff6338E2))
+            ? (activeColor ??  AppColors.navy)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
       ),
@@ -445,8 +446,8 @@ class MyRequestsScreen extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: isSelected
-                    ? (activeColor ?? const Color(0xff6338E2))
-                    : (countText ?? const Color(0xff4A5568)),
+                    ? (activeColor ??  AppColors.navy)
+                    : (countText ?? AppColors.navy.withOpacity(0.8)),
               ),
             ),
           ),
@@ -719,12 +720,12 @@ class MyRequestsScreen extends StatelessWidget {
         icon: const Icon(
           LucideIcons.messageSquare,
           size: 10,
-          color: Color(0xff6338E2),
+          color: AppColors.navy,
         ),
         label: const Text(
           'Chat',
           style: TextStyle(
-            color: Color(0xff6338E2),
+            color: AppColors.navy,
             fontSize: 8,
             fontWeight: FontWeight.bold,
           ),
@@ -734,7 +735,7 @@ class MyRequestsScreen extends StatelessWidget {
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           visualDensity: VisualDensity.compact,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-          side: const BorderSide(color: Color(0xff6338E2)),
+          side: const BorderSide(color: AppColors.navy),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
@@ -749,12 +750,12 @@ class MyRequestsScreen extends StatelessWidget {
           Text(
             'View Details',
             style: TextStyle(
-              color: Color(0xff6338E2),
+              color: AppColors.navy,
               fontSize: 10,
               fontWeight: FontWeight.bold,
             ),
           ),
-          Icon(Icons.chevron_right, size: 16, color: Color(0xff6338E2)),
+          Icon(Icons.chevron_right, size: 16, color: AppColors.navy),
         ],
       ),
     );

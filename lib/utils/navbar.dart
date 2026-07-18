@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:truxperts/screens/Requests/my_requests_screen.dart';
-import 'package:truxperts/screens/chat/chatting_screen.dart';
+import 'package:truxperts/screens/chat/chat_listScreen.dart';
 import 'package:truxperts/screens/cust_profile/cust_profile_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/screens/home/homescreen.dart';
@@ -19,7 +19,7 @@ class _NavBarScreenState extends State<NavBarScreen> {
   // ----- YAHAN SAARE SCREENS KA LIST HAI -----
   final List<Widget> _screens = [
     const HomeScreen(),     // 0 - Home
-    const ChatScreen(),  // 1 - Chats
+    const ChatListScreen(),  // 1 - Chats
     const PostRequestScreen(),   // 2 - Post
     const MyRequestsScreen(), // 3 - Favorites
     const CustomerProfileScreen(), // 4 - Profile
