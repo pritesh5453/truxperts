@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:truxperts/screens/chat/chatting_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/common_appbar.dart';
 
 /// Simple model for a chat/contact entry.
-/// Replace this with your real chat model / Firestore data.
 class ChatContact {
   final String name;
   final String lastMessage;
   final String time;
   final int unreadCount;
   final bool isOnline;
-  final String? avatarUrl; // null -> shows initials
+  final String? avatarUrl;
 
   ChatContact({
     required this.name,
@@ -33,7 +33,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
 
-  // Dummy data — swap with real data source (Firestore stream etc.)
   final List<ChatContact> _allContacts = [
     ChatContact(
       name: 'Rajesh Transport',
@@ -96,28 +95,49 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final double horizontalPadding = mediaQuery.size.width * 0.05;
+
     return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: _buildAppBar(),
+      backgroundColor: AppColors.fieldFill,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight + mediaQuery.padding.top),
+        child: Container(
+          
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.fieldFill,
+                AppColors.fieldFill.withOpacity(0.8),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: CommonAppBar(),
+        ),
+      ),
       body: Column(
         children: [
-          _buildSearchBar(),
+          _buildSearchBar(horizontalPadding),
           Expanded(
             child: _filteredContacts.isEmpty
                 ? _buildEmptyState()
                 : ListView.separated(
-                    padding: const EdgeInsets.only(top: 4, bottom: 12),
+                    padding: const EdgeInsets.only(top: 8, bottom: 24),
                     itemCount: _filteredContacts.length,
-                    separatorBuilder: (_, __) => Divider(
+                    separatorBuilder: (context, index) => Divider(
                       height: 1,
-                      thickness: 0.6,
-                      indent: 84,
-                      color: Colors.white.withOpacity(0.06),
+                      thickness: 0.5,
+                      indent: 80,
+                      endIndent: horizontalPadding,
+                      color: Colors.white.withOpacity(0.12),
                     ),
                     itemBuilder: (context, index) {
                       final contact = _filteredContacts[index];
                       return _ChatListTile(
                         contact: contact,
+                        paddingHorizontal: horizontalPadding,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -132,58 +152,57 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.orange,
-        onPressed: () {
-          // TODO: Start a new chat / pick a contact.
-        },
-        child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: AppColors.orange,
+      //   onPressed: () {
+      //     // TODO: Start a new chat / pick a contact.
+      //   },
+      //   child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+      // ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.navyDark,
-      elevation: 0,
-      centerTitle: false,
-      title: const Text(
-        'Chats',
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
-          fontSize: 22,
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.more_vert, color: Colors.white70),
-          onPressed: () {},
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(double horizontalPadding) {
     return Container(
-      color: AppColors.navyDark,
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.fieldFill.withOpacity(0.8),
+            AppColors.fieldFill.withOpacity(0.4),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(horizontalPadding, 8, horizontalPadding, 14),
       child: Container(
-        height: 44,
+        height: 46,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: Colors.black.withOpacity(0.08),
           borderRadius: BorderRadius.circular(12),
         ),
         child: TextField(
           controller: _searchController,
           onChanged: (value) => setState(() => _query = value),
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: const TextStyle(color: Colors.black, fontSize: 14),
           cursorColor: AppColors.orange,
           decoration: InputDecoration(
-            hintText: 'Search contacts or messages',
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-            prefixIcon: Icon(Icons.search,
-                color: Colors.white.withOpacity(0.5), size: 20),
+            hintText: 'Search contacts or messages...',
+            hintStyle: TextStyle(color: Colors.black.withOpacity(0.45)),
+            prefixIcon: Icon(
+              Icons.search,
+              color: Colors.black.withOpacity(0.5),
+              size: 20,
+            ),
+            suffixIcon: _query.isNotEmpty
+                ? IconButton(
+                    icon: Icon(Icons.clear, color: Colors.white.withOpacity(0.5), size: 18),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() => _query = '');
+                    },
+                  )
+                : null,
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),
@@ -197,12 +216,18 @@ class _ChatListScreenState extends State<ChatListScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.chat_bubble_outline,
-              size: 56, color: Colors.white.withOpacity(0.2)),
+          Icon(
+            Icons.chat_bubble_outline,
+            size: 56,
+            color: Colors.white.withOpacity(0.2),
+          ),
           const SizedBox(height: 12),
           Text(
             'No chats found',
-            style: TextStyle(color: Colors.white.withOpacity(0.5)),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 15,
+            ),
           ),
         ],
       ),
@@ -212,17 +237,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
 class _ChatListTile extends StatelessWidget {
   final ChatContact contact;
+  final double paddingHorizontal;
   final VoidCallback onTap;
 
-  const _ChatListTile({required this.contact, required this.onTap});
-
-  String _initials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty) return '';
-    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
-        .toUpperCase();
-  }
+  const _ChatListTile({
+    required this.contact,
+    required this.paddingHorizontal,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -231,26 +253,26 @@ class _ChatListTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: EdgeInsets.symmetric(
+          horizontal: paddingHorizontal,
+          vertical: 12,
+        ),
         child: Row(
           children: [
-            // Avatar with online indicator
+            // WhatsApp Style Avatar with Online Status Badge
             Stack(
               children: [
                 CircleAvatar(
                   radius: 26,
-                  backgroundColor: AppColors.navyDark,
+                  backgroundColor: AppColors.textSecondary,
                   backgroundImage: contact.avatarUrl != null
                       ? NetworkImage(contact.avatarUrl!)
                       : null,
                   child: contact.avatarUrl == null
-                      ? Text(
-                          _initials(contact.name),
-                          style: const TextStyle(
-                            color: AppColors.orange,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                          ),
+                      ? const Icon(
+                          Icons.person,
+                          color: Colors.white70,
+                          size: 28,
                         )
                       : null,
                 ),
@@ -264,7 +286,7 @@ class _ChatListTile extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFF3ECF6E),
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.navy, width: 2),
+                        border: Border.all(color: AppColors.bg, width: 2),
                       ),
                     ),
                   ),
@@ -272,7 +294,7 @@ class _ChatListTile extends StatelessWidget {
             ),
             const SizedBox(width: 14),
 
-            // Name + last message
+            // Contact Name & Last Message
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +304,7 @@ class _ChatListTile extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: AppColors.navy,
+                      color: Colors.black,
                       fontSize: 15.5,
                       fontWeight:
                           hasUnread ? FontWeight.w700 : FontWeight.w500,
@@ -295,8 +317,8 @@ class _ChatListTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: hasUnread
-                          ? AppColors.navy
-                          : AppColors.navy.withOpacity(0.5),
+                          ? Colors.black.withOpacity(0.9)
+                          : Colors.black.withOpacity(0.5),
                       fontSize: 13,
                       fontWeight:
                           hasUnread ? FontWeight.w500 : FontWeight.w400,
@@ -305,17 +327,18 @@ class _ChatListTile extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
 
-            // Time + unread badge
+            // Timestamp & Unread Badge Count
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   contact.time,
                   style: TextStyle(
                     color: hasUnread
-                        ? AppColors.orange
+                        ? AppColors.navy
                         : Colors.white.withOpacity(0.4),
                     fontSize: 12,
                     fontWeight: hasUnread ? FontWeight.w600 : FontWeight.w400,
@@ -324,10 +347,12 @@ class _ChatListTile extends StatelessWidget {
                 const SizedBox(height: 6),
                 if (hasUnread)
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppColors.orange,
+                      color: AppColors.navy,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(

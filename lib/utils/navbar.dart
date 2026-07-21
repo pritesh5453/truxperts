@@ -69,7 +69,7 @@ class _NavBarScreenState extends State<NavBarScreen> {
                   children: [
                     _buildNavItem(0, Icons.home_outlined, Icons.home, 'Home'),
                     _buildNavItem(1, Icons.chat_bubble_outline, Icons.chat_bubble, 'Chats'),
-                    const SizedBox(width: 40),
+                    const SizedBox(width: 15),
                     _buildNavItem(3, Icons.request_quote_outlined, Icons.request_quote, 'My Requests'),
                     _buildNavItem(4, Icons.person_outline, Icons.person, 'Profile'),
                   ],
@@ -79,7 +79,7 @@ class _NavBarScreenState extends State<NavBarScreen> {
               // Raised Post Button
               Positioned(
                 top: -22,
-                left: 0,
+                left: -12,
                 right: 0,
                 child: Center(
                   child: GestureDetector(

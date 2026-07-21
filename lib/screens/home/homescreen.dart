@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:truxperts/screens/Profile/profile_screen.dart';
+import 'package:truxperts/screens/home/categories.dart';
 import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/common_appbar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -42,7 +45,7 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 20),
               _SectionHeader(title: 'Latest Posts from Professionals'),
               SizedBox(height: 12),
-              _LatestPostsRow(),
+              _LatestPostsGrid(),  // Changed from _LatestPostsRow
             ],
           ),
         ),
@@ -184,8 +187,6 @@ class _SearchBar extends StatelessWidget {
 }
 
 // ---------------------- HERO BANNER ----------------------
-// ---------------------- HERO BANNER ----------------------
-// ---------------------- HERO BANNER ----------------------
 class _HeroBanner extends StatelessWidget {
   const _HeroBanner();
 
@@ -200,19 +201,18 @@ class _HeroBanner extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: AspectRatio(
-              aspectRatio: 1536 / 1024, // apni image ke actual ratio se adjust kar lena
+              aspectRatio: 1536 / 1024,
               child: Image.asset(
                 'assets/images/hero_banner.jpeg',
                 fit: BoxFit.cover,
               ),
             ),
           ),
-
-          // Cards jo image ke bottom edge pe "half overlap" karte hain
+          // Overlapping cards
           Positioned(
             left: 12,
             right: 12,
-            bottom: 10, // jitna neeche overlap chahiye utna adjust karo
+            bottom: 10,
             child: Row(
               children: [
                 Expanded(
@@ -252,7 +252,7 @@ class _HeroBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       decoration: BoxDecoration(
-        color: AppColors.bg, // solid navy card, image pe overlap ke liye opaque hona chahiye
+        color: AppColors.bg,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white24),
         boxShadow: [
@@ -278,7 +278,7 @@ class _HeroBanner extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 6),
             decoration: BoxDecoration(
-              color: isOrange ? AppColors.orange : AppColors.navy ,
+              color: isOrange ? AppColors.orange : AppColors.navy,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -326,7 +326,7 @@ class _ServiceItem {
   const _ServiceItem(this.icon, this.label, this.bg, this.iconColor);
 }
 
-// ---------------------- TOP INSTANT SERVICES (ROW, बिना स्क्रॉल) ----------------------
+// ---------------------- TOP INSTANT SERVICES (with "More" navigation) ----------------------
 class _TopInstantServices extends StatelessWidget {
   const _TopInstantServices();
 
@@ -346,25 +346,37 @@ class _TopInstantServices extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: items.map((item) {
-          return SizedBox(
-            width: 50,
-            child: Column(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(color: item.bg, borderRadius: BorderRadius.circular(12)),
-                  child: Icon(item.icon, color: item.iconColor, size: 20),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  item.label,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 8, color: AppColors.textDark, fontWeight: FontWeight.w500),
-                ),
-              ],
+          // Wrap each item with GestureDetector to handle taps
+          return GestureDetector(
+            onTap: () {
+              // If "More" is tapped, navigate to CategoriesScreen
+              if (item.label == 'More') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+                );
+              }
+            },
+            child: SizedBox(
+              width: 50,
+              child: Column(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(color: item.bg, borderRadius: BorderRadius.circular(12)),
+                    child: Icon(item.icon, color: item.iconColor, size: 20),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.label,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 8, color: AppColors.textDark, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
             ),
           );
         }).toList(),
@@ -373,7 +385,7 @@ class _TopInstantServices extends StatelessWidget {
   }
 }
 
-// ---------------------- ADVANCE BOOKING (ROW, बिना स्क्रॉल) ----------------------
+// ---------------------- ADVANCE BOOKING (unchanged) ----------------------
 class _AdvanceBookingServices extends StatelessWidget {
   const _AdvanceBookingServices();
 
@@ -420,7 +432,7 @@ class _AdvanceBookingServices extends StatelessWidget {
   }
 }
 
-// ---------------------- REWARDS BANNER ----------------------
+// ---------------------- REWARDS BANNER (unchanged) ----------------------
 class _RewardsBanner extends StatelessWidget {
   const _RewardsBanner();
 
@@ -475,7 +487,7 @@ class _RewardsBanner extends StatelessWidget {
   }
 }
 
-// ---------------------- LIVE OFFERS – ROW (बिना स्क्रॉल) ----------------------
+// ---------------------- LIVE OFFERS – ROW (unchanged) ----------------------
 class _LiveOffersRow extends StatelessWidget {
   const _LiveOffersRow();
 
@@ -526,7 +538,7 @@ class _LiveOffersRow extends StatelessWidget {
   }
 }
 
-// ---------------------- NEARBY PROFESSIONALS – ROW (बिना स्क्रॉल) ----------------------
+// ---------------------- NEARBY PROFESSIONALS – ROW with navigation ----------------------
 class _NearbyProfessionalsRow extends StatelessWidget {
   const _NearbyProfessionalsRow();
 
@@ -544,34 +556,43 @@ class _NearbyProfessionalsRow extends StatelessWidget {
       child: Row(
         children: profs.map((p) {
           return Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(right: 10),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2))],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircleAvatar(radius: 20, backgroundColor: p['color'] as Color,
-                      child: const Icon(Icons.person, color: Colors.white, size: 18)),
-                  const SizedBox(height: 4),
-                  Text(p['name'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.textDark)),
-                  const SizedBox(height: 2),
-                  Text(p['rating'] as String, style: const TextStyle(fontSize: 8, color: AppColors.textGrey)),
-                  const SizedBox(height: 6),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: BoxDecoration(color: const Color(0xFFE9ECFB), borderRadius: BorderRadius.circular(6)),
-                    child: const Text('Available now', textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 7, color: AppColors.navy, fontWeight: FontWeight.w600)),
-                  ),
-                ],
+            child: GestureDetector(
+              onTap: () {
+                // Navigate to ProviderProfileScreen when any professional is tapped
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProviderProfileScreen()),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2))],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircleAvatar(radius: 20, backgroundColor: p['color'] as Color,
+                        child: const Icon(Icons.person, color: Colors.white, size: 18)),
+                    const SizedBox(height: 4),
+                    Text(p['name'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.textDark)),
+                    const SizedBox(height: 2),
+                    Text(p['rating'] as String, style: const TextStyle(fontSize: 8, color: AppColors.textGrey)),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(color: const Color(0xFFE9ECFB), borderRadius: BorderRadius.circular(6)),
+                      child: const Text('Available now', textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 7, color: AppColors.navy, fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -581,7 +602,7 @@ class _NearbyProfessionalsRow extends StatelessWidget {
   }
 }
 
-// ---------------------- STATS ROW ----------------------
+// ---------------------- STATS ROW (unchanged) ----------------------
 class _StatsRow extends StatelessWidget {
   const _StatsRow();
 
@@ -624,9 +645,9 @@ class _StatsRow extends StatelessWidget {
   }
 }
 
-// ---------------------- LATEST POSTS – ROW (4 कार्ड एक पंक्ति में) ----------------------
-class _LatestPostsRow extends StatelessWidget {
-  const _LatestPostsRow();
+// ---------------------- LATEST POSTS – 2x2 GRID (replaces single row) ----------------------
+class _LatestPostsGrid extends StatelessWidget {
+  const _LatestPostsGrid();
 
   @override
   Widget build(BuildContext context) {
@@ -639,55 +660,58 @@ class _LatestPostsRow extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Row(
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(), // Prevent internal scrolling
+        crossAxisCount: 2, // 2 columns
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 1.2, // Adjust as needed
         children: posts.map((p) {
-          return Expanded(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(radius: 8, backgroundColor: p['color'] as Color,
-                          child: const Icon(Icons.person, size: 10, color: Colors.white)),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(p['author'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 7, fontWeight: FontWeight.w600)),
-                      ),
-                      const Icon(Icons.more_vert, size: 10, color: AppColors.textGrey),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    height: 60,
-                    decoration: BoxDecoration(color: p['color'] as Color, borderRadius: BorderRadius.circular(8)),
-                    child: const Center(child: Icon(Icons.image, color: Colors.white70, size: 18)),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(p['caption'] as String, maxLines: 2, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 7, color: AppColors.textDark, height: 1.2)),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.favorite_border, size: 9, color: AppColors.textGrey),
-                      const SizedBox(width: 2),
-                      Text('${p['likes']}', style: const TextStyle(fontSize: 6, color: AppColors.textGrey)),
-                      const SizedBox(width: 6),
-                      const Icon(Icons.mode_comment_outlined, size: 9, color: AppColors.textGrey),
-                      const SizedBox(width: 2),
-                      Text('${p['comments']}', style: const TextStyle(fontSize: 6, color: AppColors.textGrey)),
-                    ],
-                  ),
-                ],
-              ),
+          return Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(radius: 8, backgroundColor: p['color'] as Color,
+                        child: const Icon(Icons.person, size: 10, color: Colors.white)),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(p['author'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 7, fontWeight: FontWeight.w600)),
+                    ),
+                    const Icon(Icons.more_vert, size: 10, color: AppColors.textGrey),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  height: 60,
+                  decoration: BoxDecoration(color: p['color'] as Color, borderRadius: BorderRadius.circular(8)),
+                  child: const Center(child: Icon(Icons.image, color: Colors.white70, size: 18)),
+                ),
+                const SizedBox(height: 4),
+                Text(p['caption'] as String, maxLines: 2, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 7, color: AppColors.textDark, height: 1.2)),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.favorite_border, size: 9, color: AppColors.textGrey),
+                    const SizedBox(width: 2),
+                    Text('${p['likes']}', style: const TextStyle(fontSize: 6, color: AppColors.textGrey)),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.mode_comment_outlined, size: 9, color: AppColors.textGrey),
+                    const SizedBox(width: 2),
+                    Text('${p['comments']}', style: const TextStyle(fontSize: 6, color: AppColors.textGrey)),
+                  ],
+                ),
+              ],
             ),
           );
         }).toList(),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/common_appbar.dart';
 
 class CustomerProfileScreen extends StatelessWidget {
   const CustomerProfileScreen({Key? key}) : super(key: key);
@@ -8,35 +9,7 @@ class CustomerProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: const Icon(Icons.arrow_back, color: Color(0xff1A1A2E)),
-        centerTitle: true,
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Text(
-              'TruXperts',
-              style: TextStyle(
-                fontSize: 20, 
-                fontWeight: FontWeight.bold, 
-                color: Color(0xff1C2D5A),
-              ),
-            ),
-            SizedBox(height: 2),
-            Text(
-              "— Trusted Professionals, One Tap Away. —",
-              style: TextStyle(fontSize: 8, color: Color(0xff6C757D), fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-        actions: const [
-          Icon(Icons.notifications_none_outlined, color: Color(0xff1A1A2E), size: 24),
-          SizedBox(width: 16),
-        ],
-      ),
+      appBar: CommonAppBar(),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
+import 'package:truxperts/utils/appcolors.dart';
 
 class RequestTrackingScreen extends StatelessWidget {
   const RequestTrackingScreen({Key? key}) : super(key: key);
@@ -7,12 +8,12 @@ class RequestTrackingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF8F9FA),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.cardBg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xff1A1A2E)),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () {},
         ),
         centerTitle: true,
@@ -24,11 +25,11 @@ class RequestTrackingScreen extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: 'Tru',
-                    style: TextStyle(color: Color(0xff1C2D5A)),
+                    style: TextStyle(color: AppColors.navy),
                   ),
                   TextSpan(
                     text: 'Xperts',
-                    style: TextStyle(color: Color(0xffE65F2B)),
+                    style: TextStyle(color: AppColors.orange),
                   ),
                 ],
               ),
@@ -38,7 +39,7 @@ class RequestTrackingScreen extends StatelessWidget {
               "— Trusted Professionals, One Tap Away. —",
               style: TextStyle(
                 fontSize: 8,
-                color: Color(0xff6C757D),
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -51,7 +52,7 @@ class RequestTrackingScreen extends StatelessWidget {
               IconButton(
                 icon: const Icon(
                   LucideIcons.bell,
-                  color: Color(0xff1A1A2E),
+                  color: AppColors.textPrimary,
                   size: 22,
                 ),
                 onPressed: () {},
@@ -86,27 +87,16 @@ class RequestTrackingScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Top Brief Job Summary Card
               _buildBriefJobSummaryCard(),
               const SizedBox(height: 16),
-
-              // 2. Vendor Assignment Card
               _buildVendorAssignmentCard(),
               const SizedBox(height: 16),
-
-              // 3. Map Card
               _buildLiveLocationMapCard(),
               const SizedBox(height: 16),
-
-              // 4. Request Status Timeline Tracker
               _buildRequestStatusTracker(),
               const SizedBox(height: 16),
-
-              // 5. Request Details Grid Section
               _buildRequestDetailsGrid(),
               const SizedBox(height: 24),
-
-              // 6. Action Bottom Buttons Row
               _buildBottomActionButtons(),
               const SizedBox(height: 24),
             ],
@@ -121,9 +111,9 @@ class RequestTrackingScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xffE2E8F0)),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,12 +124,12 @@ class RequestTrackingScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: const BoxDecoration(
-                  color: Color(0xffEAE4FF),
+                  color: AppColors.lightPurple,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   LucideIcons.zap,
-                  color: Color(0xff6338E2),
+                  color: AppColors.navy,
                   size: 24,
                 ),
               ),
@@ -153,7 +143,7 @@ class RequestTrackingScreen extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: Color(0xff1A1A2E),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -163,13 +153,13 @@ class RequestTrackingScreen extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xffE0EFFF),
+                        color: AppColors.lightBlue,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Text(
                         'Assigned',
                         style: TextStyle(
-                          color: Color(0xff007AFF),
+                          color: AppColors.blueAccent,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -181,14 +171,14 @@ class RequestTrackingScreen extends StatelessWidget {
                         Icon(
                           LucideIcons.calendar,
                           size: 14,
-                          color: Color(0xffA0AEC0),
+                          color: AppColors.hintText,
                         ),
                         SizedBox(width: 6),
                         Text(
                           '08 Jul 2025  •  04:30 PM',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xff718096),
+                            color: AppColors.textGrey,
                           ),
                         ),
                       ],
@@ -196,7 +186,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     const SizedBox(height: 6),
                     const Text(
                       'Need wiring repair in 2BHK flat.',
-                      style: TextStyle(fontSize: 12, color: Color(0xff4A5568)),
+                      style: TextStyle(fontSize: 12, color: AppColors.textDark),
                     ),
                   ],
                 ),
@@ -206,18 +196,18 @@ class RequestTrackingScreen extends StatelessWidget {
                 icon: const Icon(
                   LucideIcons.headphones,
                   size: 12,
-                  color: Color(0xff6338E2),
+                  color: AppColors.navy,
                 ),
                 label: const Text(
                   'Need Help?',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff6338E2),
+                    color: AppColors.navy,
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xffE2E8F0)),
+                  side: const BorderSide(color: AppColors.borderLight),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -230,7 +220,7 @@ class RequestTrackingScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Divider(height: 1, color: Color(0xffEDF2F7)),
+          const Divider(height: 1, color: AppColors.chipUnselected),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -239,7 +229,7 @@ class RequestTrackingScreen extends StatelessWidget {
                 'REQ125678',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Color(0xffA0AEC0),
+                  color: AppColors.hintText,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -249,11 +239,11 @@ class RequestTrackingScreen extends StatelessWidget {
                     '1 Quote Received',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Color(0xff4A5568),
+                      color: AppColors.textDark,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Icon(Icons.chevron_right, size: 16, color: Color(0xff4A5568)),
+                  Icon(Icons.chevron_right, size: 16, color: AppColors.textDark),
                 ],
               ),
             ],
@@ -268,9 +258,9 @@ class RequestTrackingScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xffE2E8F0)),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,7 +270,7 @@ class RequestTrackingScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Color(0xff4A5568),
+              color: AppColors.textDark,
             ),
           ),
           const SizedBox(height: 12),
@@ -305,7 +295,7 @@ class RequestTrackingScreen extends StatelessWidget {
                       ),
                       child: const Icon(
                         Icons.check_circle,
-                        color: Color(0xff6338E2),
+                        color: AppColors.navy,
                         size: 16,
                       ),
                     ),
@@ -324,13 +314,13 @@ class RequestTrackingScreen extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
-                            color: Color(0xff1A1A2E),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         SizedBox(width: 4),
                         Icon(
                           Icons.verified,
-                          color: Color(0xff6338E2),
+                          color: AppColors.navy,
                           size: 16,
                         ),
                       ],
@@ -338,14 +328,14 @@ class RequestTrackingScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: const [
-                        Icon(Icons.star, color: Colors.amber, size: 14),
+                        Icon(Icons.star, color: AppColors.star, size: 14),
                         SizedBox(width: 2),
                         Text(
                           '4.7',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xff1A1A2E),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         SizedBox(width: 4),
@@ -353,7 +343,7 @@ class RequestTrackingScreen extends StatelessWidget {
                           '(128 Reviews)',
                           style: TextStyle(
                             fontSize: 11,
-                            color: Color(0xff718096),
+                            color: AppColors.textGrey,
                           ),
                         ),
                       ],
@@ -364,14 +354,14 @@ class RequestTrackingScreen extends StatelessWidget {
                         Icon(
                           LucideIcons.phone,
                           size: 12,
-                          color: Color(0xff718096),
+                          color: AppColors.textGrey,
                         ),
                         SizedBox(width: 6),
                         Text(
                           '98765 43210',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xff718096),
+                            color: AppColors.textGrey,
                           ),
                         ),
                       ],
@@ -386,7 +376,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     'ETA',
                     style: TextStyle(
                       fontSize: 10,
-                      color: Color(0xffA0AEC0),
+                      color: AppColors.hintText,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -395,7 +385,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff6338E2),
+                      color: AppColors.navy,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -408,7 +398,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff1A1A2E),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -424,17 +414,17 @@ class RequestTrackingScreen extends StatelessWidget {
                   icon: const Icon(
                     LucideIcons.messageSquare,
                     size: 16,
-                    color: Color(0xff6338E2),
+                    color: AppColors.navy,
                   ),
                   label: const Text(
                     'Chat',
                     style: TextStyle(
-                      color: Color(0xff6338E2),
+                      color: AppColors.navy,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xff6338E2)),
+                    side: const BorderSide(color: AppColors.navy),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -459,7 +449,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff6338E2),
+                    backgroundColor: AppColors.navy,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -474,13 +464,13 @@ class RequestTrackingScreen extends StatelessWidget {
     );
   }
 
-  // --- 3. Live Location Map Card (Exact Design Mockup) ---
+  // --- 3. Live Location Map Card ---
   Widget _buildLiveLocationMapCard() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xffE2E8F0)),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         children: [
@@ -496,7 +486,7 @@ class RequestTrackingScreen extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
-                        color: Color(0xff1A1A2E),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -511,7 +501,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     const SizedBox(width: 4),
                     const Text(
                       'Amit is on the way',
-                      style: TextStyle(fontSize: 11, color: Color(0xff718096)),
+                      style: TextStyle(fontSize: 11, color: AppColors.textGrey),
                     ),
                   ],
                 ),
@@ -522,14 +512,14 @@ class RequestTrackingScreen extends StatelessWidget {
                       Icon(
                         LucideIcons.refreshCw,
                         size: 12,
-                        color: Color(0xff6338E2),
+                        color: AppColors.navy,
                       ),
                       SizedBox(width: 4),
                       Text(
                         'Refresh',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xff6338E2),
+                          color: AppColors.navy,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -539,7 +529,6 @@ class RequestTrackingScreen extends StatelessWidget {
               ],
             ),
           ),
-          // Static Map Illustration Image/Layout Wrapper
           Container(
             height: 180,
             width: double.infinity,
@@ -547,7 +536,7 @@ class RequestTrackingScreen extends StatelessWidget {
               image: DecorationImage(
                 image: NetworkImage(
                   'https://i.imgur.com/WbX2eW0.png',
-                ), // Standard styled vector map image background link replacement
+                ),
                 fit: BoxFit.cover,
               ),
               borderRadius: BorderRadius.only(
@@ -557,15 +546,13 @@ class RequestTrackingScreen extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                // Custom tracking line placeholder overlay graphics inside stack
                 Center(
                   child: Icon(
                     Icons.blur_linear,
-                    color: const Color(0xff6338E2).withOpacity(0.5),
+                    color: AppColors.navy.withOpacity(0.5),
                     size: 100,
                   ),
                 ),
-                // User Marker Pin Container
                 Positioned(
                   top: 80,
                   left: 40,
@@ -591,13 +578,12 @@ class RequestTrackingScreen extends StatelessWidget {
                       ),
                       const Icon(
                         Icons.location_on,
-                        color: Color(0xff6338E2),
+                        color: AppColors.navy,
                         size: 28,
                       ),
                     ],
                   ),
                 ),
-                // Bike Rider Marker Pin Container
                 Positioned(
                   top: 70,
                   right: 60,
@@ -623,7 +609,7 @@ class RequestTrackingScreen extends StatelessWidget {
                       ),
                       const Icon(
                         Icons.motorcycle,
-                        color: Color(0xffE65F2B),
+                        color: AppColors.orange,
                         size: 28,
                       ),
                     ],
@@ -642,9 +628,9 @@ class RequestTrackingScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xffE2E8F0)),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         children: [
@@ -656,7 +642,7 @@ class RequestTrackingScreen extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
-                  color: Color(0xff1A1A2E),
+                  color: AppColors.textPrimary,
                 ),
               ),
               TextButton(
@@ -668,7 +654,7 @@ class RequestTrackingScreen extends StatelessWidget {
                 child: const Text(
                   'View All',
                   style: TextStyle(
-                    color: Color(0xff6338E2),
+                    color: AppColors.navy,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -677,7 +663,6 @@ class RequestTrackingScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          // Horizontal Custom Timeline Setup Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -732,8 +717,8 @@ class RequestTrackingScreen extends StatelessWidget {
     bool isActive = false,
   }) {
     Color primaryColor = isCompleted
-        ? const Color(0xff6338E2)
-        : const Color(0xffCBD5E0);
+        ? AppColors.navy
+        : AppColors.hintText;
     return Expanded(
       child: Column(
         children: [
@@ -741,10 +726,10 @@ class RequestTrackingScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: isActive
-                  ? const Color(0xff6338E2)
+                  ? AppColors.navy
                   : (isCompleted
-                        ? const Color(0xffEAE4FF)
-                        : const Color(0xffF7FAFC)),
+                      ? AppColors.lightPurple
+                      : AppColors.chipUnselected),
               shape: BoxShape.circle,
               border: Border.all(color: primaryColor, width: isActive ? 2 : 1),
             ),
@@ -761,14 +746,14 @@ class RequestTrackingScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 9,
               fontWeight: isCompleted ? FontWeight.bold : FontWeight.w500,
-              color: const Color(0xff1A1A2E),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             time,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 8, color: Color(0xff718096)),
+            style: const TextStyle(fontSize: 8, color: AppColors.textGrey),
           ),
         ],
       ),
@@ -786,8 +771,8 @@ class RequestTrackingScreen extends StatelessWidget {
             child: Container(
               height: 1.5,
               color: isSolid
-                  ? const Color(0xff6338E2)
-                  : const Color(0xffE2E8F0),
+                  ? AppColors.navy
+                  : AppColors.borderLight,
               margin: const EdgeInsets.symmetric(horizontal: 1),
             ),
           ),
@@ -801,9 +786,9 @@ class RequestTrackingScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xffE2E8F0)),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         children: [
@@ -815,7 +800,7 @@ class RequestTrackingScreen extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
-                  color: Color(0xff1A1A2E),
+                  color: AppColors.textPrimary,
                 ),
               ),
               InkWell(
@@ -825,7 +810,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     Text(
                       'View Details',
                       style: TextStyle(
-                        color: Color(0xff6338E2),
+                        color: AppColors.navy,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -833,7 +818,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     Icon(
                       Icons.chevron_right,
                       size: 16,
-                      color: Color(0xff6338E2),
+                      color: AppColors.navy,
                     ),
                   ],
                 ),
@@ -841,7 +826,6 @@ class RequestTrackingScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          // Grid Layout Row 1
           Row(
             children: [
               _buildDetailItem(LucideIcons.zap, 'Category', 'Electrician'),
@@ -854,7 +838,6 @@ class RequestTrackingScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Grid Layout Row 2
           Row(
             children: [
               _buildDetailItem(
@@ -880,14 +863,14 @@ class RequestTrackingScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xffF8F9FA),
+          color: AppColors.bg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xffEDF2F7)),
+          border: Border.all(color: AppColors.chipUnselected),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 16, color: const Color(0xff1C2D5A)),
+            Icon(icon, size: 16, color: AppColors.navy),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
@@ -897,7 +880,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       fontSize: 10,
-                      color: Color(0xffA0AEC0),
+                      color: AppColors.hintText,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -907,7 +890,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff2D3748),
+                      color: AppColors.textDark,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -938,7 +921,7 @@ class RequestTrackingScreen extends StatelessWidget {
               ),
             ),
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color(0xffE2E8F0)),
+              side: const BorderSide(color: AppColors.borderLight),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -965,7 +948,7 @@ class RequestTrackingScreen extends StatelessWidget {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xff6338E2),
+              backgroundColor: AppColors.navy,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),

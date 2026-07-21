@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Centralized color palette matching the TruXperts design.
 class AppColors {
   AppColors._();
 
+  // Existing colors
   static const Color navy = Color(0xFF0B1B4A);
   static const Color navyDark = Color(0xFF081340);
   static const Color orange = Color(0xFFF47B20);
@@ -12,8 +12,7 @@ class AppColors {
   static const Color textPrimary = Color(0xFF1A1A2E);
   static const Color textSecondary = Color(0xFF8A8FA3);
   static const Color hintText = Color(0xFFAAB0C0);
-  static const Color normalText = Color.fromARGB(255, 245, 245, 246);
-
+  static const Color normalText = Color(0xFFF5F5F6);
 
   static const Color fieldBorder = Color(0xFFE2E5EE);
   static const Color fieldFill = Color(0xFFFFFFFF);
@@ -22,7 +21,6 @@ class AppColors {
 
   static const Color success = Color(0xFF16A34A);
 
-  // Home screen additions
   static const Color badgeAssignedBg = Color(0xFFDCFCE7);
   static const Color badgeAssignedText = Color(0xFF16A34A);
   static const Color badgePendingBg = Color(0xFFFFEDD5);
@@ -41,12 +39,18 @@ class AppColors {
   static const Color cardBorder = Color(0xFFEDEEF3);
   static const Color badgeNotifBg = Color(0xFFF47B20);
 
+  static const Color bg = Color(0xFFF4F5F9);
+  static const Color cardBg = Colors.white;
+  static const Color textDark = Color(0xFF1B1B2A);
+  static const Color textGrey = Color(0xFF8A8CA3);
+  static const Color green = Color(0xFF2FAE60);
+  static const Color pink = Color(0xFFFCE7EE);
 
-
-  static const bg = Color(0xFFF4F5F9);
-  static const cardBg = Colors.white;
-  static const textDark = Color(0xFF1B1B2A);
-  static const textGrey = Color(0xFF8A8CA3);
-  static const green = Color(0xFF2FAE60);
-  static const pink = Color(0xFFFCE7EE);
+  // --- Newly added for RequestTrackingScreen ---
+  static const Color primaryPurple = Color(0xFF6338E2);
+  static const Color lightPurple = Color(0xFFEAE4FF);
+  static const Color borderLight = Color(0xFFE2E8F0);
+  static const Color blueAccent = Color(0xFF007AFF);
+  static const Color lightBlue = Color(0xFFE0EFFF);
+  static const Color scaffoldLightBg = Color(0xFFF8F9FA);
 }
