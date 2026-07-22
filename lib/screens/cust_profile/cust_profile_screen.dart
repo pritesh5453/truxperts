@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:truxperts/screens/cust_profile/manage_address_screen.dart';
+import 'package:truxperts/screens/cust_profile/transaction_history_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
 
@@ -35,7 +37,7 @@ class CustomerProfileScreen extends StatelessWidget {
                     // 3. Account & Settings Options
                     _buildSectionHeader('Account Settings'),
                     const SizedBox(height: 12),
-                    _buildAccountOptionsList(),
+                    _buildAccountOptionsList(context),
                     const SizedBox(height: 24),
                     
                     // 4. Log Out Button Container
@@ -174,7 +176,8 @@ class CustomerProfileScreen extends StatelessWidget {
   }
 
   // --- 3. Settings & Options Rows ---
-  Widget _buildAccountOptionsList() {
+  // --- 3. Settings & Options Rows ---
+  Widget _buildAccountOptionsList(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -183,23 +186,65 @@ class CustomerProfileScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildMenuRow(Icons.location_on_outlined, 'Manage Addresses', 'Save home, office locations'),
+          _buildMenuRow(
+            icon: Icons.location_on_outlined,
+            title: 'Manage Addresses',
+            subtitle: 'Save home, office locations',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ManageAddressesScreen(),
+                ),
+              );
+            },
+          ),
           _buildDivider(),
-          _buildMenuRow(Icons.account_balance_wallet_outlined, 'Wallet & Payments', 'Manage cashbacks, history'),
+          _buildMenuRow(
+            icon: Icons.description_outlined,
+            title: 'Transaction History',
+            subtitle: 'Download PDF invoices',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TransactionHistoryScreen(),
+                ),
+              );
+            },
+          ),
           _buildDivider(),
-          _buildMenuRow(Icons.description_outlined, 'Transaction History', 'Download PDF invoices'),
+          _buildMenuRow(
+            icon: Icons.headset_mic_outlined,
+            title: 'Help & Customer Support',
+            subtitle: '24/7 active resolution room',
+            onTap: () {
+              // Help & Support Screen Navigation
+            },
+          ),
           _buildDivider(),
-          _buildMenuRow(Icons.headset_mic_outlined, 'Help & Customer Support', '24/7 active resolution room'),
-          _buildDivider(),
-          _buildMenuRow(Icons.privacy_tip_outlined, 'Privacy Policy & Terms', 'Legal agreements'),
+          _buildMenuRow(
+            icon: Icons.privacy_tip_outlined,
+            title: 'Privacy Policy & Terms',
+            subtitle: 'Legal agreements',
+            onTap: () {
+              // Privacy Policy Screen Navigation
+            },
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildMenuRow(IconData icon, String title, String subtitle) {
+  Widget _buildMenuRow({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
@@ -211,18 +256,29 @@ class CustomerProfileScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title, 
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xff1A1A2E)),
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff1A1A2E),
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    subtitle, 
-                    style: const TextStyle(fontSize: 11, color: Color(0xffA0AEC0)),
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xffA0AEC0),
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xffA0AEC0)),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: Color(0xffA0AEC0),
+            ),
           ],
         ),
       ),

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:truxperts/screens/Profile/profile_screen.dart';
 import 'package:truxperts/screens/home/categories.dart';
+import 'package:truxperts/screens/home/categories_2.dart';
+import 'package:truxperts/screens/home/explore_rewards_scren.dart';
+import 'package:truxperts/screens/post/post_requestScreen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
+
+// If you have InstantServiceScreen in your project, uncomment the next line:
+// import 'package:truxperts/screens/home/instant_service_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -45,7 +51,7 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 20),
               _SectionHeader(title: 'Latest Posts from Professionals'),
               SizedBox(height: 12),
-              _LatestPostsGrid(),  // Changed from _LatestPostsRow
+              _LatestPostsGrid(),
             ],
           ),
         ),
@@ -54,7 +60,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// ---------------------- TOP BAR (फिक्स्ड) ----------------------
+// ---------------------- TOP BAR ----------------------
 class _TopBar extends StatelessWidget {
   const _TopBar();
 
@@ -72,7 +78,7 @@ class _TopBar extends StatelessWidget {
                 SizedBox(width: 2),
                 Flexible(
                   child: Text(
-                    'Pune, Maharashtra',
+                    'Nashik, Maharashtra',
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textDark),
                   ),
@@ -83,37 +89,36 @@ class _TopBar extends StatelessWidget {
           ),
           const Spacer(),
           Column(
-          children: [
-            RichText(
-              text: const TextSpan(
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                children: [
-                  TextSpan(
-                    text: 'Tru',
-                    style: TextStyle(color: Color(0xff1C2D5A)),
-                  ),
-                  TextSpan(
-                    text: 'Xperts',
-                    style: TextStyle(color: Color(0xffE65F2B)),
-                  ),
-                ],
+            children: [
+              RichText(
+                text: const TextSpan(
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  children: [
+                    TextSpan(
+                      text: 'Tru',
+                      style: TextStyle(color: Color(0xff1C2D5A)),
+                    ),
+                    TextSpan(
+                      text: 'Xperts',
+                      style: TextStyle(color: Color(0xffE65F2B)),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 2),
-            const Text(
-              "— Trusted Professionals, One Tap Away. —",
-              style: TextStyle(
-                fontSize: 8,
-                color: Color(0xff6C757D),
-                fontWeight: FontWeight.w500,
+              const SizedBox(height: 2),
+              const Text(
+                "— Trusted Professionals, One Tap Away. —",
+                style: TextStyle(
+                  fontSize: 8,
+                  color: Color(0xff6C757D),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
           const Spacer(),
           _IconBadge(icon: Icons.notifications_none_rounded, badgeCount: 1),
           const SizedBox(width: 8),
-          _IconBadge(icon: Icons.chat_bubble_outline_rounded, badgeCount: 1),
         ],
       ),
     );
@@ -147,8 +152,11 @@ class _IconBadge extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               decoration: const BoxDecoration(color: AppColors.orange, shape: BoxShape.circle),
               constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
-              child: Text('$badgeCount', textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold)),
+              child: Text(
+                '$badgeCount',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
       ],
@@ -222,6 +230,14 @@ class _HeroBanner extends StatelessWidget {
                     subtitle: 'Get an expert\nin minutes',
                     buttonText: 'Get Started',
                     isOrange: false,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PostRequestScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -232,6 +248,14 @@ class _HeroBanner extends StatelessWidget {
                     subtitle: 'Book for events\nor future date',
                     buttonText: 'Plan Now',
                     isOrange: true,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PostRequestScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -248,50 +272,77 @@ class _HeroBanner extends StatelessWidget {
     required String subtitle,
     required String buttonText,
     required bool isOrange,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      decoration: BoxDecoration(
-        color: AppColors.bg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Icon(icon, color: AppColors.orange, size: 12),
-            const SizedBox(width: 4),
-            Text(title, style: const TextStyle(color: Colors.black, fontSize: 9, fontWeight: FontWeight.w600)),
-          ]),
-          const SizedBox(height: 2),
-          Text(subtitle, style: const TextStyle(color: Colors.black, fontSize: 9)),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            decoration: BoxDecoration(
-              color: isOrange ? AppColors.orange : AppColors.navy,
-              borderRadius: BorderRadius.circular(8),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        decoration: BoxDecoration(
+          color: AppColors.bg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(buttonText,
-                    style: TextStyle(color: isOrange ? AppColors.navy: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                Icon(icon, color: AppColors.orange, size: 12),
                 const SizedBox(width: 4),
-                Icon(Icons.arrow_forward, size: 10, color: isOrange ? Colors.white : AppColors.navy),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: const TextStyle(color: Colors.black, fontSize: 9),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: BoxDecoration(
+                color: isOrange ? AppColors.orange : AppColors.navy,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    buttonText,
+                    style: TextStyle(
+                      color: isOrange ? AppColors.navy : Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward,
+                    size: 10,
+                    color: isOrange ? Colors.white : AppColors.navy,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -310,7 +361,6 @@ class _SectionHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textDark)),
-          const Text('View All', style: TextStyle(fontSize: 12, color: AppColors.orange, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -326,7 +376,7 @@ class _ServiceItem {
   const _ServiceItem(this.icon, this.label, this.bg, this.iconColor);
 }
 
-// ---------------------- TOP INSTANT SERVICES (with "More" navigation) ----------------------
+// ---------------------- TOP INSTANT SERVICES ----------------------
 class _TopInstantServices extends StatelessWidget {
   const _TopInstantServices();
 
@@ -346,14 +396,12 @@ class _TopInstantServices extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: items.map((item) {
-          // Wrap each item with GestureDetector to handle taps
           return GestureDetector(
             onTap: () {
-              // If "More" is tapped, navigate to CategoriesScreen
               if (item.label == 'More') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+                  MaterialPageRoute(builder: (_) => const ChooseServiceScreen()),
                 );
               }
             },
@@ -385,7 +433,7 @@ class _TopInstantServices extends StatelessWidget {
   }
 }
 
-// ---------------------- ADVANCE BOOKING (unchanged) ----------------------
+// ---------------------- ADVANCE BOOKING ----------------------
 class _AdvanceBookingServices extends StatelessWidget {
   const _AdvanceBookingServices();
 
@@ -405,25 +453,35 @@ class _AdvanceBookingServices extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: items.map((item) {
-          return SizedBox(
-            width: 50,
-            child: Column(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(color: item.bg, borderRadius: BorderRadius.circular(12)),
-                  child: Icon(item.icon, color: item.iconColor, size: 20),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  item.label,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 8, color: AppColors.textDark, fontWeight: FontWeight.w500),
-                ),
-              ],
+          return GestureDetector(
+            onTap: () {
+              if (item.label == 'More') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ChooseServiceScreen2()),
+                );
+              }
+            },
+            child: SizedBox(
+              width: 50,
+              child: Column(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(color: item.bg, borderRadius: BorderRadius.circular(12)),
+                    child: Icon(item.icon, color: item.iconColor, size: 20),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.label,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 8, color: AppColors.textDark, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
             ),
           );
         }).toList(),
@@ -432,7 +490,7 @@ class _AdvanceBookingServices extends StatelessWidget {
   }
 }
 
-// ---------------------- REWARDS BANNER (unchanged) ----------------------
+// ---------------------- REWARDS BANNER ----------------------
 class _RewardsBanner extends StatelessWidget {
   const _RewardsBanner();
 
@@ -443,8 +501,11 @@ class _RewardsBanner extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(colors: [Color(0xFF3B2B8C), Color(0xFF1B2B6B)],
-              begin: Alignment.topLeft, end: Alignment.bottomRight),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF3B2B8C), Color(0xFF1B2B6B)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(18),
         ),
         child: Row(
@@ -453,16 +514,44 @@ class _RewardsBanner extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('TruXperts Rewards',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text(
+                    'TruXperts Rewards',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  const Text('Book now, earn more!', style: TextStyle(color: Colors.white70, fontSize: 10)),
+                  const Text(
+                    'Book now, earn more!',
+                    style: TextStyle(color: Colors.white70, fontSize: 10),
+                  ),
                   const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                    child: const Text('Explore Rewards',
-                        style: TextStyle(color: AppColors.navy, fontSize: 10, fontWeight: FontWeight.bold)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ExploreRewardsScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'Explore Rewards',
+                        style: TextStyle(
+                          color: AppColors.navy,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -470,14 +559,28 @@ class _RewardsBanner extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Text('Your Points', style: TextStyle(color: Colors.white60, fontSize: 9)),
-                Row(children: const [
+                const Text(
+                  'Your Points',
+                  style: TextStyle(color: Colors.white60, fontSize: 9),
+                ),
+                const Row(children: [
                   Icon(Icons.emoji_events, color: Color(0xFFFFC94A), size: 14),
                   SizedBox(width: 4),
-                  Text('250', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(
+                    '250',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ]),
                 const SizedBox(height: 6),
-                Icon(Icons.card_giftcard, color: Colors.white.withOpacity(0.5), size: 30),
+                Icon(
+                  Icons.card_giftcard,
+                  color: Colors.white.withOpacity(0.5),
+                  size: 30,
+                ),
               ],
             ),
           ],
@@ -486,8 +589,7 @@ class _RewardsBanner extends StatelessWidget {
     );
   }
 }
-
-// ---------------------- LIVE OFFERS – ROW (unchanged) ----------------------
+// ---------------------- LIVE OFFERS – ROW ----------------------
 class _LiveOffersRow extends StatelessWidget {
   const _LiveOffersRow();
 
@@ -538,7 +640,7 @@ class _LiveOffersRow extends StatelessWidget {
   }
 }
 
-// ---------------------- NEARBY PROFESSIONALS – ROW with navigation ----------------------
+// ---------------------- NEARBY PROFESSIONALS – ROW ----------------------
 class _NearbyProfessionalsRow extends StatelessWidget {
   const _NearbyProfessionalsRow();
 
@@ -558,7 +660,6 @@ class _NearbyProfessionalsRow extends StatelessWidget {
           return Expanded(
             child: GestureDetector(
               onTap: () {
-                // Navigate to ProviderProfileScreen when any professional is tapped
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const ProviderProfileScreen()),
@@ -576,8 +677,10 @@ class _NearbyProfessionalsRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(radius: 20, backgroundColor: p['color'] as Color,
-                        child: const Icon(Icons.person, color: Colors.white, size: 18)),
+                    Center(
+                      child: CircleAvatar(radius: 20, backgroundColor: p['color'] as Color,
+                          child: const Icon(Icons.person, color: Colors.white, size: 18)),
+                    ),
                     const SizedBox(height: 4),
                     Text(p['name'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.textDark)),
@@ -602,7 +705,7 @@ class _NearbyProfessionalsRow extends StatelessWidget {
   }
 }
 
-// ---------------------- STATS ROW (unchanged) ----------------------
+// ---------------------- STATS ROW ----------------------
 class _StatsRow extends StatelessWidget {
   const _StatsRow();
 
@@ -645,7 +748,7 @@ class _StatsRow extends StatelessWidget {
   }
 }
 
-// ---------------------- LATEST POSTS – 2x2 GRID (replaces single row) ----------------------
+// ---------------------- LATEST POSTS – 2x2 GRID ----------------------
 class _LatestPostsGrid extends StatelessWidget {
   const _LatestPostsGrid();
 
@@ -662,11 +765,11 @@ class _LatestPostsGrid extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: GridView.count(
         shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(), // Prevent internal scrolling
-        crossAxisCount: 2, // 2 columns
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
-        childAspectRatio: 1.2, // Adjust as needed
+        childAspectRatio: 1.2,
         children: posts.map((p) {
           return Container(
             padding: const EdgeInsets.all(8),

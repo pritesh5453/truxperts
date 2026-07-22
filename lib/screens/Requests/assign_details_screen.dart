@@ -222,32 +222,7 @@ class RequestTrackingScreen extends StatelessWidget {
           const SizedBox(height: 12),
           const Divider(height: 1, color: AppColors.chipUnselected),
           const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                'REQ125678',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.hintText,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    '1 Quote Received',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textDark,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Icon(Icons.chevron_right, size: 16, color: AppColors.textDark),
-                ],
-              ),
-            ],
-          ),
+          
         ],
       ),
     );
@@ -358,7 +333,7 @@ class RequestTrackingScreen extends StatelessWidget {
                         ),
                         SizedBox(width: 6),
                         Text(
-                          '98765 43210',
+                          '+91 xxxxxxxxxx',
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textGrey,
@@ -803,26 +778,7 @@ class RequestTrackingScreen extends StatelessWidget {
                   color: AppColors.textPrimary,
                 ),
               ),
-              InkWell(
-                onTap: () {},
-                child: Row(
-                  children: const [
-                    Text(
-                      'View Details',
-                      style: TextStyle(
-                        color: AppColors.navy,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right,
-                      size: 16,
-                      color: AppColors.navy,
-                    ),
-                  ],
-                ),
-              ),
+              
             ],
           ),
           const SizedBox(height: 16),
@@ -935,12 +891,12 @@ class RequestTrackingScreen extends StatelessWidget {
           child: ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(
-              LucideIcons.alertTriangle,
+              LucideIcons.checkCircle,
               size: 16,
               color: Colors.white,
             ),
             label: const Text(
-              'Report an Issue',
+              'Mark as Done',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,

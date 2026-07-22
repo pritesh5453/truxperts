@@ -22,73 +22,73 @@ class ServiceItem {
 /// -----------------------------------------------------------------------
 /// ChooseServiceScreen
 /// -----------------------------------------------------------------------
-class ChooseServiceScreen extends StatelessWidget {
-  const ChooseServiceScreen({super.key});
+class ChooseServiceScreen2 extends StatelessWidget {
+  const ChooseServiceScreen2({super.key});
 
-  static const List<ServiceItem> instantServices = [
+  
+
+  static const List<ServiceItem> advanceBooking = [
     ServiceItem(
-        label: 'Electrician',
-        icon: Icons.electric_bolt,
-        bg: AppColors.iconElectricianBg,
-        fg: AppColors.iconElectricianFg),
+        label: 'Photographer',
+        icon: Icons.camera_alt,
+        bg: AppColors.iconPhotographerBg,
+        fg: AppColors.iconPhotographerFg),
     ServiceItem(
-        label: 'Plumber',
-        icon: Icons.plumbing,
-        bg: AppColors.iconPlumberBg,
-        fg: AppColors.iconPlumberFg),
+        label: 'Wedding Planner',
+        icon: Icons.favorite,
+        bg: AppColors.iconWeddingBg,
+        fg: AppColors.iconWeddingFg),
     ServiceItem(
-        label: 'AC Repair',
-        icon: Icons.ac_unit,
-        bg: AppColors.iconAcBg,
-        fg: AppColors.iconAcFg),
+        label: 'Decorator',
+        icon: Icons.celebration,
+        bg: AppColors.iconDecoratorBg,
+        fg: AppColors.iconDecoratorFg),
     ServiceItem(
-        label: 'Carpenter',
-        icon: Icons.carpenter,
-        bg: AppColors.iconCarpenterBg,
-        fg: AppColors.iconCarpenterFg),
+        label: 'Catering',
+        icon: Icons.restaurant,
+        bg: AppColors.iconCateringBg,
+        fg: AppColors.iconCateringFg),
     ServiceItem(
-        label: 'RO Service',
-        icon: Icons.water_drop,
-        bg: AppColors.iconRoBg,
-        fg: AppColors.iconRoFg),
+        label: 'Makeup Artist',
+        icon: Icons.brush,
+        bg: AppColors.iconMakeupBg,
+        fg: AppColors.iconMakeupFg),
     ServiceItem(
-        label: 'Cleaning',
-        icon: Icons.cleaning_services,
-        bg: AppColors.iconCleaningBg,
-        fg: AppColors.iconCleaningFg),
+        label: 'DJ',
+        icon: Icons.music_note,
+        bg: AppColors.iconDjBg,
+        fg: AppColors.iconDjFg),
     ServiceItem(
-        label: 'Grocery',
-        icon: Icons.shopping_basket,
-        bg: AppColors.iconGroceryBg,
-        fg: AppColors.iconGroceryFg),
+        label: 'Mehendi Artist',
+        icon: Icons.back_hand,
+        bg: AppColors.iconMehendiBg,
+        fg: AppColors.iconMehendiFg),
     ServiceItem(
-        label: 'Medicine',
-        icon: Icons.medical_services,
-        bg: AppColors.iconMedicineBg,
-        fg: AppColors.iconMedicineFg),
+        label: 'Event Planner',
+        icon: Icons.mic,
+        bg: AppColors.iconEventBg,
+        fg: AppColors.iconEventFg),
     ServiceItem(
-        label: 'Pest Control',
-        icon: Icons.pest_control,
-        bg: AppColors.iconPestBg,
-        fg: AppColors.iconPestFg),
+        label: 'Tutor',
+        icon: Icons.menu_book,
+        bg: AppColors.iconTutorBg,
+        fg: AppColors.iconTutorFg),
     ServiceItem(
-        label: 'Auto / Cab',
-        icon: Icons.directions_car,
-        bg: AppColors.iconAutoBg,
-        fg: AppColors.iconAutoFg),
+        label: 'Pandit',
+        icon: Icons.star,
+        bg: AppColors.iconPanditBg,
+        fg: AppColors.iconPanditFg),
     ServiceItem(
-        label: 'Courier',
-        icon: Icons.local_shipping,
-        bg: AppColors.iconCourierBg,
-        fg: AppColors.iconCourierFg),
+        label: 'Interior Designer',
+        icon: Icons.chair_alt,
+        bg: AppColors.iconInteriorBg,
+        fg: AppColors.iconInteriorFg),
     ServiceItem(
         label: 'More',
         icon: Icons.grid_view_rounded,
         bg: AppColors.iconMoreBg,
         fg: AppColors.iconMoreFg),
   ];
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -98,34 +98,32 @@ class ChooseServiceScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
- 
+      
           const SizedBox(height: 16),
+        
           _SectionCard(
-            backgroundColor: AppColors.instantBannerBg,
+            backgroundColor: AppColors.advanceBannerBg,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _SectionHeader(
-                  icon: Icons.bolt,
-                  iconColor: AppColors.orange,
-                  title: 'INSTANT SERVICES',
+                  icon: Icons.calendar_today,
+                  iconColor: AppColors.primaryPurple,
+                  title: 'ADVANCE BOOKING',
                   subtitleWidget: const Text(
-                    'Available in minutes',
+                    'Book for future date & events',
                     style: TextStyle(
-                      color: AppColors.success,
+                      color: AppColors.textSecondary,
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   onViewAll: () {},
                 ),
                 const SizedBox(height: 16),
-                _ServiceGrid(items: instantServices),
+                _ServiceGrid(items: advanceBooking),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          
           const SizedBox(height: 16),
           _SmartSearchCard(),
           const SizedBox(height: 16),
@@ -135,9 +133,7 @@ class ChooseServiceScreen extends StatelessWidget {
   }
 }
 
-/// -----------------------------------------------------------------------
-/// Search bar
-/// -----------------------------------------------------------------------
+
 
 /// -----------------------------------------------------------------------
 /// Rounded section wrapper (instant / advance booking)

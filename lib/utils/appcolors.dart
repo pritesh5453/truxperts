@@ -53,4 +53,73 @@ class AppColors {
   static const Color blueAccent = Color(0xFF007AFF);
   static const Color lightBlue = Color(0xFFE0EFFF);
   static const Color scaffoldLightBg = Color(0xFFF8F9FA);
+
+
+
+  // ─────────────────────────────────────────────────────────────
+// ADD THESE INSIDE YOUR EXISTING AppColors CLASS
+// (paste just above the closing brace `}` of AppColors)
+// ─────────────────────────────────────────────────────────────
+
+  // --- Newly added for ChooseServiceScreen ---
+  static const Color iconAcBg = Color(0xFFE3E9F5);
+  static const Color iconAcFg = Color(0xFF5A6B94);
+
+  static const Color iconRoBg = Color(0xFFDCEEFB);
+  static const Color iconRoFg = Color(0xFF2E9BE0);
+
+  static const Color iconCleaningBg = Color(0xFFDCFCE7);
+  static const Color iconCleaningFg = Color(0xFF16A34A);
+
+  static const Color iconGroceryBg = Color(0xFFDCFCE7);
+  static const Color iconGroceryFg = Color(0xFF16A34A);
+
+  static const Color iconMedicineBg = Color(0xFFFDE1E1);
+  static const Color iconMedicineFg = Color(0xFFE23F3F);
+
+  static const Color iconPestBg = Color(0xFFE9F9E9);
+  static const Color iconPestFg = Color(0xFF2FAE60);
+
+  static const Color iconAutoBg = Color(0xFFDCFCE7);
+  static const Color iconAutoFg = Color(0xFF16A34A);
+
+  static const Color iconCourierBg = Color(0xFFDCEEFB);
+  static const Color iconCourierFg = Color(0xFF2E9BE0);
+
+  static const Color iconPhotographerBg = Color(0xFFEDE9FE);
+  static const Color iconPhotographerFg = Color(0xFF6D5BD0);
+
+  static const Color iconWeddingBg = Color(0xFFFDE1EA);
+  static const Color iconWeddingFg = Color(0xFFE0577F);
+
+  static const Color iconDecoratorBg = Color(0xFFF3E8FD);
+  static const Color iconDecoratorFg = Color(0xFFA45EE5);
+
+  static const Color iconCateringBg = Color(0xFFFCE9D8);
+  static const Color iconCateringFg = Color(0xFFD97B3F);
+
+  static const Color iconMakeupBg = Color(0xFFFDE1E1);
+  static const Color iconMakeupFg = Color(0xFFE23F3F);
+
+  static const Color iconDjBg = Color(0xFFF3E8FD);
+  static const Color iconDjFg = Color(0xFFA45EE5);
+
+  static const Color iconMehendiBg = Color(0xFFFCE1E6);
+  static const Color iconMehendiFg = Color(0xFF8A5A3D);
+
+  static const Color iconEventBg = Color(0xFFFDE1EA);
+  static const Color iconEventFg = Color(0xFFE0577F);
+
+  static const Color iconTutorBg = Color(0xFFDCEEFB);
+  static const Color iconTutorFg = Color(0xFF2E9BE0);
+
+  static const Color iconPanditBg = Color(0xFFFFF3D6);
+  static const Color iconPanditFg = Color(0xFFE0A020);
+
+  static const Color iconInteriorBg = Color(0xFFDCEEFB);
+  static const Color iconInteriorFg = Color(0xFF2E9BE0);
+
+  static const Color instantBannerBg = Color(0xFFEFF9F0);
+  static const Color advanceBannerBg = Color(0xFFF3EFFE);
+  static const Color smartSearchBg = Color(0xFFEFF3FF);
 }

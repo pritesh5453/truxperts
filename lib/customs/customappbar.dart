@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/common_appbar.dart';
 
 class CustomAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -20,36 +20,7 @@ class CustomAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: backgroundColor ?? const Color(0xFF001A4E),
-      elevation: 0,
-      centerTitle: true,
-      leading: showBackButton
-          ? IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                size: 20,
-                color: AppColors.normalText,
-              ),
-              onPressed: () {
-                if (onBack != null) {
-                  onBack!();
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-            )
-          : null,
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          color: AppColors.normalText,
-        ),
-      ),
-      actions: actions,
-    );
+    return CommonAppBar();
   }
 
   @override
