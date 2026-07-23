@@ -46,55 +46,17 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with Text & Safe Icon (No generic breaking URL)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text.rich(
-                            TextSpan(
-                              text: 'Post a ',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF001A4E),
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'Service Request',
-                                  style: TextStyle(color: Colors.orange),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Tell us what you need and we\'ll connect you with trusted professionals nearby.',
-                            style: TextStyle(color: Colors.grey, fontSize: 13),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // Safe Icon placeholder box inside container to prevent layout crash
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.assignment_turned_in,
-                        size: 65,
-                        color: Colors.orange,
-                      ),
-                    ),
-                  ],
+                // Full-width Banner Image (Text & description removed)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/images/post_banner.png',
+                    width: double.infinity,
+                    height: 180, // adjust height as per your banner
+                    fit: BoxFit.contain,
+                  ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
                 // 1. Select Service Category
                 _sectionTitle("1. Select a Service Category"),
@@ -200,7 +162,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                   ],
                 ),
 
-                // 3. Add Photos (Optional) - Handled safely using Local Boxes to stop 404 overflow crashes
+                // 3. Add Photos (Optional)
                 _sectionTitle("3. Add Photos (Optional)"),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,

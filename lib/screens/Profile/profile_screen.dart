@@ -109,108 +109,87 @@ class ProviderProfileScreen extends StatelessWidget {
         ),
       ),
       // Clean structure container using full horizontal space matrix
-      bottomNavigationBar: Material(
-        elevation: 20,
-        color: Colors.white,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            border: Border(top: BorderSide(color: Color(0xffEDF2F7), width: 1)),
-          ),
-          child: SafeArea(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Wrapped left column content inside Expanded to stop horizontal push crashes
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Get Quote',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff6338E2),
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Free Estimate',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Color(0xffA0AEC0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Center action button layout fixed
-                Expanded(
-                  flex: 4,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff1C2D5A),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.send, size: 15, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Send Request',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Right Badge
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: const [
-                      Icon(
-                        Icons.shield_outlined,
-                        size: 18,
-                        color: Color(0xff1C2D5A),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Verified Professional',
-                        style: TextStyle(
-                          fontSize: 8,
-                          color: Color(0xff718096),
-                          height: 1.15,
-                        ),
-                        textAlign: TextAlign.right,
-                        maxLines: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      // bottomNavigationBar: Material(
+      //   elevation: 20,
+      //   color: Colors.white,
+      //   child: Container(
+      //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      //     decoration: const BoxDecoration(
+      //       color: Colors.white,
+      //       border: Border(top: BorderSide(color: Color(0xffEDF2F7), width: 1)),
+      //     ),
+      //     child: SafeArea(
+      //       child: Row(
+      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //         children: [
+      //           // Wrapped left column content inside Expanded to stop horizontal push crashes
+                
+      //           // Center action button layout fixed
+      //           Expanded(
+      //             flex: 4,
+      //             child: ElevatedButton(
+      //               onPressed: () {},
+      //               style: ElevatedButton.styleFrom(
+      //                 backgroundColor: const Color(0xff1C2D5A),
+      //                 shape: RoundedRectangleBorder(
+      //                   borderRadius: BorderRadius.circular(12),
+      //                 ),
+      //                 padding: const EdgeInsets.symmetric(vertical: 12),
+      //                 elevation: 0,
+      //               ),
+      //               child: Row(
+      //                 mainAxisAlignment: MainAxisAlignment.center,
+      //                 mainAxisSize: MainAxisSize.min,
+      //                 children: const [
+      //                   Icon(Icons.send, size: 15, color: Colors.white),
+      //                   SizedBox(width: 8),
+      //                   Text(
+      //                     'Send Request',
+      //                     style: TextStyle(
+      //                       color: Colors.white,
+      //                       fontWeight: FontWeight.bold,
+      //                       fontSize: 14,
+      //                     ),
+      //                   ),
+      //                 ],
+      //               ),
+      //             ),
+      //           ),
+      //           const SizedBox(width: 8),
+      //           // Right Badge
+      //           Padding(
+      //             padding: const EdgeInsets.only(right: 10),
+      //             child: Expanded(
+      //               flex: 2,
+      //               child: Column(
+      //                 mainAxisSize: MainAxisSize.min,
+      //                 crossAxisAlignment: CrossAxisAlignment.end,
+      //                 children: const [
+      //                   Icon(
+      //                     Icons.shield_outlined,
+      //                     size: 18,
+      //                     color: Color(0xff1C2D5A),
+      //                   ),
+      //                   SizedBox(height: 2),
+      //                   Text(
+      //                     'Verified Professional',
+      //                     style: TextStyle(
+      //                       fontSize: 8,
+      //                       color: Color(0xff718096),
+      //                       height: 1.15,
+      //                     ),
+      //                     textAlign: TextAlign.right,
+      //                     maxLines: 2,
+      //                   ),
+      //                 ],
+      //               ),
+      //             ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
     );
   }
 

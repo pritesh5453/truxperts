@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
+import 'package:truxperts/screens/Requests/poyment_method_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 
 class RequestTrackingScreen extends StatelessWidget {
@@ -97,7 +98,7 @@ class RequestTrackingScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildRequestDetailsGrid(),
               const SizedBox(height: 24),
-              _buildBottomActionButtons(),
+              _buildBottomActionButtons(context),
               const SizedBox(height: 24),
             ],
           ),
@@ -620,21 +621,7 @@ class RequestTrackingScreen extends StatelessWidget {
                   color: AppColors.textPrimary,
                 ),
               ),
-              TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: const Size(0, 0),
-                ),
-                child: const Text(
-                  'View All',
-                  style: TextStyle(
-                    color: AppColors.navy,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+             
             ],
           ),
           const SizedBox(height: 20),
@@ -861,7 +848,7 @@ class RequestTrackingScreen extends StatelessWidget {
   }
 
   // --- 6. Action Bottom Buttons Row ---
-  Widget _buildBottomActionButtons() {
+  Widget _buildBottomActionButtons(BuildContext context) {
     return Row(
       children: [
         Expanded(
@@ -889,7 +876,11 @@ class RequestTrackingScreen extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context, 
+              MaterialPageRoute(builder: (context) => ServicePaymentScreen()),
+              );
+            },
             icon: const Icon(
               LucideIcons.checkCircle,
               size: 16,
