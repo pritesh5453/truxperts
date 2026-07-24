@@ -72,7 +72,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
           child: ElevatedButton(
             onPressed: _onSubmit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryPurple,
+              backgroundColor: AppColors.navy,
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -352,10 +352,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryPurple : AppColors.cardBg,
+          color: isSelected ? AppColors.navy : AppColors.cardBg,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? AppColors.primaryPurple : AppColors.fieldBorder,
+            color: isSelected ? AppColors.navy : AppColors.fieldBorder,
           ),
         ),
         child: Row(

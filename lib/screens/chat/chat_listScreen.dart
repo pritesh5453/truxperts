@@ -103,7 +103,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight + mediaQuery.padding.top),
         child: Container(
-          
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -152,13 +151,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: AppColors.orange,
-      //   onPressed: () {
-      //     // TODO: Start a new chat / pick a contact.
-      //   },
-      //   child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
-      // ),
     );
   }
 
@@ -184,11 +176,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
         child: TextField(
           controller: _searchController,
           onChanged: (value) => setState(() => _query = value),
-          style: const TextStyle(color: Colors.black, fontSize: 14),
+          style: const TextStyle(color: Colors.black, fontSize: 13), // Reduced from 14
           cursorColor: AppColors.orange,
           decoration: InputDecoration(
             hintText: 'Search contacts or messages...',
-            hintStyle: TextStyle(color: Colors.black.withOpacity(0.45)),
+            hintStyle: TextStyle(
+              color: Colors.black.withOpacity(0.45),
+              fontSize: 13, // Added explicit size for consistency
+            ),
             prefixIcon: Icon(
               Icons.search,
               color: Colors.black.withOpacity(0.5),
@@ -226,7 +221,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             'No chats found',
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
-              fontSize: 15,
+              fontSize: 13, // Reduced from 15
             ),
           ),
         ],
@@ -305,7 +300,7 @@ class _ChatListTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 15.5,
+                      fontSize: 14, // Reduced from 15.5
                       fontWeight:
                           hasUnread ? FontWeight.w700 : FontWeight.w500,
                     ),
@@ -319,7 +314,7 @@ class _ChatListTile extends StatelessWidget {
                       color: hasUnread
                           ? Colors.black.withOpacity(0.9)
                           : Colors.black.withOpacity(0.5),
-                      fontSize: 13,
+                      fontSize: 12, // Reduced from 13
                       fontWeight:
                           hasUnread ? FontWeight.w500 : FontWeight.w400,
                     ),
@@ -340,7 +335,7 @@ class _ChatListTile extends StatelessWidget {
                     color: hasUnread
                         ? AppColors.navy
                         : Colors.white.withOpacity(0.4),
-                    fontSize: 12,
+                    fontSize: 11, // Reduced from 12
                     fontWeight: hasUnread ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
@@ -361,7 +356,7 @@ class _ChatListTile extends StatelessWidget {
                           : contact.unreadCount.toString(),
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 11,
+                        fontSize: 10, // Reduced from 11
                         fontWeight: FontWeight.w700,
                       ),
                     ),

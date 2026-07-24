@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
+import 'package:truxperts/screens/notification/notification_screen.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBackPressed;
@@ -61,7 +62,15 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             IconButton(
               icon: const Icon(LucideIcons.bell, color: Color(0xff1A1A2E)),
-              onPressed: onNotificationTap,
+              onPressed: onNotificationTap ??
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationsScreen(),
+                      ),
+                    );
+                  },
             ),
             if (notificationCount > 0)
               Positioned(

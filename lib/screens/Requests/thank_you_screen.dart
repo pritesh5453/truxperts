@@ -252,7 +252,7 @@ class ThankYouScreen extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryPurple,
+          backgroundColor: AppColors.navy,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -270,11 +270,11 @@ class ThankYouScreen extends StatelessWidget {
   Widget _buildDownloadInvoiceButton() {
     return TextButton.icon(
       onPressed: () {},
-      icon: const Icon(Icons.download_rounded, color: AppColors.primaryPurple, size: 18),
+      icon: const Icon(Icons.download_rounded, color: AppColors.navy, size: 18),
       label: const Text(
         'Download Invoice',
         style: TextStyle(
-          color: AppColors.primaryPurple,
+          color: AppColors.navy,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),

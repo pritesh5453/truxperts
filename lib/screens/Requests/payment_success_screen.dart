@@ -69,7 +69,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => const ReviewScreen()));
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryPurple,
+                    backgroundColor: AppColors.navy,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(

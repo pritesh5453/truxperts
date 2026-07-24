@@ -36,7 +36,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBg,
-      appBar: CommonAppBar(),
+      appBar: const CommonAppBar(),
       body: SafeArea(
         child: Column(
           children: [
@@ -67,7 +67,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: item['isDefault'] ? AppColors.orange : AppColors.cardBorder,
+          color: item['isDefault'] ? AppColors.navy : AppColors.cardBorder,
           width: item['isDefault'] ? 1.5 : 1.0,
         ),
         boxShadow: [
@@ -113,7 +113,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.badgePendingBg,
+                    color: AppColors.lightPurple,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
@@ -121,7 +121,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.orange,
+                      color: AppColors.primaryPurple,
                     ),
                   ),
                 ),
@@ -167,7 +167,11 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                 icon: const Icon(Icons.edit_outlined, size: 16, color: AppColors.navy),
                 label: const Text(
                   'Edit',
-                  style: TextStyle(color: AppColors.navy, fontSize: 13, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: AppColors.navy,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -178,7 +182,11 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                 icon: const Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
                 label: const Text(
                   'Delete',
-                  style: TextStyle(color: Colors.redAccent, fontSize: 13, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -217,7 +225,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
             ),
           ),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.orange,
+            backgroundColor: AppColors.navy,
             padding: const EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),

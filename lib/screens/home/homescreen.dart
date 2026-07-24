@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:truxperts/screens/Profile/profile_screen.dart';
+import 'package:truxperts/screens/cust_profile/manage_address_screen.dart';
+import 'package:truxperts/screens/home/address_location.dart';
 import 'package:truxperts/screens/home/categories.dart';
 import 'package:truxperts/screens/home/categories_2.dart';
 import 'package:truxperts/screens/home/explore_rewards_scren.dart';
+import 'package:truxperts/screens/home/nearby_professionals.dart';
+import 'package:truxperts/screens/notification/notification_screen.dart';
 import 'package:truxperts/screens/post/post_requestScreen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
@@ -29,11 +34,11 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 16),
               _HeroBanner(),
               SizedBox(height: 20),
-              _SectionHeader(title: 'Top Instant Services'),
+              _SectionHeader(title: 'Top Instant Services', showViewAll: false),
               SizedBox(height: 12),
               _TopInstantServices(),
               SizedBox(height: 20),
-              _SectionHeader(title: 'Popular for Advance Booking'),
+              _SectionHeader(title: 'Popular for Advance Booking', showViewAll: false),
               SizedBox(height: 12),
               _AdvanceBookingServices(),
               SizedBox(height: 20),
@@ -43,7 +48,7 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 12),
               _LiveOffersRow(),
               SizedBox(height: 20),
-              _SectionHeader(title: 'Nearby Professionals'),
+              _SectionHeader(title: 'Nearby Experts'),
               SizedBox(height: 12),
               _NearbyProfessionalsRow(),
               SizedBox(height: 20),
@@ -70,21 +75,40 @@ class _TopBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
+          // Sirf location wale part pe tap -> bottom sheet khulega
           Flexible(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.location_on, color: AppColors.navy, size: 16),
-                SizedBox(width: 2),
-                Flexible(
-                  child: Text(
-                    'Nashik, Maharashtra',
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textDark),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                LocationSelectorSheet.show(context);
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(
+                    Icons.location_on,
+                    color: AppColors.navy,
+                    size: 16,
                   ),
-                ),
-                Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textDark),
-              ],
+                  SizedBox(width: 2),
+                  Flexible(
+                    child: Text(
+                      'Nashik, Maharashtra',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 16,
+                    color: AppColors.textDark,
+                  ),
+                ],
+              ),
             ),
           ),
           const Spacer(),
@@ -117,7 +141,17 @@ class _TopBar extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          _IconBadge(icon: Icons.notifications_none_rounded, badgeCount: 1),
+          // NOTE: ye ab const nahi hai kyunki iske andar onTap callback (closure) hai
+          _IconBadge(
+            icon: Icons.notifications_none_rounded,
+            badgeCount: 1,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              );
+            },
+          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -128,38 +162,49 @@ class _TopBar extends StatelessWidget {
 class _IconBadge extends StatelessWidget {
   final IconData icon;
   final int badgeCount;
-  const _IconBadge({required this.icon, required this.badgeCount});
+  final VoidCallback? onTap;
+  const _IconBadge({
+    required this.icon,
+    required this.badgeCount,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 6, offset: const Offset(0, 2))],
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            child: Icon(LucideIcons.bell, size: 20, color: AppColors.navy),
           ),
-          child: Icon(icon, size: 16, color: AppColors.navy),
-        ),
-        if (badgeCount > 0)
-          Positioned(
-            right: -2,
-            top: -2,
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: const BoxDecoration(color: AppColors.orange, shape: BoxShape.circle),
-              constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
-              child: Text(
-                '$badgeCount',
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold),
+          if (badgeCount > 0)
+            Positioned(
+              right: -2,
+              top: -2,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  color: AppColors.orange,
+                  shape: BoxShape.circle,
+                ),
+                constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
+                child: Text(
+                  '$badgeCount',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 7,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -178,14 +223,24 @@ class _SearchBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            )
+          ],
         ),
         child: Row(
           children: const [
             Icon(Icons.search, color: AppColors.textGrey, size: 18),
             SizedBox(width: 6),
-            Expanded(child: Text('Search for services or professionals...',
-                style: TextStyle(color: AppColors.textGrey, fontSize: 12))),
+            Expanded(
+              child: Text(
+                'Search for services or professionals...',
+                style: TextStyle(color: AppColors.textGrey, fontSize: 12),
+              ),
+            ),
             Icon(Icons.tune, color: AppColors.navy, size: 18),
           ],
         ),
@@ -351,7 +406,8 @@ class _HeroBanner extends StatelessWidget {
 // ---------------------- SECTION HEADER ----------------------
 class _SectionHeader extends StatelessWidget {
   final String title;
-  const _SectionHeader({required this.title});
+  final bool showViewAll;
+  const _SectionHeader({required this.title, this.showViewAll = true});
 
   @override
   Widget build(BuildContext context) {
@@ -360,7 +416,48 @@ class _SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textDark)),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textDark,
+            ),
+          ),
+          if (showViewAll)
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NearbyProfessionalsScreen(),
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(0, 0),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: const Row(
+                children: [
+                  Text(
+                    "View All",
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.navy,
+                    ),
+                  ),
+                  SizedBox(width: 2),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 12,
+                    color: AppColors.navy,
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -412,7 +509,10 @@ class _TopInstantServices extends StatelessWidget {
                   Container(
                     width: 44,
                     height: 44,
-                    decoration: BoxDecoration(color: item.bg, borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(
+                      color: item.bg,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Icon(item.icon, color: item.iconColor, size: 20),
                   ),
                   const SizedBox(height: 4),
@@ -421,7 +521,11 @@ class _TopInstantServices extends StatelessWidget {
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 8, color: AppColors.textDark, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 8,
+                      color: AppColors.textDark,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -469,7 +573,10 @@ class _AdvanceBookingServices extends StatelessWidget {
                   Container(
                     width: 44,
                     height: 44,
-                    decoration: BoxDecoration(color: item.bg, borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(
+                      color: item.bg,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Icon(item.icon, color: item.iconColor, size: 20),
                   ),
                   const SizedBox(height: 4),
@@ -478,7 +585,11 @@ class _AdvanceBookingServices extends StatelessWidget {
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 8, color: AppColors.textDark, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 8,
+                      color: AppColors.textDark,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -533,7 +644,7 @@ class _RewardsBanner extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const ExploreRewardsScreen(),
+                          builder: (_) => const TruXpertsRewardsScreen(),
                         ),
                       );
                     },
@@ -563,22 +674,24 @@ class _RewardsBanner extends StatelessWidget {
                   'Your Points',
                   style: TextStyle(color: Colors.white60, fontSize: 9),
                 ),
-                const Row(children: [
-                  Icon(Icons.emoji_events, color: Color(0xFFFFC94A), size: 14),
-                  SizedBox(width: 4),
-                  Text(
-                    '250',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                const Row(
+                  children: [
+                    Icon(Icons.emoji_events, color: Color(0xFFFFC94A), size: 14),
+                    SizedBox(width: 4),
+                    Text(
+                      '250',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ]),
+                  ],
+                ),
                 const SizedBox(height: 6),
                 Icon(
                   Icons.card_giftcard,
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white,
                   size: 30,
                 ),
               ],
@@ -589,6 +702,7 @@ class _RewardsBanner extends StatelessWidget {
     );
   }
 }
+
 // ---------------------- LIVE OFFERS – ROW ----------------------
 class _LiveOffersRow extends StatelessWidget {
   const _LiveOffersRow();
@@ -596,9 +710,30 @@ class _LiveOffersRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final offers = [
-      {'discount': '20% OFF', 'desc': 'on AC Service', 'code': 'CODE: CDDL20', 'valid': 'Valid till 31 May 2025', 'bg': const Color(0xFFE3F8EA), 'accent': const Color(0xFF2FAE60)},
-      {'discount': '\$100 OFF', 'desc': 'on Fast Booking', 'code': 'CODE: FBSIT100', 'valid': 'Valid till 25 May 2025', 'bg': const Color(0xFFFFEFE3), 'accent': const Color(0xFFFF7A1A)},
-      {'discount': 'UP TO 15% OFF', 'desc': 'on Cleaning Services', 'code': 'CODE: CLEAR15', 'valid': 'Valid till 31 May 2025', 'bg': const Color(0xFFEFE9FF), 'accent': const Color(0xFF7A5AF8)},
+      {
+        'discount': '20% OFF',
+        'desc': 'on AC Service',
+        'code': 'CODE: CDDL20',
+        'valid': 'Valid till 31 May 2025',
+        'bg': const Color(0xFFE3F8EA),
+        'accent': const Color(0xFF2FAE60)
+      },
+      {
+        'discount': '\$100 OFF',
+        'desc': 'on Fast Booking',
+        'code': 'CODE: FBSIT100',
+        'valid': 'Valid till 25 May 2025',
+        'bg': const Color(0xFFFFEFE3),
+        'accent': const Color(0xFFFF7A1A)
+      },
+      {
+        'discount': 'UP TO 15% OFF',
+        'desc': 'on Cleaning Services',
+        'code': 'CODE: CLEAR15',
+        'valid': 'Valid till 31 May 2025',
+        'bg': const Color(0xFFEFE9FF),
+        'accent': const Color(0xFF7A5AF8)
+      },
     ];
 
     return Padding(
@@ -609,27 +744,50 @@ class _LiveOffersRow extends StatelessWidget {
             child: Container(
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: o['bg'] as Color, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                color: o['bg'] as Color,
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(o['discount'] as String,
-                      style: TextStyle(color: o['accent'] as Color, fontSize: 12, fontWeight: FontWeight.bold)),
-                  Text(o['desc'] as String, style: const TextStyle(fontSize: 9, color: AppColors.textDark)),
+                  Text(
+                    o['discount'] as String,
+                    style: TextStyle(
+                      color: o['accent'] as Color,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    o['desc'] as String,
+                    style: const TextStyle(fontSize: 9, color: AppColors.textDark),
+                  ),
                   const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: (o['accent'] as Color).withOpacity(0.4)),
+                      border: Border.all(
+                        color: (o['accent'] as Color).withOpacity(0.4),
+                      ),
                     ),
-                    child: Text(o['code'] as String,
-                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: o['accent'] as Color)),
+                    child: Text(
+                      o['code'] as String,
+                      style: TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                        color: o['accent'] as Color,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 4),
-                  Text(o['valid'] as String, style: const TextStyle(fontSize: 7, color: AppColors.textGrey)),
+                  Text(
+                    o['valid'] as String,
+                    style: const TextStyle(fontSize: 7, color: AppColors.textGrey),
+                  ),
                 ],
               ),
             ),
@@ -671,28 +829,58 @@ class _NearbyProfessionalsRow extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2))],
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    )
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Center(
-                      child: CircleAvatar(radius: 20, backgroundColor: p['color'] as Color,
-                          child: const Icon(Icons.person, color: Colors.white, size: 18)),
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: p['color'] as Color,
+                        child: const Icon(Icons.person, color: Colors.white, size: 18),
+                      ),
                     ),
                     const SizedBox(height: 4),
-                    Text(p['name'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.textDark)),
+                    Text(
+                      p['name'] as String,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
+                      ),
+                    ),
                     const SizedBox(height: 2),
-                    Text(p['rating'] as String, style: const TextStyle(fontSize: 8, color: AppColors.textGrey)),
+                    Text(
+                      p['rating'] as String,
+                      style: const TextStyle(fontSize: 8, color: AppColors.textGrey),
+                    ),
                     const SizedBox(height: 6),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 4),
-                      decoration: BoxDecoration(color: const Color(0xFFE9ECFB), borderRadius: BorderRadius.circular(6)),
-                      child: const Text('Available now', textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 7, color: AppColors.navy, fontWeight: FontWeight.w600)),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE9ECFB),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'Available now',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 7,
+                          color: AppColors.navy,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -725,7 +913,13 @@ class _StatsRow extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            )
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -734,11 +928,23 @@ class _StatsRow extends StatelessWidget {
               children: [
                 Icon(s['icon'] as IconData, color: AppColors.navy, size: 16),
                 const SizedBox(height: 4),
-                Text(s['value'] as String,
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textDark)),
+                Text(
+                  s['value'] as String,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textDark,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                SizedBox(width: 60, child: Text(s['label'] as String, textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 7, color: AppColors.textGrey))),
+                SizedBox(
+                  width: 60,
+                  child: Text(
+                    s['label'] as String,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 7, color: AppColors.textGrey),
+                  ),
+                ),
               ],
             );
           }).toList(),
@@ -755,10 +961,38 @@ class _LatestPostsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final posts = [
-      {'author': 'Amit Photography', 'time': '2h ago', 'caption': 'Pre-wedding shoot available for this season. Book your date!', 'likes': 26, 'comments': 8, 'color': const Color(0xFFE8D9C4)},
-      {'author': 'Drawn Wedding Planners', 'time': '3h ago', 'caption': 'Make your big day memorable with our expert planning.', 'likes': 32, 'comments': 5, 'color': const Color(0xFFF3C9D6)},
-      {'author': 'Bing Ceremony Experts', 'time': '4h ago', 'caption': 'Bing and ceremony services for your special moments.', 'likes': 41, 'comments': 12, 'color': const Color(0xFFD9C9F3)},
-      {'author': 'Shah Etesh Events', 'time': '5h ago', 'caption': 'Book a caterer, decorator, and photographers.', 'likes': 27, 'comments': 6, 'color': const Color(0xFFD6C9B0)},
+      {
+        'author': 'Amit Photography',
+        'time': '2h ago',
+        'caption': 'Pre-wedding shoot available for this season. Book your date!',
+        'likes': 26,
+        'comments': 8,
+        'color': const Color(0xFFE8D9C4)
+      },
+      {
+        'author': 'Drawn Wedding Planners',
+        'time': '3h ago',
+        'caption': 'Make your big day memorable with our expert planning.',
+        'likes': 32,
+        'comments': 5,
+        'color': const Color(0xFFF3C9D6)
+      },
+      {
+        'author': 'Bing Ceremony Experts',
+        'time': '4h ago',
+        'caption': 'Bing and ceremony services for your special moments.',
+        'likes': 41,
+        'comments': 12,
+        'color': const Color(0xFFD9C9F3)
+      },
+      {
+        'author': 'Shah Etesh Events',
+        'time': '5h ago',
+        'caption': 'Book a caterer, decorator, and photographers.',
+        'likes': 27,
+        'comments': 6,
+        'color': const Color(0xFFD6C9B0)
+      },
     ];
 
     return Padding(
@@ -776,19 +1010,35 @@ class _LatestPostsGrid extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                )
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    CircleAvatar(radius: 8, backgroundColor: p['color'] as Color,
-                        child: const Icon(Icons.person, size: 10, color: Colors.white)),
+                    CircleAvatar(
+                      radius: 8,
+                      backgroundColor: p['color'] as Color,
+                      child: const Icon(Icons.person, size: 10, color: Colors.white),
+                    ),
                     const SizedBox(width: 4),
                     Expanded(
-                      child: Text(p['author'] as String, maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 7, fontWeight: FontWeight.w600)),
+                      child: Text(
+                        p['author'] as String,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 7,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                     const Icon(Icons.more_vert, size: 10, color: AppColors.textGrey),
                   ],
@@ -796,12 +1046,25 @@ class _LatestPostsGrid extends StatelessWidget {
                 const SizedBox(height: 4),
                 Container(
                   height: 60,
-                  decoration: BoxDecoration(color: p['color'] as Color, borderRadius: BorderRadius.circular(8)),
-                  child: const Center(child: Icon(Icons.image, color: Colors.white70, size: 18)),
+                  decoration: BoxDecoration(
+                    color: p['color'] as Color,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.image, color: Colors.white70, size: 18),
+                  ),
                 ),
                 const SizedBox(height: 4),
-                Text(p['caption'] as String, maxLines: 2, overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 7, color: AppColors.textDark, height: 1.2)),
+                Text(
+                  p['caption'] as String,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 7,
+                    color: AppColors.textDark,
+                    height: 1.2,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Row(
                   children: [

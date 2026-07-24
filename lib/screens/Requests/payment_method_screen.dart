@@ -348,7 +348,7 @@ class _ServicePaymentScreenState extends State<ServicePaymentScreen> {
            MaterialPageRoute(builder: (context) => const PaymentSuccessScreen()));
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryPurple,
+            backgroundColor: AppColors.navy,
             foregroundColor: Colors.white,
             elevation: 0,
             shape: RoundedRectangleBorder(

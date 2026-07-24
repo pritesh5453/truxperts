@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:truxperts/Auth/login_screen.dart';
+import 'package:truxperts/screens/cust_profile/edit_profile_screen.dart';
 import 'package:truxperts/screens/cust_profile/manage_address_screen.dart';
 import 'package:truxperts/screens/cust_profile/transaction_history_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
@@ -11,7 +13,7 @@ class CustomerProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CommonAppBar(),
+      appBar: const CommonAppBar(),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -19,7 +21,7 @@ class CustomerProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Customer Hero Profile Card
-              _buildCustomerHeroCard(),
+              _buildCustomerHeroCard(context),
               
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -41,7 +43,7 @@ class CustomerProfileScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     
                     // 4. Log Out Button Container
-                    _buildLogoutButton(),
+                    _buildLogoutButton(context),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -54,7 +56,7 @@ class CustomerProfileScreen extends StatelessWidget {
   }
 
   // --- 1. Customer Main Profile Card ---
-  Widget _buildCustomerHeroCard() {
+  Widget _buildCustomerHeroCard(BuildContext context) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -102,10 +104,13 @@ class CustomerProfileScreen extends StatelessWidget {
               ],
             ),
           ),
+          // Edit Profile Button Action
           IconButton(
-            icon: const Icon(Icons.edit_outlined, color: Colors.white, size: 20),
-            onPressed: () {},
-          )
+            icon: const Icon(Icons.edit_outlined, color: Colors.white, size: 22),
+            onPressed: () {
+              showEditProfileDialog(context);
+            },
+          ),
         ],
       ),
     );
@@ -176,7 +181,6 @@ class CustomerProfileScreen extends StatelessWidget {
   }
 
   // --- 3. Settings & Options Rows ---
-  // --- 3. Settings & Options Rows ---
   Widget _buildAccountOptionsList(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -186,20 +190,6 @@ class CustomerProfileScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildMenuRow(
-            icon: Icons.location_on_outlined,
-            title: 'Manage Addresses',
-            subtitle: 'Save home, office locations',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ManageAddressesScreen(),
-                ),
-              );
-            },
-          ),
-          _buildDivider(),
           _buildMenuRow(
             icon: Icons.description_outlined,
             title: 'Transaction History',
@@ -219,7 +209,7 @@ class CustomerProfileScreen extends StatelessWidget {
             title: 'Help & Customer Support',
             subtitle: '24/7 active resolution room',
             onTap: () {
-              // Help & Support Screen Navigation
+              // Help & Support Navigation
             },
           ),
           _buildDivider(),
@@ -228,7 +218,7 @@ class CustomerProfileScreen extends StatelessWidget {
             title: 'Privacy Policy & Terms',
             subtitle: 'Legal agreements',
             onTap: () {
-              // Privacy Policy Screen Navigation
+              // Privacy Policy Navigation
             },
           ),
         ],
@@ -290,25 +280,42 @@ class CustomerProfileScreen extends StatelessWidget {
   }
 
   // --- 4. Log Out Interactive Action Layout ---
-  Widget _buildLogoutButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.logout, size: 18, color: AppColors.navy),
-        label: const Text(
-          'Log Out Account', 
-          style: TextStyle(color: AppColors.navy, fontWeight: FontWeight.bold, fontSize: 14),
-        ),
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Color(0xffFEEBC8)),
-          backgroundColor: AppColors.navy.withOpacity(0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          padding: const EdgeInsets.symmetric(vertical: 14),
+  Widget _buildLogoutButton(BuildContext context) {
+  return SizedBox(
+    width: double.infinity,
+    child: OutlinedButton.icon(
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const LoginScreen(),
+          ),
+        );
+      },
+      icon: const Icon(
+        Icons.logout,
+        size: 18,
+        color: AppColors.navy,
+      ),
+      label: const Text(
+        'Log Out Account',
+        style: TextStyle(
+          color: AppColors.navy,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
         ),
       ),
-    );
-  }
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(color: Color(0xffFEEBC8)),
+        backgroundColor: AppColors.navy.withOpacity(0.05),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+      ),
+    ),
+  );
+}
 
   Widget _buildSectionHeader(String title) {
     return Text(
