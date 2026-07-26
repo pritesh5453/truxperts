@@ -110,7 +110,7 @@ class ChooseServiceScreen extends StatelessWidget {
                   iconColor: AppColors.orange,
                   title: 'INSTANT SERVICES',
                   subtitleWidget: const Text(
-                    'Available in minutes',
+                    '        Available in minutes',
                     style: TextStyle(
                       color: AppColors.success,
                       fontSize: 12,
@@ -209,17 +209,7 @@ class _SectionHeader extends StatelessWidget {
             ],
           ),
         ),
-        GestureDetector(
-          onTap: onViewAll,
-          child: const Text(
-            'View All',
-            style: TextStyle(
-              color: AppColors.primaryPurple,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
+        
       ],
     );
   }

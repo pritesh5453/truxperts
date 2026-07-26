@@ -44,20 +44,20 @@ class HomeScreen extends StatelessWidget {
               _AdvanceBookingServices(),
               SizedBox(height: 20),
               _RewardsBanner(),
-              SizedBox(height: 20),
-              _SectionHeader(title: 'Live Offers 🔥'),
-              SizedBox(height: 12),
-              _LiveOffersRow(),
+            
+             
+            
               SizedBox(height: 20),
               _SectionHeader(title: 'Nearby Experts'),
               SizedBox(height: 12),
               _NearbyProfessionalsRow(),
-              SizedBox(height: 20),
-              _StatsRow(),
+             
               SizedBox(height: 20),
               _SectionHeader(title: 'Latest Posts from Professionals'),
               SizedBox(height: 12),
               _LatestPostsGrid(),
+               SizedBox(height: 20),
+              _StatsRow(),
             ],
           ),
         ),
@@ -691,7 +691,7 @@ class _RewardsBanner extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF3B2B8C), Color(0xFF1B2B6B)],
@@ -761,8 +761,8 @@ class _RewardsBanner extends StatelessWidget {
               child: Center(
                 child: Image.asset(
                   'assets/images/rewards.png',
-                  height: 70,
-                  width: 70,
+                  height: 100,
+                  width: 100,
                   fit: BoxFit.cover,
                   
                 ),
@@ -778,7 +778,7 @@ class _RewardsBanner extends StatelessWidget {
                 children: [
                   const Text(
                     'Your Points',
-                    style: TextStyle(color: Colors.white60, fontSize: 9),
+                    style: TextStyle(color: Colors.white60, fontSize: 12),
                   ),
                   const SizedBox(height: 2),
                   const Row(
@@ -1156,7 +1156,7 @@ class _LatestPostsGridState extends State<_LatestPostsGrid> {
           crossAxisCount: 2,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 0.74,
+          childAspectRatio: 0.90,
         ),
         itemBuilder: (context, index) {
           final post = _posts[index];
