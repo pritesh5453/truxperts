@@ -1,238 +1,143 @@
 import 'package:flutter/material.dart';
 import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/common_appbar.dart';
 
-class NearbyProfessionalsScreen extends StatefulWidget {
-  const NearbyProfessionalsScreen({Key? key}) : super(key: key);
+class _Expert {
+  final String name;
+  final String category;
+  final double rating;
+  final String imageUrl;
+  final String avatarUrl;
+  final Color avatarBg;
 
-  @override
-  State<NearbyProfessionalsScreen> createState() => _NearbyProfessionalsScreenState();
+  const _Expert({
+    required this.name,
+    required this.category,
+    required this.rating,
+    required this.imageUrl,
+    required this.avatarUrl,
+    required this.avatarBg,
+  });
 }
 
-class _NearbyProfessionalsScreenState extends State<NearbyProfessionalsScreen> {
-  int selectedCategoryIndex = 0;
-  int selectedPageIndex = 1;
+class NearbyExpertsScreen extends StatefulWidget {
+  const NearbyExpertsScreen({super.key});
 
-  final List<String> categories = [
+  @override
+  State<NearbyExpertsScreen> createState() => _NearbyExpertsScreenState();
+}
+
+class _NearbyExpertsScreenState extends State<NearbyExpertsScreen> {
+  static const Color _link = Color(0xFF2F80ED);
+  static const Color _star = Color(0xFFF2A93B);
+
+  final List<String> _filters = const [
     'All',
-    'Electrician',
-    'Plumber',
-    'AC Repair',
-    'Cleaning',
-    'Carpenter',
+    'Photographer',
+    'Caterer',
+    'Decorator',
+    'DJ',
+    'Makeup Artist',
   ];
 
-  final List<Map<String, dynamic>> professionals = [
-    {
-      'name': 'Amit Electricals',
-      'isVerified': true,
-      'rating': '4.7',
-      'reviews': '(128 Reviews)',
-      'jobs': '120+ Jobs',
-      'category': 'Electrician',
-      'distance': '1.2 km away',
-      'responseTime': '15 min response',
-      'isAvailable': true,
-      'categoryIcon': Icons.electric_bolt_rounded,
-      'categoryIconBg': AppColors.iconElectricianBg,
-      'categoryIconFg': AppColors.iconElectricianFg,
-      'avatarUrl': 'https://i.pravatar.cc/150?img=11',
-    },
-    {
-      'name': 'Suresh Plumbing',
-      'isVerified': true,
-      'rating': '4.6',
-      'reviews': '(96 Reviews)',
-      'jobs': '95+ Jobs',
-      'category': 'Plumber',
-      'distance': '1.5 km away',
-      'responseTime': '20 min response',
-      'isAvailable': true,
-      'categoryIcon': Icons.water_drop_rounded,
-      'categoryIconBg': AppColors.iconPlumberBg,
-      'categoryIconFg': AppColors.iconPlumberFg,
-      'avatarUrl': 'https://i.pravatar.cc/150?img=12',
-    },
-    {
-      'name': 'AC Cool Services',
-      'isVerified': true,
-      'rating': '4.8',
-      'reviews': '(76 Reviews)',
-      'jobs': '80+ Jobs',
-      'category': 'AC Repair',
-      'distance': '1.8 km away',
-      'responseTime': '18 min response',
-      'isAvailable': true,
-      'categoryIcon': Icons.ac_unit_rounded,
-      'categoryIconBg': AppColors.iconAcBg,
-      'categoryIconFg': AppColors.iconAcFg,
-      'avatarUrl': 'https://i.pravatar.cc/150?img=13',
-    },
-    {
-      'name': 'Home Clean Experts',
-      'isVerified': true,
-      'rating': '4.7',
-      'reviews': '(112 Reviews)',
-      'jobs': '150+ Jobs',
-      'category': 'Home Cleaning',
-      'distance': '2.0 km away',
-      'responseTime': '25 min response',
-      'isAvailable': true,
-      'categoryIcon': Icons.cleaning_services_rounded,
-      'categoryIconBg': AppColors.iconCleaningBg,
-      'categoryIconFg': AppColors.iconCleaningFg,
-      'avatarUrl': 'https://i.pravatar.cc/150?img=14',
-    },
-    {
-      'name': 'Sai Carpentry',
-      'isVerified': true,
-      'rating': '4.5',
-      'reviews': '(64 Reviews)',
-      'jobs': '60+ Jobs',
-      'category': 'Carpenter',
-      'distance': '2.3 km away',
-      'responseTime': '30 min response',
-      'isAvailable': true,
-      'categoryIcon': Icons.construction_rounded,
-      'categoryIconBg': AppColors.iconCarpenterBg,
-      'categoryIconFg': AppColors.iconCarpenterFg,
-      'avatarUrl': 'https://i.pravatar.cc/150?img=15',
-    },
+  String _selectedFilter = 'All';
+  final Set<int> _favorites = {};
+
+  final List<_Expert> _experts = const [
+    _Expert(
+      name: 'Amit Photography',
+      category: 'Photographer',
+      rating: 4.8,
+      imageUrl: 'https://picsum.photos/seed/wedcouple1/400/500',
+      avatarUrl: 'https://i.pravatar.cc/80?img=12',
+      avatarBg: Color(0xFF2F80ED),
+    ),
+    _Expert(
+      name: 'Dream Wedding Planners',
+      category: 'Wedding Planner',
+      rating: 4.7,
+      imageUrl: 'https://picsum.photos/seed/mandap2/400/500',
+      avatarUrl: 'https://i.pravatar.cc/80?img=32',
+      avatarBg: Color(0xFFEB5757),
+    ),
+    _Expert(
+      name: 'Bling Ceremony Experts',
+      category: 'Caterer',
+      rating: 4.6,
+      imageUrl: 'https://picsum.photos/seed/banquet3/400/500',
+      avatarUrl: 'https://i.pravatar.cc/80?img=5',
+      avatarBg: Color(0xFF27AE60),
+    ),
+    _Expert(
+      name: 'Shah Elah Events',
+      category: 'Decorator',
+      rating: 4.8,
+      imageUrl: 'https://picsum.photos/seed/decor4/400/500',
+      avatarUrl: 'https://i.pravatar.cc/80?img=45',
+      avatarBg: Color(0xFFF08C9B),
+    ),
+    _Expert(
+      name: 'DJ Rhythmix',
+      category: 'DJ',
+      rating: 4.5,
+      imageUrl: 'https://picsum.photos/seed/djparty5/400/500',
+      avatarUrl: 'https://i.pravatar.cc/80?img=15',
+      avatarBg: Color(0xFF9B51E0),
+    ),
+    _Expert(
+      name: 'Makeover by Priya',
+      category: 'Makeup Artist',
+      rating: 4.7,
+      imageUrl: 'https://picsum.photos/seed/bridalmakeup6/400/500',
+      avatarUrl: 'https://i.pravatar.cc/80?img=47',
+      avatarBg: Color(0xFF27AE60),
+    ),
   ];
+
+  List<_Expert> get _filteredExperts {
+    if (_selectedFilter == 'All') return _experts;
+    return _experts.where((e) => e.category == _selectedFilter).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldLightBg,
-      appBar: AppBar(
-        backgroundColor: AppColors.scaffoldLightBg,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.navy),
-          onPressed: () => Navigator.maybePop(context),
-        ),
-        title: Column(
-          children: [
-            const Text(
-              'Nearby Professionals',
-              style: TextStyle(
-                color: AppColors.navy,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.location_on_outlined, size: 14, color: AppColors.navy),
-                SizedBox(width: 2),
-                Text(
-                  'Kothrud, Pune',
-                  style: TextStyle(
-                    color: AppColors.navy,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppColors.navy),
-              ],
-            ),
-          ],
-        ),
-      ),
-      body: SingleChildScrollView(
+      backgroundColor: AppColors.scaffoldBg,
+      body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 12),
-            
-            // Search Bar & Filter Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: AppColors.fieldFill,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.fieldBorder),
-                      ),
-                      child: const TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search by service or professional name...',
-                          hintStyle: TextStyle(
-                            color: AppColors.hintText,
-                            fontSize: 12.5,
-                          ),
-                          prefixIcon: Icon(Icons.search, color: AppColors.hintText, size: 20),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    height: 46,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: AppColors.fieldFill,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.fieldBorder),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.tune_rounded, color: AppColors.navy, size: 18),
-                        SizedBox(width: 6),
-                        Text(
-                          'Filters',
-                          style: TextStyle(
-                            color: AppColors.navy,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 14),
+            // Top Bar
+            CommonAppBar(),
 
-            // Horizontal Filter Chips
+            // Category Filter
             SizedBox(
-              height: 34,
+              height: 36,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: categories.length,
+                itemCount: _filters.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
-                  final isSelected = selectedCategoryIndex == index;
+                  final label = _filters[index];
+                  final selected = label == _selectedFilter;
                   return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedCategoryIndex = index;
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    onTap: () => setState(() => _selectedFilter = label),
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.navy : AppColors.chipUnselected,
-                        borderRadius: BorderRadius.circular(18),
+                        color: selected ? AppColors.navy : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: selected ? AppColors.navy : const Color(0xFFE3E3E3),
+                        ),
                       ),
-                      child: Center(
-                        child: Text(
-                          categories[index],
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : AppColors.textSecondary,
-                            fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                          ),
+                      child: Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: selected ? Colors.white : AppColors.textSecondary,
                         ),
                       ),
                     ),
@@ -240,385 +145,311 @@ class _NearbyProfessionalsScreenState extends State<NearbyProfessionalsScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Professional List Cards
-            ListView.separated(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: professionals.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                return _buildProfessionalCard(professionals[index]);
-              },
-            ),
-            const SizedBox(height: 20),
-
-            // Pagination Text
-            const Text(
-              'Showing 1 – 10 of 58 professionals',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 11,
-              ),
-            ),
             const SizedBox(height: 12),
 
-            // Pagination Controls
-            _buildPaginationControls(),
-            const SizedBox(height: 16),
-
-            // Bottom Informational Banner
+            // Location Info Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.lightPurple.withOpacity(0.35),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: AppColors.lightPurple,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.pin_drop_rounded,
-                        color: AppColors.primaryPurple,
-                        size: 20,
+              child: Row(
+                children: [
+                  const Icon(Icons.location_on_outlined,
+                      size: 16, color: AppColors.textSecondary),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'Pune, Maharashtra',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: () {},
+                    child: const Text(
+                      'Change',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: _link,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Professionals near you',
-                            style: TextStyle(
-                              color: AppColors.navy,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'These professionals are available in your area and ready to help you.',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${_filteredExperts.length} Experts found',
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: _link,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 10),
+
+            // Grid View
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                itemCount: _filteredExperts.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.70, // Optimized for vertical mobile screens
+                ),
+                itemBuilder: (context, index) {
+                  final expert = _filteredExperts[index];
+                  final originalIndex = _experts.indexOf(expert);
+                  return _ExpertCard(
+                    expert: expert,
+                    favorite: _favorites.contains(originalIndex),
+                    onFavoriteTap: () {
+                      setState(() {
+                        if (_favorites.contains(originalIndex)) {
+                          _favorites.remove(originalIndex);
+                        } else {
+                          _favorites.add(originalIndex);
+                        }
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
 
-  // --- Helper Card Widget ---
-  Widget _buildProfessionalCard(Map<String, dynamic> data) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.cardBorder, width: 1),
-      ),
-      child: Stack(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Avatar with Online Status Indicator
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 34,
-                    backgroundImage: NetworkImage(data['avatarUrl']),
-                    backgroundColor: AppColors.chipUnselected,
-                  ),
-                  if (data['isAvailable'])
-                    Positioned(
-                      bottom: 0,
-                      right: 2,
-                      child: Container(
-                        width: 13,
-                        height: 13,
-                        decoration: BoxDecoration(
-                          color: AppColors.success,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                      ),
-                    ),
-                ],
+      // Bottom Banner Section
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
               ),
-              const SizedBox(width: 12),
-
-              // Content Section
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF1ECFB),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.campaign_outlined,
+                    color: Color(0xFF7C5CE0), size: 20),
+              ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title & Verified Badge
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            data['name'],
-                            style: const TextStyle(
-                              color: AppColors.navy,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (data['isVerified']) ...[
-                          const SizedBox(width: 4),
-                          const Icon(Icons.verified, size: 16, color: AppColors.blueAccent),
-                        ],
-                      ],
+                  children: const [
+                    Text(
+                      "Can't find right expert?",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-
-                    // Rating & Reviews Row
-                    Row(
-                      children: [
-                        const Icon(Icons.star, size: 14, color: AppColors.star),
-                        const SizedBox(width: 3),
-                        Text(
-                          data['rating'],
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(width: 3),
-                        Text(
-                          data['reviews'],
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-
-                    // Category Tag
-                    Row(
-                      children: [
-                        Icon(
-                          data['categoryIcon'] as IconData,
-                          size: 13,
-                          color: data['categoryIconFg'] as Color,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          data['category'],
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-
-                    // Distance & Response Time Row
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on_outlined, size: 13, color: AppColors.textSecondary),
-                        const SizedBox(width: 2),
-                        Text(
-                          data['distance'],
-                          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(width: 10),
-                        const Icon(Icons.access_time_rounded, size: 13, color: AppColors.textSecondary),
-                        const SizedBox(width: 2),
-                        Text(
-                          data['responseTime'],
-                          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Available Tag & View Profile Button Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppColors.badgeAssignedBg,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'Available now',
-                            style: TextStyle(
-                              color: AppColors.badgeAssignedText,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.navy,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
-                            minimumSize: const Size(0, 30),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                          ),
-                          child: const Text(
-                            'View Profile',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
+                    SizedBox(height: 2),
+                    Text(
+                      'Post requirement for best quotes',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: AppColors.textSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.navy,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Post Requirement',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
 
-          // Top Right Badge (Rating & Jobs Done)
-          Positioned(
-            top: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+class _ExpertCard extends StatelessWidget {
+  final _Expert expert;
+  final bool favorite;
+  final VoidCallback onFavoriteTap;
+
+  const _ExpertCard({
+    required this.expert,
+    required this.favorite,
+    required this.onFavoriteTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.network(
+            expert.imageUrl,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+              return Container(color: const Color(0xFFE3E3E3));
+            },
+            errorBuilder: (context, error, stackTrace) => Container(
               decoration: BoxDecoration(
-                color: AppColors.badgeAssignedBg.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(6),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    expert.avatarBg.withOpacity(0.6),
+                    expert.avatarBg.withOpacity(0.9),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: GestureDetector(
+              onTap: onFavoriteTap,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  favorite ? Icons.favorite : Icons.favorite_border,
+                  size: 15,
+                  color: favorite ? const Color(0xFFEB5757) : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0),
+                    Colors.black.withOpacity(0.80),
+                  ],
+                ),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        data['rating'],
-                        style: const TextStyle(
-                          color: AppColors.badgeAssignedText,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          CircleAvatar(
+                            radius: 10,
+                            backgroundColor: expert.avatarBg,
+                            backgroundImage: NetworkImage(expert.avatarUrl),
+                          ),
+                          Positioned(
+                            right: -2,
+                            bottom: -2,
+                            child: Container(
+                              padding: const EdgeInsets.all(1),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.verified,
+                                  size: 10, color: Color(0xFF2F80ED)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          expert.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 2),
-                      const Icon(Icons.star, color: AppColors.badgeAssignedText, size: 10),
                     ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    data['jobs'],
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 9,
-                    ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          expert.category,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: 9.5,
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.star, size: 11, color: Color(0xFFF2A93B)),
+                      const SizedBox(width: 2),
+                      Text(
+                        expert.rating.toStringAsFixed(1),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // --- Pagination Controls ---
-  Widget _buildPaginationControls() {
-    final List<dynamic> pages = [1, 2, 3, 4, 5, '...', 6];
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildPageNavButton(Icons.chevron_left_rounded, enabled: false),
-        const SizedBox(width: 4),
-        ...pages.map((page) {
-          if (page == '...') {
-            return const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4),
-              child: Text('...', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-            );
-          }
-          final isSelected = selectedPageIndex == page;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedPageIndex = page as int;
-              });
-            },
-            child: Container(
-              width: 28,
-              height: 28,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.navyDark : Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: isSelected ? AppColors.navyDark : AppColors.cardBorder,
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  page.toString(),
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.textDark,
-                    fontSize: 11,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-        const SizedBox(width: 4),
-        _buildPageNavButton(Icons.chevron_right_rounded, enabled: true),
-      ],
-    );
-  }
-
-  Widget _buildPageNavButton(IconData icon, {required bool enabled}) {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: Icon(
-        icon,
-        size: 18,
-        color: enabled ? AppColors.textDark : AppColors.hintText,
       ),
     );
   }

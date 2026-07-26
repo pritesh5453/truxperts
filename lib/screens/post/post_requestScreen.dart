@@ -16,6 +16,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
   // UI state variables
   String selectedSubcategoryText = "Select a subcategory";
   String selectedCategory = "Electrician"; // Default selected category
+  bool isInstantBooking = true; // Booking type: Instant (true) / Advance (false)
 
   // Static Category List
   final List<Map<String, String>> popularCategories = [
@@ -23,6 +24,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
     {"name": "Plumber", "icon": "assets/icons/plumber.png"},
     {"name": "Carpenter", "icon": "assets/icons/carpenter.png"},
     {"name": "Painter", "icon": "assets/icons/painter.png"},
+    {"name": "Cleaning", "icon": "assets/icons/cleaning.png"},
     {"name": "More", "icon": "assets/icons/more.png"},
   ];
 
@@ -58,8 +60,53 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                 ),
                 const SizedBox(height: 10),
 
-                // 1. Select Service Category
-                _sectionTitle("1. Select a Service Category"),
+                // 1. Select Booking Type
+                _sectionTitle("1. Select Booking Type"),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _bookingTypeCard(
+                        icon: Icons.bolt,
+                        title: "Instant",
+                        subtitle: "Get immediate service\nfrom available experts",
+                        isInstantOption: true,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _bookingTypeCard(
+                        icon: Icons.calendar_today,
+                        title: "Advance Booking",
+                        subtitle: "Book for a future date\nand time",
+                        isInstantOption: false,
+                      ),
+                    ),
+                  ],
+                ),
+                if (isInstantBooking)
+                  Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline, size: 16, color: Colors.deepPurple),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            "Instant Booking is available for selected services only.",
+                            style: TextStyle(fontSize: 11, color: Colors.deepPurple.shade700),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // 2. Select Service Category
+                _sectionTitle("2. Select a Service Category"),
                 SizedBox(
                   height: 90,
                   child: ListView.builder(
@@ -84,8 +131,8 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                   ),
                 ),
 
-                // 2. Select Subcategory
-                _sectionTitle("2. Select a Subcategory"),
+                // 3. Select Subcategory
+                _sectionTitle("3. Select a Subcategory"),
                 GestureDetector(
                   onTap: () async {
                     final result =
@@ -136,8 +183,8 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                   ),
                 ),
 
-                // 3. Describe Your Requirement
-                _sectionTitle("3. Describe Your Requirement"),
+                // 4. Describe Your Requirement
+                _sectionTitle("4. Describe Your Requirement"),
                 _customTextField(
                   "E.g. Need wiring repair in 2BHK flat. Switchboard issue and 3 tube lights not working.",
                   4,
@@ -162,8 +209,8 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                   ],
                 ),
 
-                // 3. Add Photos (Optional)
-                _sectionTitle("3. Add Photos (Optional)"),
+                // 5. Add Photos (Optional)
+                _sectionTitle("5. Add Photos (Optional)"),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -177,21 +224,21 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                   ),
                 ),
 
-                // 4. Location
-                _sectionTitle("4. Location"),
+                // 6. Location
+                _sectionTitle("6. Location"),
                 _customDropdownWithIcon(
                   Icons.location_on,
                   "Pune, Maharashtra",
                   "Tap to change location",
                 ),
 
-                // 6 & 7 Row
+                // 7 & 8 Row
                 const SizedBox(height: 15),
                 Row(
                   children: [
                     Expanded(
                       child: _infoBox(
-                        "6. Preferred Time",
+                        "7. Preferred Time",
                         Icons.calendar_today,
                         "Select Date & Time",
                       ),
@@ -199,7 +246,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: _infoBox(
-                        "7. Budget (Optional)",
+                        "8. Budget (Optional)",
                         Icons.currency_rupee,
                         "Select Budget Range",
                       ),
@@ -207,8 +254,8 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                   ],
                 ),
 
-                // 8. Additional Notes
-                _sectionTitle("8. Additional Notes (Optional)"),
+                // 9. Additional Notes
+                _sectionTitle("9. Additional Notes (Optional)"),
                 _customTextField("Any additional information...", 2, "0/200"),
 
                 const SizedBox(height: 15),
@@ -301,6 +348,76 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
           fontSize: 14,
           fontWeight: FontWeight.bold,
           color: Color(0xFF001A4E),
+        ),
+      ),
+    );
+  }
+
+  // Instant / Advance Booking selectable card
+  Widget _bookingTypeCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool isInstantOption,
+  }) {
+    final bool selected = isInstantBooking == isInstantOption;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isInstantBooking = isInstantOption;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: selected ? Colors.deepPurple : Colors.grey.shade300,
+            width: selected ? 1.5 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          color: selected
+              ? Colors.deepPurple.withOpacity(0.05)
+              : Colors.white,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                  size: 18,
+                  color: selected ? Colors.deepPurple : Colors.grey,
+                ),
+                const SizedBox(width: 6),
+                Icon(
+                  icon,
+                  size: 15,
+                  color: selected ? Colors.deepPurple : Colors.black54,
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: selected ? Colors.deepPurple : Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 10.5,
+                color: Colors.grey,
+                height: 1.3,
+              ),
+            ),
+          ],
         ),
       ),
     );

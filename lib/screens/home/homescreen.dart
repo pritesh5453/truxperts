@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:truxperts/screens/Profile/profile_screen.dart';
 import 'package:truxperts/screens/cust_profile/manage_address_screen.dart';
 import 'package:truxperts/screens/home/address_location.dart';
@@ -30,7 +31,7 @@ class HomeScreen extends StatelessWidget {
             children: const [
               _TopBar(),
               SizedBox(height: 12),
-              _SearchBar(),
+              _SearchBar(),           // <-- now stateful, no 'const'
               SizedBox(height: 16),
               _HeroBanner(),
               SizedBox(height: 20),
@@ -141,7 +142,6 @@ class _TopBar extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          // NOTE: ye ab const nahi hai kyunki iske andar onTap callback (closure) hai
           _IconBadge(
             icon: Icons.notifications_none_rounded,
             badgeCount: 1,
@@ -209,9 +209,70 @@ class _IconBadge extends StatelessWidget {
   }
 }
 
-// ---------------------- SEARCH BAR ----------------------
-class _SearchBar extends StatelessWidget {
+// ---------------------- SEARCH BAR (with Speech-to-Text) ----------------------
+class _SearchBar extends StatefulWidget {
   const _SearchBar();
+
+  @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<_SearchBar> {
+  final TextEditingController _controller = TextEditingController();
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSpeech();
+  }
+
+  Future<void> _initSpeech() async {
+  bool available = await _speech.initialize(
+    onStatus: (status) {
+      debugPrint("STATUS: $status");
+    },
+    onError: (error) {
+      debugPrint("ERROR: ${error.errorMsg}");
+      debugPrint("PERMANENT: ${error.permanent}");
+    },
+    debugLogging: true,
+  );
+
+  debugPrint("AVAILABLE: $available");
+}
+
+  void _startListening() async {
+    if (!_speech.isAvailable) {
+      // Optionally show a snackbar or toast
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Speech recognition not available')),
+      );
+      return;
+    }
+    setState(() => _isListening = true);
+    _speech.listen(
+      onResult: (result) {
+        setState(() {
+          _controller.text = result.recognizedWords;
+        });
+      },
+      listenMode: stt.ListenMode.dictation,
+    );
+  }
+
+  void _stopListening() {
+    _speech.stop();
+    setState(() => _isListening = false);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _speech.stop();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,16 +293,36 @@ class _SearchBar extends StatelessWidget {
           ],
         ),
         child: Row(
-          children: const [
-            Icon(Icons.search, color: AppColors.textGrey, size: 18),
-            SizedBox(width: 6),
+          children: [
+            const Icon(Icons.search, color: AppColors.textGrey, size: 18),
+            const SizedBox(width: 6),
             Expanded(
-              child: Text(
-                'Search for services or professionals...',
-                style: TextStyle(color: AppColors.textGrey, fontSize: 12),
+              child: TextField(
+                controller: _controller,
+                decoration: const InputDecoration(
+                  hintText: 'Search for services or professionals...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: AppColors.textGrey, fontSize: 12),
+                ),
+                style: const TextStyle(fontSize: 12),
+                onChanged: (value) {
+                  // You can trigger search here if needed
+                },
               ),
             ),
-            Icon(Icons.tune, color: AppColors.navy, size: 18),
+            GestureDetector(
+              onTap: _isListening ? _stopListening : _startListening,
+              child: _isListening
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.orange,
+                      ),
+                    )
+                  : const Icon(Icons.mic, color: AppColors.navy, size: 18),
+            ),
           ],
         ),
       ),
@@ -430,7 +511,7 @@ class _SectionHeader extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const NearbyProfessionalsScreen(),
+                    builder: (context) => const NearbyExpertsScreen(),
                   ),
                 );
               },
@@ -601,7 +682,7 @@ class _AdvanceBookingServices extends StatelessWidget {
   }
 }
 
-// ---------------------- REWARDS BANNER ----------------------
+
 class _RewardsBanner extends StatelessWidget {
   const _RewardsBanner();
 
@@ -620,8 +701,11 @@ class _RewardsBanner extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Left Section: Texts and Button
             Expanded(
+              flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -638,7 +722,7 @@ class _RewardsBanner extends StatelessWidget {
                     'Book now, earn more!',
                     style: TextStyle(color: Colors.white70, fontSize: 10),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -649,7 +733,10 @@ class _RewardsBanner extends StatelessWidget {
                       );
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
@@ -667,34 +754,54 @@ class _RewardsBanner extends StatelessWidget {
                 ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text(
-                  'Your Points',
-                  style: TextStyle(color: Colors.white60, fontSize: 9),
+
+            // Center Section: Image
+            Expanded(
+              flex: 2,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/rewards.png',
+                  height: 70,
+                  width: 70,
+                  fit: BoxFit.cover,
+                  
                 ),
-                const Row(
-                  children: [
-                    Icon(Icons.emoji_events, color: Color(0xFFFFC94A), size: 14),
-                    SizedBox(width: 4),
-                    Text(
-                      '250',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            // Right Section: Points
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Your Points',
+                    style: TextStyle(color: Colors.white60, fontSize: 9),
+                  ),
+                  const SizedBox(height: 2),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Icon(
+                        Icons.emoji_events,
+                        color: Color(0xFFFFC94A),
+                        size: 14,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Icon(
-                  Icons.card_giftcard,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ],
+                      SizedBox(width: 3),
+                      Text(
+                        '250',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -702,7 +809,6 @@ class _RewardsBanner extends StatelessWidget {
     );
   }
 }
-
 // ---------------------- LIVE OFFERS – ROW ----------------------
 class _LiveOffersRow extends StatelessWidget {
   const _LiveOffersRow();
@@ -954,133 +1060,279 @@ class _StatsRow extends StatelessWidget {
   }
 }
 
-// ---------------------- LATEST POSTS – 2x2 GRID ----------------------
-class _LatestPostsGrid extends StatelessWidget {
+// ---------------------- LATEST POSTS (Nearby-Experts style image cards) ----------------------
+class _Post {
+  final String author;
+  final String category;
+  final String time;
+  final String caption;
+  final int likes;
+  final int comments;
+  final Color color;
+  final String avatarUrl;
+  final String imageUrl;
+
+  const _Post({
+    required this.author,
+    required this.category,
+    required this.time,
+    required this.caption,
+    required this.likes,
+    required this.comments,
+    required this.color,
+    required this.avatarUrl,
+    required this.imageUrl,
+  });
+}
+
+// Sirf 4 posts home screen pe dikhte hain. Poori list dekhne ke liye
+// "View All" hai (upar wale _SectionHeader se already connected).
+class _LatestPostsGrid extends StatefulWidget {
   const _LatestPostsGrid();
 
   @override
-  Widget build(BuildContext context) {
-    final posts = [
-      {
-        'author': 'Amit Photography',
-        'time': '2h ago',
-        'caption': 'Pre-wedding shoot available for this season. Book your date!',
-        'likes': 26,
-        'comments': 8,
-        'color': const Color(0xFFE8D9C4)
-      },
-      {
-        'author': 'Drawn Wedding Planners',
-        'time': '3h ago',
-        'caption': 'Make your big day memorable with our expert planning.',
-        'likes': 32,
-        'comments': 5,
-        'color': const Color(0xFFF3C9D6)
-      },
-      {
-        'author': 'Bing Ceremony Experts',
-        'time': '4h ago',
-        'caption': 'Bing and ceremony services for your special moments.',
-        'likes': 41,
-        'comments': 12,
-        'color': const Color(0xFFD9C9F3)
-      },
-      {
-        'author': 'Shah Etesh Events',
-        'time': '5h ago',
-        'caption': 'Book a caterer, decorator, and photographers.',
-        'likes': 27,
-        'comments': 6,
-        'color': const Color(0xFFD6C9B0)
-      },
-    ];
+  State<_LatestPostsGrid> createState() => _LatestPostsGridState();
+}
 
+class _LatestPostsGridState extends State<_LatestPostsGrid> {
+  final Set<int> _liked = {};
+
+  static const List<_Post> _posts = [
+    _Post(
+      author: 'Amit Photography',
+      category: 'Photographer',
+      time: '2h ago',
+      caption: 'Pre-wedding shoot available for this season. Book your date!',
+      likes: 26,
+      comments: 8,
+      color: Color(0xFFE8D9C4),
+      avatarUrl: 'https://i.pravatar.cc/80?img=12',
+      imageUrl: 'https://picsum.photos/seed/post1photo/400/500',
+    ),
+    _Post(
+      author: 'Drawn Wedding Planners',
+      category: 'Wedding Planner',
+      time: '3h ago',
+      caption: 'Make your big day memorable with our expert planning.',
+      likes: 32,
+      comments: 5,
+      color: Color(0xFFF3C9D6),
+      avatarUrl: 'https://i.pravatar.cc/80?img=32',
+      imageUrl: 'https://picsum.photos/seed/post2photo/400/500',
+    ),
+    _Post(
+      author: 'Bing Ceremony Experts',
+      category: 'Caterer',
+      time: '4h ago',
+      caption: 'Bing and ceremony services for your special moments.',
+      likes: 41,
+      comments: 12,
+      color: Color(0xFFD9C9F3),
+      avatarUrl: 'https://i.pravatar.cc/80?img=5',
+      imageUrl: 'https://picsum.photos/seed/post3photo/400/500',
+    ),
+    _Post(
+      author: 'Shah Etesh Events',
+      category: 'Decorator',
+      time: '5h ago',
+      caption: 'Book a caterer, decorator, and photographers.',
+      likes: 27,
+      comments: 6,
+      color: Color(0xFFD6C9B0),
+      avatarUrl: 'https://i.pravatar.cc/80?img=45',
+      imageUrl: 'https://picsum.photos/seed/post4photo/400/500',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: GridView.count(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 1.2,
-        children: posts.map((p) {
-          return Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                )
-              ],
+        itemCount: _posts.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.74,
+        ),
+        itemBuilder: (context, index) {
+          final post = _posts[index];
+          return _PostCard(
+            post: post,
+            liked: _liked.contains(index),
+            onLikeTap: () {
+              setState(() {
+                if (_liked.contains(index)) {
+                  _liked.remove(index);
+                } else {
+                  _liked.add(index);
+                }
+              });
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PostCard extends StatelessWidget {
+  final _Post post;
+  final bool liked;
+  final VoidCallback onLikeTap;
+
+  const _PostCard({
+    required this.post,
+    required this.liked,
+    required this.onLikeTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.network(
+            post.imageUrl,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+              return Container(color: post.color.withOpacity(0.3));
+            },
+            errorBuilder: (context, error, stackTrace) => Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    post.color.withOpacity(0.6),
+                    post.color.withOpacity(0.95),
+                  ],
+                ),
+              ),
+              child: const Center(
+                child: Icon(Icons.image, color: Colors.white70, size: 22),
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 8,
-                      backgroundColor: p['color'] as Color,
-                      child: const Icon(Icons.person, size: 10, color: Colors.white),
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        p['author'] as String,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: GestureDetector(
+              onTap: onLikeTap,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  liked ? Icons.favorite : Icons.favorite_border,
+                  size: 14,
+                  color: liked ? const Color(0xFFEB5757) : AppColors.textGrey,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0),
+                    Colors.black.withOpacity(0.75),
+                  ],
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          CircleAvatar(
+                            radius: 11,
+                            backgroundColor: post.color,
+                            backgroundImage: NetworkImage(post.avatarUrl),
+                            onBackgroundImageError: (_, __) {},
+                          ),
+                          Positioned(
+                            right: -2,
+                            bottom: -2,
+                            child: Container(
+                              padding: const EdgeInsets.all(1),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.verified, size: 11, color: Color(0xFF2F80ED)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          post.author,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          post.category,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        liked ? Icons.favorite : Icons.favorite_border,
+                        size: 12,
+                        color: liked ? const Color(0xFFEB5757) : const Color(0xFFF2A93B),
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${post.likes + (liked ? 1 : 0)}',
                         style: const TextStyle(
-                          fontSize: 7,
+                          color: Colors.white,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
-                    const Icon(Icons.more_vert, size: 10, color: AppColors.textGrey),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Container(
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: p['color'] as Color,
-                    borderRadius: BorderRadius.circular(8),
+                    ],
                   ),
-                  child: const Center(
-                    child: Icon(Icons.image, color: Colors.white70, size: 18),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  p['caption'] as String,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 7,
-                    color: AppColors.textDark,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.favorite_border, size: 9, color: AppColors.textGrey),
-                    const SizedBox(width: 2),
-                    Text('${p['likes']}', style: const TextStyle(fontSize: 6, color: AppColors.textGrey)),
-                    const SizedBox(width: 6),
-                    const Icon(Icons.mode_comment_outlined, size: 9, color: AppColors.textGrey),
-                    const SizedBox(width: 2),
-                    Text('${p['comments']}', style: const TextStyle(fontSize: 6, color: AppColors.textGrey)),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          );
-        }).toList(),
+          ),
+        ],
       ),
     );
   }

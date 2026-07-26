@@ -16,7 +16,11 @@ class TruXpertsRewardsScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textDark, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: AppColors.textDark,
+            size: 20,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
@@ -25,8 +29,14 @@ class TruXpertsRewardsScreen extends StatelessWidget {
               text: const TextSpan(
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 children: [
-                  TextSpan(text: 'Tru', style: TextStyle(color: AppColors.navy)),
-                  TextSpan(text: 'Xperts', style: TextStyle(color: AppColors.orange)),
+                  TextSpan(
+                    text: 'Tru',
+                    style: TextStyle(color: AppColors.navy),
+                  ),
+                  TextSpan(
+                    text: 'Xperts',
+                    style: TextStyle(color: AppColors.orange),
+                  ),
                 ],
               ),
             ),
@@ -41,7 +51,11 @@ class TruXpertsRewardsScreen extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textDark, size: 26),
+                icon: const Icon(
+                  Icons.notifications_none_rounded,
+                  color: AppColors.textDark,
+                  size: 26,
+                ),
                 onPressed: () {},
               ),
               Positioned(
@@ -55,7 +69,11 @@ class TruXpertsRewardsScreen extends StatelessWidget {
                   ),
                   child: const Text(
                     '5',
-                    style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -76,11 +94,23 @@ class TruXpertsRewardsScreen extends StatelessWidget {
                 children: [
                   RichText(
                     text: const TextSpan(
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                      ),
                       children: [
-                        TextSpan(text: 'Tru', style: TextStyle(color: AppColors.navy)),
-                        TextSpan(text: 'Xperts', style: TextStyle(color: AppColors.orange)),
-                        TextSpan(text: ' Rewards', style: TextStyle(color: AppColors.textDark)),
+                        TextSpan(
+                          text: 'Tru',
+                          style: TextStyle(color: AppColors.navy),
+                        ),
+                        TextSpan(
+                          text: 'Xperts',
+                          style: TextStyle(color: AppColors.orange),
+                        ),
+                        TextSpan(
+                          text: ' Rewards',
+                          style: TextStyle(color: AppColors.textDark),
+                        ),
                       ],
                     ),
                   ),
@@ -88,11 +118,38 @@ class TruXpertsRewardsScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Text('Earn Points', style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
-                      Text('  •  ', style: TextStyle(color: AppColors.orange, fontSize: 14)),
-                      Text('Unlock Rewards', style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
-                      Text('  •  ', style: TextStyle(color: AppColors.orange, fontSize: 14)),
-                      Text('Save More', style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
+                      Text(
+                        'Earn Points',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        '  •  ',
+                        style: TextStyle(color: AppColors.orange, fontSize: 14),
+                      ),
+                      Text(
+                        'Unlock Rewards',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        '  •  ',
+                        style: TextStyle(color: AppColors.orange, fontSize: 14),
+                      ),
+                      Text(
+                        'Save More',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -105,7 +162,11 @@ class TruXpertsRewardsScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // How to Earn Points Section
-            _buildSectionHeader(Icons.star_outline_rounded, 'How to Earn Points?', iconColor: AppColors.primaryPurple),
+            _buildSectionHeader(
+              Icons.star_outline_rounded,
+              'How to Earn Points?',
+              iconColor: AppColors.primaryPurple,
+            ),
             const SizedBox(height: 12),
             _buildEarnPointsGrid(),
             const SizedBox(height: 24),
@@ -114,13 +175,28 @@ class TruXpertsRewardsScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildSectionHeader(Icons.card_giftcard_rounded, 'Redeem Your Points', iconColor: AppColors.primaryPurple),
+                _buildSectionHeader(
+                  Icons.card_giftcard_rounded,
+                  'Redeem Your Points',
+                  iconColor: AppColors.primaryPurple,
+                ),
                 TextButton(
                   onPressed: () {},
                   child: Row(
                     children: const [
-                      Text('How it works?', style: TextStyle(color: AppColors.primaryPurple, fontSize: 12, fontWeight: FontWeight.w600)),
-                      Icon(Icons.chevron_right_rounded, color: AppColors.primaryPurple, size: 16),
+                      Text(
+                        'How it works?',
+                        style: TextStyle(
+                          color: AppColors.primaryPurple,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: AppColors.primaryPurple,
+                        size: 16,
+                      ),
                     ],
                   ),
                 ),
@@ -131,7 +207,11 @@ class TruXpertsRewardsScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // How to Use Points Section
-            _buildSectionHeader(Icons.info_outline_rounded, 'How to Use Points?', iconColor: AppColors.primaryPurple),
+            _buildSectionHeader(
+              Icons.info_outline_rounded,
+              'How to Use Points?',
+              iconColor: AppColors.primaryPurple,
+            ),
             const SizedBox(height: 12),
             _buildUsePointsFlow(),
             const SizedBox(height: 24),
@@ -148,7 +228,11 @@ class TruXpertsRewardsScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Why Earn Rewards Section
-            _buildSectionHeader(Icons.diamond_outlined, 'Why Earn Rewards?', iconColor: AppColors.primaryPurple),
+            _buildSectionHeader(
+              Icons.diamond_outlined,
+              'Why Earn Rewards?',
+              iconColor: AppColors.primaryPurple,
+            ),
             const SizedBox(height: 12),
             _buildWhyEarnGrid(),
             const SizedBox(height: 16),
@@ -164,7 +248,11 @@ class TruXpertsRewardsScreen extends StatelessWidget {
 
   // --- Widget Components ---
 
-  Widget _buildSectionHeader(IconData icon, String title, {required Color iconColor}) {
+  Widget _buildSectionHeader(
+    IconData icon,
+    String title, {
+    required Color iconColor,
+  }) {
     return Row(
       children: [
         Container(
@@ -178,7 +266,11 @@ class TruXpertsRewardsScreen extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textDark),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textDark,
+          ),
         ),
       ],
     );
@@ -205,20 +297,12 @@ class TruXpertsRewardsScreen extends StatelessWidget {
                   color: AppColors.primaryPurple,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(Icons.card_giftcard, size: 40, color: Colors.white),
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: AppColors.star,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.star, size: 18, color: Colors.white),
+                child: Image.asset(
+                  'assets/images/rewards.png',
+                fit: BoxFit.cover,
                 ),
               ),
+             
             ],
           ),
           const SizedBox(width: 12),
@@ -228,7 +312,11 @@ class TruXpertsRewardsScreen extends StatelessWidget {
               children: const [
                 Text(
                   'TruXperts Rewards is our way of thanking you! Earn points on your activities and redeem them for discount coupons on your next booking.',
-                  style: TextStyle(fontSize: 11, color: AppColors.textPrimary, height: 1.3),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textPrimary,
+                    height: 1.3,
+                  ),
                 ),
               ],
             ),
@@ -243,17 +331,37 @@ class TruXpertsRewardsScreen extends StatelessWidget {
             ),
             child: Column(
               children: const [
-                Text('Your Points', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                Text(
+                  'Your Points',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
                 SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(Icons.stars_rounded, color: AppColors.star, size: 20),
                     SizedBox(width: 4),
-                    Text('250', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primaryPurple)),
+                    Text(
+                      '250',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryPurple,
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(height: 2),
-                Text('Points', style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                Text(
+                  'Points',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
@@ -264,16 +372,76 @@ class TruXpertsRewardsScreen extends StatelessWidget {
 
   Widget _buildEarnPointsGrid() {
     final items = [
-      {'icon': Icons.person_add_alt_1_outlined, 'title': 'New Account\nRegistration', 'pts': '+50', 'bg': AppColors.iconPhotographerBg, 'fg': AppColors.iconPhotographerFg},
-      {'icon': Icons.badge_outlined, 'title': 'Complete\nProfile', 'pts': '+50', 'bg': AppColors.iconTutorBg, 'fg': AppColors.iconTutorFg},
-      {'icon': Icons.phonelink_ring_rounded, 'title': 'Verify Mobile\nNumber', 'pts': '+20', 'bg': AppColors.iconCleaningBg, 'fg': AppColors.iconCleaningFg},
-      {'icon': Icons.location_on_outlined, 'title': 'Verify\nLocation', 'pts': '+20', 'bg': AppColors.iconCateringBg, 'fg': AppColors.iconCateringFg},
-      {'icon': Icons.description_outlined, 'title': 'Post a\nRequest', 'pts': '+10', 'bg': AppColors.iconTutorBg, 'fg': AppColors.iconTutorFg},
-      {'icon': Icons.check_circle_outline_rounded, 'title': 'Complete\na Service', 'pts': '+50', 'bg': AppColors.iconCleaningBg, 'fg': AppColors.iconCleaningFg},
-      {'icon': Icons.star_outline_rounded, 'title': 'Rate & Review\nVembor', 'pts': '+20', 'bg': AppColors.iconCateringBg, 'fg': AppColors.iconCateringFg},
-      {'icon': Icons.camera_alt_outlined, 'title': 'Upload Service\nPhotos', 'pts': '+15', 'bg': AppColors.iconWeddingBg, 'fg': AppColors.iconWeddingFg},
-      {'icon': Icons.group_outlined, 'title': 'Refer a\nFriend', 'pts': '+100', 'bg': AppColors.iconPhotographerBg, 'fg': AppColors.iconPhotographerFg},
-      {'icon': Icons.cake_outlined, 'title': 'Birthday\nBonus', 'pts': '+50', 'bg': AppColors.iconWeddingBg, 'fg': AppColors.iconWeddingFg},
+      {
+        'icon': Icons.person_add_alt_1_outlined,
+        'title': 'New Account\nRegistration',
+        'pts': '+50',
+        'bg': AppColors.iconPhotographerBg,
+        'fg': AppColors.iconPhotographerFg,
+      },
+      {
+        'icon': Icons.badge_outlined,
+        'title': 'Complete\nProfile',
+        'pts': '+50',
+        'bg': AppColors.iconTutorBg,
+        'fg': AppColors.iconTutorFg,
+      },
+      {
+        'icon': Icons.phonelink_ring_rounded,
+        'title': 'Verify Mobile\nNumber',
+        'pts': '+20',
+        'bg': AppColors.iconCleaningBg,
+        'fg': AppColors.iconCleaningFg,
+      },
+      {
+        'icon': Icons.location_on_outlined,
+        'title': 'Verify\nLocation',
+        'pts': '+20',
+        'bg': AppColors.iconCateringBg,
+        'fg': AppColors.iconCateringFg,
+      },
+      {
+        'icon': Icons.description_outlined,
+        'title': 'Post a\nRequest',
+        'pts': '+10',
+        'bg': AppColors.iconTutorBg,
+        'fg': AppColors.iconTutorFg,
+      },
+      {
+        'icon': Icons.check_circle_outline_rounded,
+        'title': 'Complete\na Service',
+        'pts': '+50',
+        'bg': AppColors.iconCleaningBg,
+        'fg': AppColors.iconCleaningFg,
+      },
+      {
+        'icon': Icons.star_outline_rounded,
+        'title': 'Rate & Review\nVembor',
+        'pts': '+20',
+        'bg': AppColors.iconCateringBg,
+        'fg': AppColors.iconCateringFg,
+      },
+      {
+        'icon': Icons.camera_alt_outlined,
+        'title': 'Upload Service\nPhotos',
+        'pts': '+15',
+        'bg': AppColors.iconWeddingBg,
+        'fg': AppColors.iconWeddingFg,
+      },
+      {
+        'icon': Icons.group_outlined,
+        'title': 'Refer a\nFriend',
+        'pts': '+100',
+        'bg': AppColors.iconPhotographerBg,
+        'fg': AppColors.iconPhotographerFg,
+      },
+      {
+        'icon': Icons.cake_outlined,
+        'title': 'Birthday\nBonus',
+        'pts': '+50',
+        'bg': AppColors.iconWeddingBg,
+        'fg': AppColors.iconWeddingFg,
+      },
     ];
 
     return GridView.builder(
@@ -301,16 +469,29 @@ class TruXpertsRewardsScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 16,
                 backgroundColor: item['bg'] as Color,
-                child: Icon(item['icon'] as IconData, color: item['fg'] as Color, size: 16),
+                child: Icon(
+                  item['icon'] as IconData,
+                  color: item['fg'] as Color,
+                  size: 16,
+                ),
               ),
               Text(
                 item['title'] as String,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w500, color: AppColors.textDark, height: 1.1),
+                style: const TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textDark,
+                  height: 1.1,
+                ),
               ),
               Text(
                 item['pts'] as String,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primaryPurple),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryPurple,
+                ),
               ),
             ],
           ),
@@ -321,11 +502,41 @@ class TruXpertsRewardsScreen extends StatelessWidget {
 
   Widget _buildRedeemCards() {
     final redeemList = [
-      {'pts': '100 Points', 'value': '₹25 OFF', 'bg': AppColors.iconCleaningBg, 'btnColor': AppColors.green, 'isGold': false},
-      {'pts': '250 Points', 'value': '₹75 OFF', 'bg': AppColors.badgePendingBg, 'btnColor': AppColors.orange, 'isGold': false},
-      {'pts': '500 Points', 'value': '₹150 OFF', 'bg': AppColors.lightPurple, 'btnColor': AppColors.primaryPurple, 'isGold': false},
-      {'pts': '1000 Points', 'value': '₹400 OFF', 'bg': AppColors.iconMedicineBg, 'btnColor': AppColors.iconMedicineFg, 'isGold': false},
-      {'pts': '2000 Points', 'value': 'Gold Member\n+ ₹1000 OFF', 'bg': AppColors.lightBlue, 'btnColor': AppColors.blueAccent, 'isGold': true},
+      {
+        'pts': '100 Points',
+        'value': '₹25 OFF',
+        'bg': AppColors.iconCleaningBg,
+        'btnColor': AppColors.green,
+        'isGold': false,
+      },
+      {
+        'pts': '250 Points',
+        'value': '₹75 OFF',
+        'bg': AppColors.badgePendingBg,
+        'btnColor': AppColors.orange,
+        'isGold': false,
+      },
+      {
+        'pts': '500 Points',
+        'value': '₹150 OFF',
+        'bg': AppColors.lightPurple,
+        'btnColor': AppColors.primaryPurple,
+        'isGold': false,
+      },
+      {
+        'pts': '1000 Points',
+        'value': '₹400 OFF',
+        'bg': AppColors.iconMedicineBg,
+        'btnColor': AppColors.iconMedicineFg,
+        'isGold': false,
+      },
+      {
+        'pts': '2000 Points',
+        'value': 'Gold Member\n+ ₹1000 OFF',
+        'bg': AppColors.lightBlue,
+        'btnColor': AppColors.blueAccent,
+        'isGold': true,
+      },
     ];
 
     return SizedBox(
@@ -351,12 +562,20 @@ class TruXpertsRewardsScreen extends StatelessWidget {
               children: [
                 Text(
                   item['pts'] as String,
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isGold ? AppColors.blueAccent : AppColors.textDark),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: isGold ? AppColors.blueAccent : AppColors.textDark,
+                  ),
                 ),
                 isGold
                     ? Container(
                         padding: const EdgeInsets.all(8),
-                        child: const Icon(Icons.workspace_premium, color: AppColors.blueAccent, size: 28),
+                        child: const Icon(
+                          Icons.workspace_premium,
+                          color: AppColors.blueAccent,
+                          size: 28,
+                        ),
                       )
                     : Container(
                         width: double.infinity,
@@ -368,13 +587,23 @@ class TruXpertsRewardsScreen extends StatelessWidget {
                         child: Text(
                           item['value'] as String,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                 Text(
                   isGold ? item['value'] as String : 'Coupon',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 9, color: isGold ? AppColors.blueAccent : AppColors.textSecondary, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: isGold
+                        ? AppColors.blueAccent
+                        : AppColors.textSecondary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -395,13 +624,45 @@ class TruXpertsRewardsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildStepItem(Icons.shopping_bag_outlined, 'Book a\nService', AppColors.iconPainterBg, AppColors.iconPainterFg),
-          const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.textSecondary),
-          _buildStepItem(Icons.stars_rounded, 'Earn Points on\nCompleted Service', AppColors.badgePendingBg, AppColors.orange),
-          const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.textSecondary),
-          _buildStepItem(Icons.local_offer_outlined, 'Redeem Points for\nDiscount Coupon', AppColors.iconCleaningBg, AppColors.green),
-          const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.textSecondary),
-          _buildStepItem(Icons.percent_rounded, 'Apply Coupon &\nGet Discount', AppColors.lightBlue, AppColors.blueAccent),
+          _buildStepItem(
+            Icons.shopping_bag_outlined,
+            'Book a\nService',
+            AppColors.iconPainterBg,
+            AppColors.iconPainterFg,
+          ),
+          const Icon(
+            Icons.arrow_forward_rounded,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
+          _buildStepItem(
+            Icons.stars_rounded,
+            'Earn Points on\nCompleted Service',
+            AppColors.badgePendingBg,
+            AppColors.orange,
+          ),
+          const Icon(
+            Icons.arrow_forward_rounded,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
+          _buildStepItem(
+            Icons.local_offer_outlined,
+            'Redeem Points for\nDiscount Coupon',
+            AppColors.iconCleaningBg,
+            AppColors.green,
+          ),
+          const Icon(
+            Icons.arrow_forward_rounded,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
+          _buildStepItem(
+            Icons.percent_rounded,
+            'Apply Coupon &\nGet Discount',
+            AppColors.lightBlue,
+            AppColors.blueAccent,
+          ),
         ],
       ),
     );
@@ -419,7 +680,12 @@ class TruXpertsRewardsScreen extends StatelessWidget {
         Text(
           label,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w600, color: AppColors.textDark, height: 1.2),
+          style: const TextStyle(
+            fontSize: 8,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textDark,
+            height: 1.2,
+          ),
         ),
       ],
     );
@@ -447,27 +713,51 @@ class TruXpertsRewardsScreen extends StatelessWidget {
         children: [
           Row(
             children: const [
-              Icon(Icons.shield_outlined, color: AppColors.primaryPurple, size: 16),
+              Icon(
+                Icons.shield_outlined,
+                color: AppColors.primaryPurple,
+                size: 16,
+              ),
               SizedBox(width: 6),
-              Text('Important Information', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textDark)),
+              Text(
+                'Important Information',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textDark,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
-          ...points.map((pt) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('✓ ', style: TextStyle(color: AppColors.primaryPurple, fontSize: 10, fontWeight: FontWeight.bold)),
-                    Expanded(
-                      child: Text(
-                        pt,
-                        style: const TextStyle(fontSize: 8.5, color: AppColors.textSecondary, height: 1.2),
+          ...points.map(
+            (pt) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '✓ ',
+                    style: TextStyle(
+                      color: AppColors.primaryPurple,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      pt,
+                      style: const TextStyle(
+                        fontSize: 8.5,
+                        color: AppColors.textSecondary,
+                        height: 1.2,
                       ),
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -486,9 +776,20 @@ class TruXpertsRewardsScreen extends StatelessWidget {
         children: [
           Row(
             children: const [
-              Icon(Icons.receipt_long_outlined, color: AppColors.primaryPurple, size: 16),
+              Icon(
+                Icons.receipt_long_outlined,
+                color: AppColors.primaryPurple,
+                size: 16,
+              ),
               SizedBox(width: 6),
-              Text('Example', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textDark)),
+              Text(
+                'Example',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textDark,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -504,11 +805,24 @@ class TruXpertsRewardsScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 _buildExampleRow('Available Points', '500'),
                 const SizedBox(height: 4),
-                _buildExampleRow('Redeem Points', '-500', valueColor: Colors.red),
+                _buildExampleRow(
+                  'Redeem Points',
+                  '-500',
+                  valueColor: Colors.red,
+                ),
                 const SizedBox(height: 4),
                 _buildExampleRow('Discount', '-₹150', valueColor: Colors.red),
-                const Divider(height: 12, thickness: 0.8, color: AppColors.borderLight),
-                _buildExampleRow('Final Amount', '₹1,050', isBold: true, valueColor: AppColors.primaryPurple),
+                const Divider(
+                  height: 12,
+                  thickness: 0.8,
+                  color: AppColors.borderLight,
+                ),
+                _buildExampleRow(
+                  'Final Amount',
+                  '₹1,050',
+                  isBold: true,
+                  valueColor: AppColors.primaryPurple,
+                ),
               ],
             ),
           ),
@@ -517,43 +831,98 @@ class TruXpertsRewardsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExampleRow(String title, String value, {bool isBold = false, Color? valueColor}) {
+  Widget _buildExampleRow(
+    String title,
+    String value, {
+    bool isBold = false,
+    Color? valueColor,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: TextStyle(fontSize: 9.5, color: isBold ? AppColors.textDark : AppColors.textSecondary, fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
-        Text(value, style: TextStyle(fontSize: 9.5, color: valueColor ?? AppColors.textDark, fontWeight: isBold ? FontWeight.bold : FontWeight.w600)),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 9.5,
+            color: isBold ? AppColors.textDark : AppColors.textSecondary,
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 9.5,
+            color: valueColor ?? AppColors.textDark,
+            fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildWhyEarnGrid() {
     final benefits = [
-      {'icon': Icons.local_offer_outlined, 'title': 'Discount\nCoupons', 'bg': AppColors.iconCleaningBg, 'fg': AppColors.green},
-      {'icon': Icons.account_balance_wallet_outlined, 'title': 'Save More on\nBookings', 'bg': AppColors.badgePendingBg, 'fg': AppColors.orange},
-      {'icon': Icons.card_giftcard, 'title': 'Exclusive\nOffers', 'bg': AppColors.lightPurple, 'fg': AppColors.primaryPurple},
-      {'icon': Icons.workspace_premium_outlined, 'title': 'Priority\nBookings', 'bg': AppColors.lightBlue, 'fg': AppColors.blueAccent},
-      {'icon': Icons.cake_outlined, 'title': 'Birthday\nGift', 'bg': AppColors.iconMedicineBg, 'fg': AppColors.iconMedicineFg},
+      {
+        'icon': Icons.local_offer_outlined,
+        'title': 'Discount\nCoupons',
+        'bg': AppColors.iconCleaningBg,
+        'fg': AppColors.green,
+      },
+      {
+        'icon': Icons.account_balance_wallet_outlined,
+        'title': 'Save More on\nBookings',
+        'bg': AppColors.badgePendingBg,
+        'fg': AppColors.orange,
+      },
+      {
+        'icon': Icons.card_giftcard,
+        'title': 'Exclusive\nOffers',
+        'bg': AppColors.lightPurple,
+        'fg': AppColors.primaryPurple,
+      },
+      {
+        'icon': Icons.workspace_premium_outlined,
+        'title': 'Priority\nBookings',
+        'bg': AppColors.lightBlue,
+        'fg': AppColors.blueAccent,
+      },
+      {
+        'icon': Icons.cake_outlined,
+        'title': 'Birthday\nGift',
+        'bg': AppColors.iconMedicineBg,
+        'fg': AppColors.iconMedicineFg,
+      },
     ];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: benefits
-          .map((b) => Column(
-                children: [
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundColor: b['bg'] as Color,
-                    child: Icon(b['icon'] as IconData, color: b['fg'] as Color, size: 18),
+          .map(
+            (b) => Column(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: b['bg'] as Color,
+                  child: Icon(
+                    b['icon'] as IconData,
+                    color: b['fg'] as Color,
+                    size: 18,
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    b['title'] as String,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: AppColors.textDark, height: 1.1),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  b['title'] as String,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                    height: 1.1,
                   ),
-                ],
-              ))
+                ),
+              ],
+            ),
+          )
           .toList(),
     );
   }
@@ -580,8 +949,21 @@ class TruXpertsRewardsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
-                Text('Your trust and satisfaction drive our rewards program.', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryPurple)),
-                Text('Thank you for choosing TruXperts. Keep earning and saving more!', style: TextStyle(fontSize: 8.5, color: AppColors.textSecondary)),
+                Text(
+                  'Your trust and satisfaction drive our rewards program.',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryPurple,
+                  ),
+                ),
+                Text(
+                  'Thank you for choosing TruXperts. Keep earning and saving more!',
+                  style: TextStyle(
+                    fontSize: 8.5,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ],
             ),
           ),

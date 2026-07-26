@@ -521,15 +521,17 @@ class MyRequestsScreen extends StatelessWidget {
                           Row(
                             children: [
                               Expanded(
-                                child: Text(
-                                  title,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: Color(0xff1A1A2E),
-                                  ),
-                                ),
-                              ),
+  child: Text(
+    title,
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+    style: const TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 13,
+      color: Color(0xff1A1A2E),
+    ),
+  ),
+),
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
@@ -674,39 +676,7 @@ class MyRequestsScreen extends StatelessWidget {
           const Divider(height: 1, color: Color(0xffEDF2F7)),
 
           // ===================== FOOTER (NOT CLICKABLE) =====================
-          SizedBox(
-            height: 40,
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 14),
-                  child: Text(
-                    reqId,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Color(0xffA0AEC0),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                if (footerLeftText.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12),
-                    child: Text(
-                      footerLeftText,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xff4A5568),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                const Spacer(),
-                actionWidget,
-              ],
-            ),
-          ),
-        ],
+           ],
       ),
     );
   }
