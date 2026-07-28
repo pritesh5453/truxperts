@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
 
-/// -----------------------------------------------------------------------
-/// Simple model for a service item shown in the grid
-/// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// Simple model for a service item shown in the grid
+// -----------------------------------------------------------------------
 class ServiceItem {
   final String label;
   final IconData icon;
@@ -19,9 +19,9 @@ class ServiceItem {
   });
 }
 
-/// -----------------------------------------------------------------------
-/// ChooseServiceScreen
-/// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// ChooseServiceScreen
+// -----------------------------------------------------------------------
 class ChooseServiceScreen extends StatelessWidget {
   const ChooseServiceScreen({super.key});
 
@@ -81,67 +81,69 @@ class ChooseServiceScreen extends StatelessWidget {
         icon: Icons.local_shipping,
         bg: AppColors.iconCourierBg,
         fg: AppColors.iconCourierFg),
-    ServiceItem(
-        label: 'More',
-        icon: Icons.grid_view_rounded,
-        bg: AppColors.iconMoreBg,
-        fg: AppColors.iconMoreFg),
   ];
-
-  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: CommonAppBar(),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      body: Column(
         children: [
- 
-          const SizedBox(height: 16),
-          _SectionCard(
-            backgroundColor: AppColors.instantBannerBg,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SectionHeader(
-                  icon: Icons.bolt,
-                  iconColor: AppColors.orange,
-                  title: 'INSTANT SERVICES',
-                  subtitleWidget: const Text(
-                    '        Available in minutes',
-                    style: TextStyle(
-                      color: AppColors.success,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+          // Scrollable content (everything except the footer)
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    backgroundColor: AppColors.instantBannerBg,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionHeader(
+                          icon: Icons.bolt,
+                          iconColor: AppColors.orange,
+                          title: 'INSTANT SERVICES',
+                          subtitleWidget: const Text(
+                            '        Available in minutes',
+                            style: TextStyle(
+                              color: AppColors.success,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          onViewAll: () {},
+                        ),
+                        const SizedBox(height: 16),
+                        _ServiceGrid(items: instantServices),
+                      ],
                     ),
                   ),
-                  onViewAll: () {},
-                ),
-                const SizedBox(height: 16),
-                _ServiceGrid(items: instantServices),
-              ],
+                  const SizedBox(height: 16),
+                  // You can add more sections here (e.g., Advance Booking)
+                  // ...
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          
-          const SizedBox(height: 16),
-          _SmartSearchCard(),
-          const SizedBox(height: 16),
+          // Sticky footer: Smart Search Card
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: AppColors.bg, // same as scaffold background to blend
+            child: const _SmartSearchCard(),
+          ),
         ],
       ),
     );
   }
 }
 
-/// -----------------------------------------------------------------------
-/// Search bar
-/// -----------------------------------------------------------------------
-
-/// -----------------------------------------------------------------------
-/// Rounded section wrapper (instant / advance booking)
-/// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// Rounded section wrapper (instant / advance booking)
+// -----------------------------------------------------------------------
 class _SectionCard extends StatelessWidget {
   final Color backgroundColor;
   final Widget child;
@@ -162,9 +164,9 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-/// -----------------------------------------------------------------------
-/// Section header: icon + title + subtitle on the left, "View All" on right
-/// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// Section header: icon + title + subtitle on the left, "View All" on right
+// -----------------------------------------------------------------------
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -209,15 +211,14 @@ class _SectionHeader extends StatelessWidget {
             ],
           ),
         ),
-        
       ],
     );
   }
 }
 
-/// -----------------------------------------------------------------------
-/// 4-column grid of service tiles
-/// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// 4-column grid of service tiles
+// -----------------------------------------------------------------------
 class _ServiceGrid extends StatelessWidget {
   final List<ServiceItem> items;
 
@@ -243,9 +244,9 @@ class _ServiceGrid extends StatelessWidget {
   }
 }
 
-/// -----------------------------------------------------------------------
-/// Single service tile (icon box in white card + label)
-/// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// Single service tile (icon box in white card + label)
+// -----------------------------------------------------------------------
 class _ServiceTile extends StatelessWidget {
   final ServiceItem item;
 
@@ -305,10 +306,12 @@ class _ServiceTile extends StatelessWidget {
   }
 }
 
-/// -----------------------------------------------------------------------
-/// Bottom "Not sure which service?" + Smart Search card
-/// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// Bottom "Not sure which service?" + Smart Search card (sticky footer)
+// -----------------------------------------------------------------------
 class _SmartSearchCard extends StatelessWidget {
+  const _SmartSearchCard();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -360,8 +363,7 @@ class _SmartSearchCard extends StatelessWidget {
               backgroundColor: AppColors.primaryPurple,
               foregroundColor: Colors.white,
               elevation: 0,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

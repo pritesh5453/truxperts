@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:truxperts/screens/Requests/assign_details_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/common_appbar.dart';
 
 class MyRequestsScreen extends StatelessWidget {
   const MyRequestsScreen({Key? key}) : super(key: key);
@@ -9,72 +10,8 @@ class MyRequestsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF8F9FA),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: const Icon(Icons.arrow_back, color: Color(0xff1A1A2E)),
-        centerTitle: true,
-        title: Column(
-          children: [
-            RichText(
-              text: const TextSpan(
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                children: [
-                  TextSpan(
-                    text: 'Tru',
-                    style: TextStyle(color: Color(0xff1C2D5A)),
-                  ),
-                  TextSpan(
-                    text: 'Xperts',
-                    style: TextStyle(color: Color(0xffE65F2B)),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 2),
-            const Text(
-              "— Trusted Professionals, One Tap Away. —",
-              style: TextStyle(
-                fontSize: 8,
-                color: Color(0xff6C757D),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(LucideIcons.bell, color: Color(0xff1A1A2E)),
-                onPressed: () {},
-              ),
-              Positioned(
-                top: 10,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '5',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
+      backgroundColor: AppColors.bg,
+      appBar: CommonAppBar(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -107,28 +44,7 @@ class MyRequestsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  OutlinedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(
-                      LucideIcons.slidersHorizontal,
-                      size: 14,
-                      color: AppColors.navy,
-                    ),
-                    label: const Text(
-                      'Filters',
-                      style: TextStyle(color: AppColors.navy, fontSize: 13),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xffE2E8F0)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                    ),
-                  ),
+                  
                 ],
               ),
               const SizedBox(height: 16),

@@ -20,12 +20,10 @@ class ServiceItem {
 }
 
 /// -----------------------------------------------------------------------
-/// ChooseServiceScreen
+/// ChooseServiceScreen2 (Advance Booking)
 /// -----------------------------------------------------------------------
 class ChooseServiceScreen2 extends StatelessWidget {
   const ChooseServiceScreen2({super.key});
-
-  
 
   static const List<ServiceItem> advanceBooking = [
     ServiceItem(
@@ -83,11 +81,6 @@ class ChooseServiceScreen2 extends StatelessWidget {
         icon: Icons.chair_alt,
         bg: AppColors.iconInteriorBg,
         fg: AppColors.iconInteriorFg),
-    ServiceItem(
-        label: 'More',
-        icon: Icons.grid_view_rounded,
-        bg: AppColors.iconMoreBg,
-        fg: AppColors.iconMoreFg),
   ];
 
   @override
@@ -95,45 +88,55 @@ class ChooseServiceScreen2 extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: CommonAppBar(),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      body: Column(
         children: [
-      
-          const SizedBox(height: 16),
-        
-          _SectionCard(
-            backgroundColor: AppColors.advanceBannerBg,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SectionHeader(
-                  icon: Icons.calendar_today,
-                  iconColor: AppColors.primaryPurple,
-                  title: 'ADVANCE BOOKING',
-                  subtitleWidget: const Text(
-                    'Book for future date & events',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 12,
+          // Scrollable content (Advance Booking section)
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    backgroundColor: AppColors.advanceBannerBg,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionHeader(
+                          icon: Icons.calendar_today,
+                          iconColor: AppColors.primaryPurple,
+                          title: 'ADVANCE BOOKING',
+                          subtitleWidget: const Text(
+                            '        Book for future date & events',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                          onViewAll: () {},
+                        ),
+                        const SizedBox(height: 16),
+                        _ServiceGrid(items: advanceBooking),
+                      ],
                     ),
                   ),
-                  onViewAll: () {},
-                ),
-                const SizedBox(height: 16),
-                _ServiceGrid(items: advanceBooking),
-              ],
+                  const SizedBox(height: 16),
+                  // You can add more sections here if needed
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          _SmartSearchCard(),
-          const SizedBox(height: 16),
+          // Sticky footer: Smart Search Card
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            color: AppColors.bg, // match scaffold background
+            child: const _SmartSearchCard(),
+          ),
         ],
       ),
     );
   }
 }
-
-
 
 /// -----------------------------------------------------------------------
 /// Rounded section wrapper (instant / advance booking)
@@ -312,9 +315,11 @@ class _ServiceTile extends StatelessWidget {
 }
 
 /// -----------------------------------------------------------------------
-/// Bottom "Not sure which service?" + Smart Search card
+/// Bottom "Not sure which service?" + Smart Search card (sticky footer)
 /// -----------------------------------------------------------------------
 class _SmartSearchCard extends StatelessWidget {
+  const _SmartSearchCard();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -366,8 +371,7 @@ class _SmartSearchCard extends StatelessWidget {
               backgroundColor: AppColors.primaryPurple,
               foregroundColor: Colors.white,
               elevation: 0,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

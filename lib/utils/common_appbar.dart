@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:truxperts/screens/notification/notification_screen.dart';
+import 'package:truxperts/utils/appcolors.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBackPressed;
@@ -19,7 +20,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.bg,
       elevation: 0,
       leading: showBackButton
           ? IconButton(

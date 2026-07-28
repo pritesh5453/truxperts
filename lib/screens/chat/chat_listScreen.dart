@@ -99,9 +99,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
     final double horizontalPadding = mediaQuery.size.width * 0.05;
 
     return Scaffold(
-      backgroundColor: AppColors.fieldFill,
+      backgroundColor: AppColors.bg,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight + mediaQuery.padding.top),
+        preferredSize: Size.fromHeight(kToolbarHeight ),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -159,8 +159,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.fieldFill.withOpacity(0.8),
-            AppColors.fieldFill.withOpacity(0.4),
+            AppColors.bg.withOpacity(0.8),
+            AppColors.bg.withOpacity(0.4),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -170,7 +170,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       child: Container(
         height: 46,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.08),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: TextField(

@@ -22,7 +22,10 @@ class RequestTrackingScreen extends StatelessWidget {
           children: [
             RichText(
               text: const TextSpan(
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ), // reduced from 20
                 children: [
                   TextSpan(
                     text: 'Tru',
@@ -39,7 +42,7 @@ class RequestTrackingScreen extends StatelessWidget {
             const Text(
               "— Trusted Professionals, One Tap Away. —",
               style: TextStyle(
-                fontSize: 8,
+                fontSize: 6, // reduced from 8
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
@@ -71,7 +74,8 @@ class RequestTrackingScreen extends StatelessWidget {
                     '5',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 8,
+                      fontSize:
+                          8, // reduced from 8 (kept same as it's already small)
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -89,6 +93,8 @@ class RequestTrackingScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBriefJobSummaryCard(),
+              const SizedBox(height: 16),
+              _buildServiceOtpCard(),
               const SizedBox(height: 16),
               _buildVendorAssignmentCard(),
               const SizedBox(height: 16),
@@ -143,7 +149,7 @@ class RequestTrackingScreen extends StatelessWidget {
                       'Electrical Wiring Repair',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 13, // reduced from 16
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -161,7 +167,7 @@ class RequestTrackingScreen extends StatelessWidget {
                         'Assigned',
                         style: TextStyle(
                           color: AppColors.blueAccent,
-                          fontSize: 10,
+                          fontSize: 8, // reduced from 10
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -178,7 +184,7 @@ class RequestTrackingScreen extends StatelessWidget {
                         Text(
                           '08 Jul 2025  •  04:30 PM',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 10, // reduced from 12
                             color: AppColors.textGrey,
                           ),
                         ),
@@ -187,7 +193,10 @@ class RequestTrackingScreen extends StatelessWidget {
                     const SizedBox(height: 6),
                     const Text(
                       'Need wiring repair in 2BHK flat.',
-                      style: TextStyle(fontSize: 12, color: AppColors.textDark),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: AppColors.textDark,
+                      ), // reduced from 12
                     ),
                   ],
                 ),
@@ -202,7 +211,7 @@ class RequestTrackingScreen extends StatelessWidget {
                 label: const Text(
                   'Need Help?',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 8, // reduced from 10
                     fontWeight: FontWeight.bold,
                     color: AppColors.navy,
                   ),
@@ -220,10 +229,152 @@ class RequestTrackingScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: AppColors.chipUnselected),
-          const SizedBox(height: 10),
-          
+        ],
+      ),
+    );
+  }
+
+  // --- OTP Verification Card ---
+  Widget _buildServiceOtpCard() {
+    final List<String> otpDigits = ['7', '2', '8', '4', '6', '1'];
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Header: Text and Shield Icon
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Service OTP Verification',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Share this OTP only with your assigned vendor to start the service.',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: AppColors.textGrey,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Graphic Shield Badge
+              SizedBox(
+                width: 60,
+                height: 60,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: AppColors.navy.withOpacity(0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.shield_outlined,
+                        size: 38,
+                        color: AppColors.navy,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.lock_rounded,
+                      size: 18,
+                      color: AppColors.navy,
+                    ),
+                    Positioned(
+                      bottom: 2,
+                      right: 2,
+                      child: Container(
+                        padding: const EdgeInsets.all(1),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.check_circle,
+                          size: 18,
+                          color: Color(0xFF22C55E),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Inner Gray OTP Box Container
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppColors.cardBg.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderLight),
+            ),
+            child: Column(
+              children: [
+                const Text(
+                  'Your Service OTP',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // OTP Digits Display
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: otpDigits.map((digit) {
+                    return Container(
+                      width: 38,
+                      height: 46,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.borderLight),
+                      ),
+                      child: Text(
+                        digit,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 14),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -244,7 +395,7 @@ class RequestTrackingScreen extends StatelessWidget {
           const Text(
             'Your request has been assigned to',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 10, // reduced from 12
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,
             ),
@@ -289,16 +440,12 @@ class RequestTrackingScreen extends StatelessWidget {
                           'Amit Electricals',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                            fontSize: 12, // reduced from 15
                             color: AppColors.textPrimary,
                           ),
                         ),
                         SizedBox(width: 4),
-                        Icon(
-                          Icons.verified,
-                          color: AppColors.navy,
-                          size: 16,
-                        ),
+                        Icon(Icons.verified, color: AppColors.navy, size: 16),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -309,7 +456,7 @@ class RequestTrackingScreen extends StatelessWidget {
                         Text(
                           '4.7',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 10, // reduced from 12
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
                           ),
@@ -318,7 +465,7 @@ class RequestTrackingScreen extends StatelessWidget {
                         Text(
                           '(128 Reviews)',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 9, // reduced from 11
                             color: AppColors.textGrey,
                           ),
                         ),
@@ -336,7 +483,7 @@ class RequestTrackingScreen extends StatelessWidget {
                         Text(
                           '+91 xxxxxxxxxx',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 10, // reduced from 12
                             color: AppColors.textGrey,
                           ),
                         ),
@@ -351,7 +498,7 @@ class RequestTrackingScreen extends StatelessWidget {
                   const Text(
                     'ETA',
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 8, // reduced from 10
                       color: AppColors.hintText,
                       fontWeight: FontWeight.bold,
                     ),
@@ -359,7 +506,7 @@ class RequestTrackingScreen extends StatelessWidget {
                   const Text(
                     '18 min',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 14, // reduced from 18
                       fontWeight: FontWeight.bold,
                       color: AppColors.navy,
                     ),
@@ -367,12 +514,15 @@ class RequestTrackingScreen extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     'Distance from you',
-                    style: TextStyle(fontSize: 9, color: Colors.grey.shade500),
+                    style: TextStyle(
+                      fontSize: 7,
+                      color: Colors.grey.shade500,
+                    ), // reduced from 9
                   ),
                   const Text(
                     '1.2 km',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 9, // reduced from 11
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
@@ -397,6 +547,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     style: TextStyle(
                       color: AppColors.navy,
                       fontWeight: FontWeight.bold,
+                      fontSize: 12, // added explicit size
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
@@ -404,7 +555,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 5),
                   ),
                 ),
               ),
@@ -422,6 +573,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
+                      fontSize: 12, // added explicit size
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -461,7 +613,7 @@ class RequestTrackingScreen extends StatelessWidget {
                       'Live Location',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 13,
+                        fontSize: 10, // reduced from 13
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -477,7 +629,10 @@ class RequestTrackingScreen extends StatelessWidget {
                     const SizedBox(width: 4),
                     const Text(
                       'Amit is on the way',
-                      style: TextStyle(fontSize: 11, color: AppColors.textGrey),
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: AppColors.textGrey,
+                      ), // reduced from 11
                     ),
                   ],
                 ),
@@ -494,7 +649,7 @@ class RequestTrackingScreen extends StatelessWidget {
                       Text(
                         'Refresh',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 10, // reduced from 12
                           color: AppColors.navy,
                           fontWeight: FontWeight.bold,
                         ),
@@ -510,9 +665,7 @@ class RequestTrackingScreen extends StatelessWidget {
             width: double.infinity,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage(
-                  'https://i.imgur.com/WbX2eW0.png',
-                ),
+                image: NetworkImage('https://i.imgur.com/WbX2eW0.png'),
                 fit: BoxFit.cover,
               ),
               borderRadius: BorderRadius.only(
@@ -546,7 +699,7 @@ class RequestTrackingScreen extends StatelessWidget {
                         child: const Text(
                           'Your Location\nKothrud, Pune',
                           style: TextStyle(
-                            fontSize: 8,
+                            fontSize: 6, // reduced from 8
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -577,7 +730,7 @@ class RequestTrackingScreen extends StatelessWidget {
                         child: const Text(
                           'Vendor Location\n18 min away',
                           style: TextStyle(
-                            fontSize: 8,
+                            fontSize: 6, // reduced from 8
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -617,11 +770,10 @@ class RequestTrackingScreen extends StatelessWidget {
                 'Request Status',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                  fontSize: 11, // reduced from 14
                   color: AppColors.textPrimary,
                 ),
               ),
-             
             ],
           ),
           const SizedBox(height: 20),
@@ -678,9 +830,7 @@ class RequestTrackingScreen extends StatelessWidget {
     bool isCompleted = false,
     bool isActive = false,
   }) {
-    Color primaryColor = isCompleted
-        ? AppColors.navy
-        : AppColors.hintText;
+    Color primaryColor = isCompleted ? AppColors.navy : AppColors.hintText;
     return Expanded(
       child: Column(
         children: [
@@ -690,8 +840,8 @@ class RequestTrackingScreen extends StatelessWidget {
               color: isActive
                   ? AppColors.navy
                   : (isCompleted
-                      ? AppColors.lightPurple
-                      : AppColors.chipUnselected),
+                        ? AppColors.lightPurple
+                        : AppColors.chipUnselected),
               shape: BoxShape.circle,
               border: Border.all(color: primaryColor, width: isActive ? 2 : 1),
             ),
@@ -706,7 +856,7 @@ class RequestTrackingScreen extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 9,
+              fontSize: 7, // reduced from 9
               fontWeight: isCompleted ? FontWeight.bold : FontWeight.w500,
               color: AppColors.textPrimary,
             ),
@@ -715,7 +865,10 @@ class RequestTrackingScreen extends StatelessWidget {
           Text(
             time,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 8, color: AppColors.textGrey),
+            style: const TextStyle(
+              fontSize: 6,
+              color: AppColors.textGrey,
+            ), // reduced from 8
           ),
         ],
       ),
@@ -732,9 +885,7 @@ class RequestTrackingScreen extends StatelessWidget {
           (index) => Expanded(
             child: Container(
               height: 1.5,
-              color: isSolid
-                  ? AppColors.navy
-                  : AppColors.borderLight,
+              color: isSolid ? AppColors.navy : AppColors.borderLight,
               margin: const EdgeInsets.symmetric(horizontal: 1),
             ),
           ),
@@ -761,11 +912,10 @@ class RequestTrackingScreen extends StatelessWidget {
                 'Request Details',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                  fontSize: 11, // reduced from 14
                   color: AppColors.textPrimary,
                 ),
               ),
-              
             ],
           ),
           const SizedBox(height: 16),
@@ -822,7 +972,7 @@ class RequestTrackingScreen extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 8, // reduced from 10
                       color: AppColors.hintText,
                       fontWeight: FontWeight.w500,
                     ),
@@ -831,7 +981,7 @@ class RequestTrackingScreen extends StatelessWidget {
                   Text(
                     value,
                     style: const TextStyle(
-                      fontSize: 11,
+                      fontSize: 9, // reduced from 11
                       fontWeight: FontWeight.bold,
                       color: AppColors.textDark,
                     ),
@@ -860,7 +1010,7 @@ class RequestTrackingScreen extends StatelessWidget {
               style: TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
-                fontSize: 13,
+                fontSize: 10, // reduced from 13
               ),
             ),
             style: OutlinedButton.styleFrom(
@@ -877,8 +1027,9 @@ class RequestTrackingScreen extends StatelessWidget {
         Expanded(
           child: ElevatedButton.icon(
             onPressed: () {
-              Navigator.push(context, 
-              MaterialPageRoute(builder: (context) => ServicePaymentScreen()),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ServicePaymentScreen()),
               );
             },
             icon: const Icon(
@@ -891,7 +1042,7 @@ class RequestTrackingScreen extends StatelessWidget {
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 13,
+                fontSize: 10, // reduced from 13
               ),
             ),
             style: ElevatedButton.styleFrom(

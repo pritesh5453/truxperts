@@ -7,7 +7,8 @@ import 'package:truxperts/screens/home/address_location.dart';
 import 'package:truxperts/screens/home/categories.dart';
 import 'package:truxperts/screens/home/categories_2.dart';
 import 'package:truxperts/screens/home/explore_rewards_scren.dart';
-import 'package:truxperts/screens/home/nearby_professionals.dart';
+import 'package:truxperts/screens/home/nearby_prof.dart';
+import 'package:truxperts/screens/home/nearby_professionals.dart';        
 import 'package:truxperts/screens/notification/notification_screen.dart';
 import 'package:truxperts/screens/post/post_requestScreen.dart';
 import 'package:truxperts/utils/appcolors.dart';
@@ -31,7 +32,7 @@ class HomeScreen extends StatelessWidget {
             children: const [
               _TopBar(),
               SizedBox(height: 12),
-              _SearchBar(),           // <-- now stateful, no 'const'
+              _SearchBar(),
               SizedBox(height: 16),
               _HeroBanner(),
               SizedBox(height: 20),
@@ -44,24 +45,45 @@ class HomeScreen extends StatelessWidget {
               _AdvanceBookingServices(),
               SizedBox(height: 20),
               _RewardsBanner(),
-            
-             
-            
               SizedBox(height: 20),
-              _SectionHeader(title: 'Nearby Experts'),
+              // ------------------ Nearby Experts (View All -> NearbyExpertsScreen1) ------------------
+              _SectionHeader(
+                title: 'Nearby Experts',
+                showViewAll: true,
+                onViewAll: _navigateToNearbyExperts1,   // static function
+              ),
               SizedBox(height: 12),
               _NearbyProfessionalsRow(),
-             
               SizedBox(height: 20),
-              _SectionHeader(title: 'Latest Posts from Professionals'),
+              // ------------------ Latest Posts (View All -> NearbyExpertsScreen) ------------------
+              _SectionHeader(
+                title: 'Latest Posts from Professionals',
+                showViewAll: true,
+                onViewAll: _navigateToNearbyExperts2,   // static function
+              ),
               SizedBox(height: 12),
               _LatestPostsGrid(),
-               SizedBox(height: 20),
+              SizedBox(height: 20),
               _StatsRow(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  // Navigation helpers (static so they can be used in const constructors)
+  static void _navigateToNearbyExperts1(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const NearbyExpertsScreen1()),
+    );
+  }
+
+  static void _navigateToNearbyExperts2(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const NearbyExpertsScreen()),
     );
   }
 }
@@ -77,70 +99,45 @@ class _TopBar extends StatelessWidget {
       child: Row(
         children: [
           // Sirf location wale part pe tap -> bottom sheet khulega
-          Flexible(
-            child: InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: () {
-                LocationSelectorSheet.show(context);
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(
-                    Icons.location_on,
-                    color: AppColors.navy,
-                    size: 16,
-                  ),
-                  SizedBox(width: 2),
-                  Flexible(
-                    child: Text(
-                      'Nashik, Maharashtra',
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textDark,
+          Container(
+            width: 300,
+            child: Flexible(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () {
+                  LocationSelectorSheet.show(context);
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(
+                      Icons.location_on,
+                      color: AppColors.navy,
+                      size: 16,
+                    ),
+                    SizedBox(width: 2),
+                    Flexible(
+                      child: Text(
+                        'Shivajinagar, Satpur, Nashik, Maharashtra',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.navy,
+                        ),
                       ),
                     ),
-                  ),
-                  Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 16,
-                    color: AppColors.textDark,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const Spacer(),
-          Column(
-            children: [
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  children: [
-                    TextSpan(
-                      text: 'Tru',
-                      style: TextStyle(color: Color(0xff1C2D5A)),
-                    ),
-                    TextSpan(
-                      text: 'Xperts',
-                      style: TextStyle(color: Color(0xffE65F2B)),
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 16,
+                      color: AppColors.textDark,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 2),
-              const Text(
-                "— Trusted Professionals, One Tap Away. —",
-                style: TextStyle(
-                  fontSize: 8,
-                  color: Color(0xff6C757D),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+            ),
           ),
+          const Spacer(),
           const Spacer(),
           _IconBadge(
             icon: Icons.notifications_none_rounded,
@@ -229,23 +226,21 @@ class _SearchBarState extends State<_SearchBar> {
   }
 
   Future<void> _initSpeech() async {
-  bool available = await _speech.initialize(
-    onStatus: (status) {
-      debugPrint("STATUS: $status");
-    },
-    onError: (error) {
-      debugPrint("ERROR: ${error.errorMsg}");
-      debugPrint("PERMANENT: ${error.permanent}");
-    },
-    debugLogging: true,
-  );
-
-  debugPrint("AVAILABLE: $available");
-}
+    bool available = await _speech.initialize(
+      onStatus: (status) {
+        debugPrint("STATUS: $status");
+      },
+      onError: (error) {
+        debugPrint("ERROR: ${error.errorMsg}");
+        debugPrint("PERMANENT: ${error.permanent}");
+      },
+      debugLogging: true,
+    );
+    debugPrint("AVAILABLE: $available");
+  }
 
   void _startListening() async {
     if (!_speech.isAvailable) {
-      // Optionally show a snackbar or toast
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Speech recognition not available')),
       );
@@ -463,7 +458,7 @@ class _HeroBanner extends StatelessWidget {
                   Text(
                     buttonText,
                     style: TextStyle(
-                      color: isOrange ? AppColors.navy : Colors.white,
+                      color: isOrange ? AppColors.bg : Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -484,11 +479,17 @@ class _HeroBanner extends StatelessWidget {
   }
 }
 
-// ---------------------- SECTION HEADER ----------------------
+// ---------------------- SECTION HEADER (UPDATED WITH DYNAMIC onViewAll) ----------------------
 class _SectionHeader extends StatelessWidget {
   final String title;
   final bool showViewAll;
-  const _SectionHeader({required this.title, this.showViewAll = true});
+  final void Function(BuildContext context)? onViewAll;  // new callback
+
+  const _SectionHeader({
+    required this.title,
+    this.showViewAll = true,
+    this.onViewAll,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -508,12 +509,9 @@ class _SectionHeader extends StatelessWidget {
           if (showViewAll)
             TextButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NearbyExpertsScreen(),
-                  ),
-                );
+                if (onViewAll != null) {
+                  onViewAll!(context);
+                }
               },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
@@ -682,7 +680,7 @@ class _AdvanceBookingServices extends StatelessWidget {
   }
 }
 
-
+// ---------------------- REWARDS BANNER ----------------------
 class _RewardsBanner extends StatelessWidget {
   const _RewardsBanner();
 
@@ -709,8 +707,23 @@ class _RewardsBanner extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  RichText(
+                    text: const TextSpan(
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      children: [
+                        TextSpan(
+                          text: 'Tru',
+                          style: TextStyle(color: AppColors.advanceBannerBg),
+                        ),
+                        TextSpan(
+                          text: 'Xperts',
+                          style: TextStyle(fontSize: 16, color: Color(0xffE65F2B)),
+                        ),
+                      ],
+                    ),
+                  ),
                   const Text(
-                    'TruXperts Rewards',
+                    'Rewards',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -764,7 +777,6 @@ class _RewardsBanner extends StatelessWidget {
                   height: 100,
                   width: 100,
                   fit: BoxFit.cover,
-                  
                 ),
               ),
             ),
@@ -778,7 +790,7 @@ class _RewardsBanner extends StatelessWidget {
                 children: [
                   const Text(
                     'Your Points',
-                    style: TextStyle(color: Colors.white60, fontSize: 12),
+                    style: TextStyle(color: AppColors.bg, fontSize: 14),
                   ),
                   const SizedBox(height: 2),
                   const Row(
@@ -805,100 +817,6 @@ class _RewardsBanner extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-// ---------------------- LIVE OFFERS – ROW ----------------------
-class _LiveOffersRow extends StatelessWidget {
-  const _LiveOffersRow();
-
-  @override
-  Widget build(BuildContext context) {
-    final offers = [
-      {
-        'discount': '20% OFF',
-        'desc': 'on AC Service',
-        'code': 'CODE: CDDL20',
-        'valid': 'Valid till 31 May 2025',
-        'bg': const Color(0xFFE3F8EA),
-        'accent': const Color(0xFF2FAE60)
-      },
-      {
-        'discount': '\$100 OFF',
-        'desc': 'on Fast Booking',
-        'code': 'CODE: FBSIT100',
-        'valid': 'Valid till 25 May 2025',
-        'bg': const Color(0xFFFFEFE3),
-        'accent': const Color(0xFFFF7A1A)
-      },
-      {
-        'discount': 'UP TO 15% OFF',
-        'desc': 'on Cleaning Services',
-        'code': 'CODE: CLEAR15',
-        'valid': 'Valid till 31 May 2025',
-        'bg': const Color(0xFFEFE9FF),
-        'accent': const Color(0xFF7A5AF8)
-      },
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: offers.map((o) {
-          return Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: o['bg'] as Color,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    o['discount'] as String,
-                    style: TextStyle(
-                      color: o['accent'] as Color,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    o['desc'] as String,
-                    style: const TextStyle(fontSize: 9, color: AppColors.textDark),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: (o['accent'] as Color).withOpacity(0.4),
-                      ),
-                    ),
-                    child: Text(
-                      o['code'] as String,
-                      style: TextStyle(
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
-                        color: o['accent'] as Color,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    o['valid'] as String,
-                    style: const TextStyle(fontSize: 7, color: AppColors.textGrey),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }).toList(),
       ),
     );
   }

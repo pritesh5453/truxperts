@@ -87,7 +87,7 @@ class _NavBarScreenState extends State<NavBarScreen> {
                         2,
                         Icons.request_quote_outlined,
                         Icons.request_quote,
-                        'My Requests',
+                        'My Booking',
                       ),
                     ),
                     // Profile (index 3)
