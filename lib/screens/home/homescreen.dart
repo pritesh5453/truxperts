@@ -14,8 +14,6 @@ import 'package:truxperts/screens/post/post_requestScreen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
 
-// If you have InstantServiceScreen in your project, uncomment the next line:
-// import 'package:truxperts/screens/home/instant_service_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -99,44 +97,28 @@ class _TopBar extends StatelessWidget {
       child: Row(
         children: [
           // Sirf location wale part pe tap -> bottom sheet khulega
-          Container(
-            width: 300,
-            child: Flexible(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () {
-                  LocationSelectorSheet.show(context);
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(
-                      Icons.location_on,
-                      color: AppColors.navy,
-                      size: 16,
-                    ),
-                    SizedBox(width: 2),
-                    Flexible(
-                      child: Text(
-                        'Shivajinagar, Satpur, Nashik, Maharashtra',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.navy,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 16,
-                      color: AppColors.textDark,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          SizedBox(
+  width: 300,
+  child: InkWell(
+    borderRadius: BorderRadius.circular(8),
+    onTap: () {
+      LocationSelectorSheet.show(context);
+    },
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: const [
+        Icon(Icons.location_on),
+        SizedBox(width: 2),
+        Expanded(
+          child: Text(
+            'Shivajinagar, Satpur, Nashik, Maharashtra',
+            overflow: TextOverflow.ellipsis,
           ),
+        ),
+      ],
+    ),
+  ),
+),
           const Spacer(),
           const Spacer(),
           _IconBadge(
