@@ -8,12 +8,11 @@ import 'package:truxperts/screens/home/categories.dart';
 import 'package:truxperts/screens/home/categories_2.dart';
 import 'package:truxperts/screens/home/explore_rewards_scren.dart';
 import 'package:truxperts/screens/home/nearby_prof.dart';
-import 'package:truxperts/screens/home/nearby_professionals.dart';        
+import 'package:truxperts/screens/home/nearby_professionals.dart';
 import 'package:truxperts/screens/notification/notification_screen.dart';
 import 'package:truxperts/screens/post/post_requestScreen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
-
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -28,6 +27,7 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
+              SizedBox(height: 5),
               _TopBar(),
               SizedBox(height: 12),
               _SearchBar(),
@@ -38,7 +38,10 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 12),
               _TopInstantServices(),
               SizedBox(height: 20),
-              _SectionHeader(title: 'Popular for Advance Booking', showViewAll: false),
+              _SectionHeader(
+                title: 'Popular for Advance Booking',
+                showViewAll: false,
+              ),
               SizedBox(height: 12),
               _AdvanceBookingServices(),
               SizedBox(height: 20),
@@ -48,7 +51,7 @@ class HomeScreen extends StatelessWidget {
               _SectionHeader(
                 title: 'Nearby Experts',
                 showViewAll: true,
-                onViewAll: _navigateToNearbyExperts1,   // static function
+                onViewAll: _navigateToNearbyExperts1, // static function
               ),
               SizedBox(height: 12),
               _NearbyProfessionalsRow(),
@@ -57,7 +60,7 @@ class HomeScreen extends StatelessWidget {
               _SectionHeader(
                 title: 'Latest Posts from Professionals',
                 showViewAll: true,
-                onViewAll: _navigateToNearbyExperts2,   // static function
+                onViewAll: _navigateToNearbyExperts2, // static function
               ),
               SizedBox(height: 12),
               _LatestPostsGrid(),
@@ -98,27 +101,32 @@ class _TopBar extends StatelessWidget {
         children: [
           // Sirf location wale part pe tap -> bottom sheet khulega
           SizedBox(
-  width: 300,
-  child: InkWell(
-    borderRadius: BorderRadius.circular(8),
-    onTap: () {
-      LocationSelectorSheet.show(context);
-    },
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: const [
-        Icon(Icons.location_on),
-        SizedBox(width: 2),
-        Expanded(
-          child: Text(
-            'Shivajinagar, Satpur, Nashik, Maharashtra',
-            overflow: TextOverflow.ellipsis,
+            width: 300,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                LocationSelectorSheet.show(context);
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.location_on, size: 20, color: Colors.black),
+                  Expanded(
+                    child: Text(
+                      'Shivajinagar, Satpur, Nashik, Maharashtra',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 20,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ],
-    ),
-  ),
-),
           const Spacer(),
           const Spacer(),
           _IconBadge(
@@ -142,11 +150,7 @@ class _IconBadge extends StatelessWidget {
   final IconData icon;
   final int badgeCount;
   final VoidCallback? onTap;
-  const _IconBadge({
-    required this.icon,
-    required this.badgeCount,
-    this.onTap,
-  });
+  const _IconBadge({required this.icon, required this.badgeCount, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +270,7 @@ class _SearchBarState extends State<_SearchBar> {
               color: Colors.black.withOpacity(0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
-            )
+            ),
           ],
         ),
         child: Row(
@@ -465,7 +469,7 @@ class _HeroBanner extends StatelessWidget {
 class _SectionHeader extends StatelessWidget {
   final String title;
   final bool showViewAll;
-  final void Function(BuildContext context)? onViewAll;  // new callback
+  final void Function(BuildContext context)? onViewAll; // new callback
 
   const _SectionHeader({
     required this.title,
@@ -541,12 +545,42 @@ class _TopInstantServices extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const items = [
-      _ServiceItem(Icons.bolt, 'Electrician', Color(0xFFE9ECFB), Color(0xFF4A5AD9)),
-      _ServiceItem(Icons.plumbing, 'Plumber', Color(0xFFDBF0FF), Color(0xFF2196D9)),
-      _ServiceItem(Icons.ac_unit, 'AC Repair', Color(0xFFE3F5FF), Color(0xFF1EA7E0)),
-      _ServiceItem(Icons.cleaning_services, 'Cleaning', Color(0xFFE0F7EF), Color(0xFF2FAE60)),
-      _ServiceItem(Icons.shopping_basket, 'Grocery', Color(0xFFE0F7E9), Color(0xFF2FAE60)),
-      _ServiceItem(Icons.more_horiz, 'More', Color(0xFFEFEFF4), Color(0xFF8A8CA3)),
+      _ServiceItem(
+        Icons.bolt,
+        'Electrician',
+        Color(0xFFE9ECFB),
+        Color(0xFF4A5AD9),
+      ),
+      _ServiceItem(
+        Icons.plumbing,
+        'Plumber',
+        Color(0xFFDBF0FF),
+        Color(0xFF2196D9),
+      ),
+      _ServiceItem(
+        Icons.ac_unit,
+        'AC Repair',
+        Color(0xFFE3F5FF),
+        Color(0xFF1EA7E0),
+      ),
+      _ServiceItem(
+        Icons.cleaning_services,
+        'Cleaning',
+        Color(0xFFE0F7EF),
+        Color(0xFF2FAE60),
+      ),
+      _ServiceItem(
+        Icons.shopping_basket,
+        'Grocery',
+        Color(0xFFE0F7E9),
+        Color(0xFF2FAE60),
+      ),
+      _ServiceItem(
+        Icons.more_horiz,
+        'More',
+        Color(0xFFEFEFF4),
+        Color(0xFF8A8CA3),
+      ),
     ];
 
     return Padding(
@@ -559,7 +593,9 @@ class _TopInstantServices extends StatelessWidget {
               if (item.label == 'More') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ChooseServiceScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const ChooseServiceScreen(),
+                  ),
                 );
               }
             },
@@ -605,12 +641,42 @@ class _AdvanceBookingServices extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const items = [
-      _ServiceItem(Icons.camera_alt, 'Photographer', Color(0xFFF3E8FF), Color(0xFF9B51E0)),
-      _ServiceItem(Icons.diamond_outlined, 'Wedding\nPlanner', Color(0xFFFFF1E0), Color(0xFFFF9800)),
-      _ServiceItem(Icons.restaurant, 'Catering', Color(0xFFFFE7E7), Color(0xFFE53935)),
-      _ServiceItem(Icons.chair_alt, 'Decorator', Color(0xFFE7F0FF), Color(0xFF3F6BE0)),
-      _ServiceItem(Icons.music_note, 'DJ', Color(0xFFF3E8FF), Color(0xFF9B51E0)),
-      _ServiceItem(Icons.more_horiz, 'More', Color(0xFFEFEFF4), Color(0xFF8A8CA3)),
+      _ServiceItem(
+        Icons.camera_alt,
+        'Photographer',
+        Color(0xFFF3E8FF),
+        Color(0xFF9B51E0),
+      ),
+      _ServiceItem(
+        Icons.diamond_outlined,
+        'Wedding\nPlanner',
+        Color(0xFFFFF1E0),
+        Color(0xFFFF9800),
+      ),
+      _ServiceItem(
+        Icons.restaurant,
+        'Catering',
+        Color(0xFFFFE7E7),
+        Color(0xFFE53935),
+      ),
+      _ServiceItem(
+        Icons.chair_alt,
+        'Decorator',
+        Color(0xFFE7F0FF),
+        Color(0xFF3F6BE0),
+      ),
+      _ServiceItem(
+        Icons.music_note,
+        'DJ',
+        Color(0xFFF3E8FF),
+        Color(0xFF9B51E0),
+      ),
+      _ServiceItem(
+        Icons.more_horiz,
+        'More',
+        Color(0xFFEFEFF4),
+        Color(0xFF8A8CA3),
+      ),
     ];
 
     return Padding(
@@ -623,7 +689,9 @@ class _AdvanceBookingServices extends StatelessWidget {
               if (item.label == 'More') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ChooseServiceScreen2()),
+                  MaterialPageRoute(
+                    builder: (_) => const ChooseServiceScreen2(),
+                  ),
                 );
               }
             },
@@ -691,7 +759,10 @@ class _RewardsBanner extends StatelessWidget {
                 children: [
                   RichText(
                     text: const TextSpan(
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                       children: [
                         TextSpan(
                           text: 'Tru',
@@ -699,7 +770,10 @@ class _RewardsBanner extends StatelessWidget {
                         ),
                         TextSpan(
                           text: 'Xperts',
-                          style: TextStyle(fontSize: 16, color: Color(0xffE65F2B)),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xffE65F2B),
+                          ),
                         ),
                       ],
                     ),
@@ -811,10 +885,26 @@ class _NearbyProfessionalsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profs = [
-      {'name': 'Amit Bactwala', 'rating': '+4.8 (120)', 'color': const Color(0xFFB9C4FF)},
-      {'name': 'Suresh Pushkar', 'rating': '+4.7 (90)', 'color': const Color(0xFFFFC9A6)},
-      {'name': 'AC Repair Pro', 'rating': '+4.6 (76)', 'color': const Color(0xFFA6D8FF)},
-      {'name': 'Home Cleaning', 'rating': '+4.8 (112)', 'color': const Color(0xFFFFB9D6)},
+      {
+        'name': 'Amit Bactwala',
+        'rating': '+4.8 (120)',
+        'color': const Color(0xFFB9C4FF),
+      },
+      {
+        'name': 'Suresh Pushkar',
+        'rating': '+4.7 (90)',
+        'color': const Color(0xFFFFC9A6),
+      },
+      {
+        'name': 'AC Repair Pro',
+        'rating': '+4.6 (76)',
+        'color': const Color(0xFFA6D8FF),
+      },
+      {
+        'name': 'Home Cleaning',
+        'rating': '+4.8 (112)',
+        'color': const Color(0xFFFFB9D6),
+      },
     ];
 
     return Padding(
@@ -826,7 +916,9 @@ class _NearbyProfessionalsRow extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ProviderProfileScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const ProviderProfileScreen(),
+                  ),
                 );
               },
               child: Container(
@@ -840,7 +932,7 @@ class _NearbyProfessionalsRow extends StatelessWidget {
                       color: Colors.black.withOpacity(0.04),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
-                    )
+                    ),
                   ],
                 ),
                 child: Column(
@@ -851,7 +943,11 @@ class _NearbyProfessionalsRow extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 20,
                         backgroundColor: p['color'] as Color,
-                        child: const Icon(Icons.person, color: Colors.white, size: 18),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -868,7 +964,10 @@ class _NearbyProfessionalsRow extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       p['rating'] as String,
-                      style: const TextStyle(fontSize: 8, color: AppColors.textGrey),
+                      style: const TextStyle(
+                        fontSize: 8,
+                        color: AppColors.textGrey,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Container(
@@ -906,8 +1005,16 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      {'icon': Icons.emoji_emotions, 'value': '50,000+', 'label': 'Happy Customers'},
-      {'icon': Icons.verified_user, 'value': '5,000+', 'label': 'Verified Professionals'},
+      {
+        'icon': Icons.emoji_emotions,
+        'value': '50,000+',
+        'label': 'Happy Customers',
+      },
+      {
+        'icon': Icons.verified_user,
+        'value': '5,000+',
+        'label': 'Verified Professionals',
+      },
       {'icon': Icons.category, 'value': '120+', 'label': 'Service Categories'},
       {'icon': Icons.task_alt, 'value': '1L+', 'label': 'Service Completed'},
     ];
@@ -924,7 +1031,7 @@ class _StatsRow extends StatelessWidget {
               color: Colors.black.withOpacity(0.04),
               blurRadius: 6,
               offset: const Offset(0, 2),
-            )
+            ),
           ],
         ),
         child: Row(
@@ -948,7 +1055,10 @@ class _StatsRow extends StatelessWidget {
                   child: Text(
                     s['label'] as String,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 7, color: AppColors.textGrey),
+                    style: const TextStyle(
+                      fontSize: 7,
+                      color: AppColors.textGrey,
+                    ),
                   ),
                 ),
               ],
@@ -1178,7 +1288,11 @@ class _PostCard extends StatelessWidget {
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.verified, size: 11, color: Color(0xFF2F80ED)),
+                              child: const Icon(
+                                Icons.verified,
+                                size: 11,
+                                color: Color(0xFF2F80ED),
+                              ),
                             ),
                           ),
                         ],
@@ -1215,7 +1329,9 @@ class _PostCard extends StatelessWidget {
                       Icon(
                         liked ? Icons.favorite : Icons.favorite_border,
                         size: 12,
-                        color: liked ? const Color(0xFFEB5757) : const Color(0xFFF2A93B),
+                        color: liked
+                            ? const Color(0xFFEB5757)
+                            : const Color(0xFFF2A93B),
                       ),
                       const SizedBox(width: 2),
                       Text(

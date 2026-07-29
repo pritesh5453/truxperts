@@ -1,5 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:truxperts/API/Model_n_svc/login/login_svc.dart';
+import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/customtextfield.dart';
 import 'package:truxperts/utils/logowidget.dart';
@@ -16,6 +19,108 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
+  bool _isLoading = false;
+
+  // Controllers for text fields
+  final TextEditingController _mobileController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  // Dio and AuthService instances
+  late final Dio _dio;
+  late final AuthService _authService;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize Dio with base options
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: ApiEndpoints.baseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
+    _authService = AuthService(_dio);
+  }
+
+  @override
+  void dispose() {
+    _mobileController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  // Login method
+  Future<void> _login() async {
+    // Validate fields
+    final mobile = _mobileController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (mobile.isEmpty || password.isEmpty) {
+      _showSnackBar('Please fill all fields');
+      return;
+    }
+
+    if (mobile.length < 10) {
+      _showSnackBar('Enter a valid mobile number');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _authService.login(
+        mobileNumber: mobile,
+        password: password,
+      );
+
+      // Login successful
+      if (mounted) {
+        setState(() => _isLoading = false);
+        // Optionally store token (shared_preferences etc.)
+        // For now, just navigate
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const NavBarScreen()),
+        );
+      }
+    } on DioException catch (e) {
+      setState(() => _isLoading = false);
+      String errorMessage = 'Login failed';
+      if (e.response != null && e.response?.data != null) {
+        // Try to extract message from server response
+        try {
+          final data = e.response?.data as Map<String, dynamic>;
+          if (data.containsKey('message')) {
+            errorMessage = data['message'] as String;
+          } else if (data.containsKey('error')) {
+            errorMessage = data['error'] as String;
+          }
+        } catch (_) {
+          // ignore
+        }
+      } else {
+        errorMessage = e.message ?? 'Network error';
+      }
+      _showSnackBar(errorMessage);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      _showSnackBar('Unexpected error occurred');
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade700,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,16 +161,21 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 26),
 
-              const CustomTextField(
+              // Mobile Number field
+              CustomTextField(
                 hint: 'Mobile Number',
                 icon: Icons.person_outline,
                 keyboardType: TextInputType.phone,
+                controller: _mobileController,
               ),
               const SizedBox(height: 14),
+
+              // Password field
               CustomTextField(
                 hint: 'Password',
                 icon: Icons.lock_outline,
                 obscureText: _obscurePassword,
+                controller: _passwordController,
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscurePassword
@@ -80,6 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 10),
+
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -105,17 +216,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 18),
 
+              // Login Button with loading indicator
               SizedBox(
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const NavBarScreen(),
-      ),
-    );
-                  },
+                  onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.navy,
                     foregroundColor: Colors.white,
@@ -124,13 +229,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 22),

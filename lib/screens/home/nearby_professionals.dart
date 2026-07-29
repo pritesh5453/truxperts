@@ -109,6 +109,7 @@ class _NearbyExpertsScreenState extends State<NearbyExpertsScreen> {
             // Top Bar
             CommonAppBar(),
 
+SizedBox(height: 10,),
             // Category Filter
             SizedBox(
               height: 36,

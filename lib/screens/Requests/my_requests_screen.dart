@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
+import 'package:truxperts/screens/Requests/advance/advance_details_screen.dart';
 import 'package:truxperts/screens/Requests/assign_details_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
 
-class MyRequestsScreen extends StatelessWidget {
+class MyRequestsScreen extends StatefulWidget {
   const MyRequestsScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MyRequestsScreen> createState() => _MyRequestsScreenState();
+}
+
+class _MyRequestsScreenState extends State<MyRequestsScreen> {
+  bool instantSelected = true;
+  bool advanceSelected = false;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +27,7 @@ class MyRequestsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header & Filter Button Row
+              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,13 +53,62 @@ class MyRequestsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  
                 ],
               ),
               const SizedBox(height: 16),
 
-              // Filter Chips Grid
-              // Filter Chips Section (Exactly like Image 1)
+              // Booking Type Filters
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  
+                  const SizedBox(height: 12),
+                  IntrinsicHeight(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: _buildBookingTypeChip(
+                            icon: LucideIcons.zap,
+                            label: 'Instant Booking',
+                            subtitle: 'Quick services at your door',
+                            selected: instantSelected,
+                            onTap: () {
+                              setState(() {
+                                if (!instantSelected) {
+                                  instantSelected = true;
+                                  advanceSelected = false;
+                                }
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 1,
+                          child: _buildBookingTypeChip(
+                            icon: LucideIcons.calendar,
+                            label: 'Advance Booking',
+                            subtitle: 'Plan ahead, book in advance',
+                            selected: advanceSelected,
+                            onTap: () {
+                              setState(() {
+                                if (!advanceSelected) {
+                                  advanceSelected = true;
+                                  instantSelected = false;
+                                }
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Status Filter Chips (unchanged)
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -63,7 +121,6 @@ class MyRequestsScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    // First Row (All Requests, Pending, Assigned, In Progress)
                     IntrinsicHeight(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,7 +129,7 @@ class MyRequestsScreen extends StatelessWidget {
                             'All Requests',
                             '12',
                             isSelected: true,
-                            activeColor:  AppColors.navy,
+                            activeColor: AppColors.navy,
                           ),
                           _buildVerticalDivider(),
                           _buildFilterChip(
@@ -93,13 +150,12 @@ class MyRequestsScreen extends StatelessWidget {
                             'In Progress',
                             '2',
                             countBg: const Color(0xffEAE4FF),
-                            countText:  AppColors.navy,
+                            countText: AppColors.navy,
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Second Row (Completed, Cancelled)
                     IntrinsicHeight(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -127,7 +183,7 @@ class MyRequestsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Request Cards List
+              // Request Cards (same as before)
               _buildRequestCard(
                 title: 'Electrical Wiring Repair',
                 onTap: () {
@@ -146,19 +202,26 @@ class MyRequestsScreen extends StatelessWidget {
                 statusBg: const Color(0xffE0EFFF),
                 statusTextColor: const Color(0xff007AFF),
                 icon: LucideIcons.zap,
-                iconColor:  AppColors.navy,
+                iconColor: AppColors.navy,
                 iconBg: const Color(0xffEAE4FF),
                 footerLeftText: '1 Quote Received',
                 actionWidget: _buildChatButton(),
                 providerName: 'Amit Electricals',
                 providerRating: '4.7',
-                providerImage:
-                    'https://i.imgur.com/8Km9tLL.png', // Fallback placeholder
+                providerImage: 'https://i.imgur.com/8Km9tLL.png',
               ),
               const SizedBox(height: 16),
 
               _buildRequestCard(
                 title: 'Plumbing Issue',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const RequestDetailsScreen(),
+                    ),
+                  );
+                },
                 location: 'Baner, Pune',
                 dateTime: '07 Jul 2025  •  11:00 AM',
                 description: 'Tap leaking in bathroom.',
@@ -166,7 +229,7 @@ class MyRequestsScreen extends StatelessWidget {
                 statusText: 'Pending',
                 statusBg: const Color(0xffFFECC7),
                 statusTextColor: const Color(0xffFF9F00),
-                icon: LucideIcons.pipette, // Alternate for tap icon
+                icon: LucideIcons.pipette,
                 iconColor: const Color(0xffE65F2B),
                 iconBg: const Color(0xffFFEFEA),
                 footerLeftText: '0 Quotes Yet',
@@ -214,7 +277,7 @@ class MyRequestsScreen extends StatelessWidget {
                 reqId: 'REQ125675',
                 statusText: 'In Progress',
                 statusBg: const Color(0xffEAE4FF),
-                statusTextColor:  AppColors.navy,
+                statusTextColor: AppColors.navy,
                 icon: LucideIcons.airplay,
                 iconColor: const Color(0xff007AFF),
                 iconBg: const Color(0xffE0EFFF),
@@ -240,7 +303,10 @@ class MyRequestsScreen extends StatelessWidget {
                 iconBg: const Color(0xffE2F6EA),
                 footerLeftText: 'Completed on 03 Jul 2025',
                 actionWidget: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, 
+                    MaterialPageRoute(builder: (context) => const RequestDetailsScreen()));
+                  },
                   child: const Text(
                     'Rate Now',
                     style: TextStyle(
@@ -305,8 +371,67 @@ class MyRequestsScreen extends StatelessWidget {
     );
   }
 
-  // Filter Chip Widget
-  // Custom Thin Vertical Divider Helper
+  // ========== Booking Type Chip (with navy background & white text when selected) ==========
+  Widget _buildBookingTypeChip({
+    required IconData icon,
+    required String label,
+    required String subtitle,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.navy : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? AppColors.navy : const Color(0xffEFF1F4),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: selected ? Colors.white : const Color(0xffA0AEC0),
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                      color: selected ? Colors.white : const Color(0xff1A1A2E),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: selected ? Colors.white : const Color(0xff6C757D),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ========== Existing helpers ==========
   Widget _buildVerticalDivider() {
     return VerticalDivider(
       color: Colors.grey.shade300,
@@ -317,7 +442,6 @@ class MyRequestsScreen extends StatelessWidget {
     );
   }
 
-  // Fixed Size/Padding Filter Chip Helper (Matches Image 1 Text Ratios)
   Widget _buildFilterChip(
     String label,
     String count, {
@@ -332,7 +456,7 @@ class MyRequestsScreen extends StatelessWidget {
           : const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
       decoration: BoxDecoration(
         color: isSelected
-            ? (activeColor ??  AppColors.navy)
+            ? (activeColor ?? AppColors.navy)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
       ),
@@ -362,7 +486,7 @@ class MyRequestsScreen extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: isSelected
-                    ? (activeColor ??  AppColors.navy)
+                    ? (activeColor ?? AppColors.navy)
                     : (countText ?? AppColors.navy.withOpacity(0.8)),
               ),
             ),
@@ -372,7 +496,6 @@ class MyRequestsScreen extends StatelessWidget {
     );
   }
 
-  // Main Generic Request Card Component
   Widget _buildRequestCard({
     required String title,
     required String location,
@@ -409,7 +532,6 @@ class MyRequestsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ===================== CLICKABLE HEADER =====================
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -429,7 +551,6 @@ class MyRequestsScreen extends StatelessWidget {
                       child: Icon(icon, color: iconColor, size: 22),
                     ),
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,17 +558,17 @@ class MyRequestsScreen extends StatelessWidget {
                           Row(
                             children: [
                               Expanded(
-  child: Text(
-    title,
-    maxLines: 1,
-    overflow: TextOverflow.ellipsis,
-    style: const TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 13,
-      color: Color(0xff1A1A2E),
-    ),
-  ),
-),
+                                child: Text(
+                                  title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: Color(0xff1A1A2E),
+                                  ),
+                                ),
+                              ),
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
@@ -516,7 +637,6 @@ class MyRequestsScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     if (providerName != null) ...[
                       const SizedBox(width: 12),
                       Row(
@@ -588,16 +708,28 @@ class MyRequestsScreen extends StatelessWidget {
               ),
             ),
           ),
-
           const Divider(height: 1, color: Color(0xffEDF2F7)),
-
-          // ===================== FOOTER (NOT CLICKABLE) =====================
-           ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  footerLeftText,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Color(0xff6C757D),
+                  ),
+                ),
+                actionWidget,
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  // Standard Action Buttons
   static Widget _buildChatButton() {
     return Padding(
       padding: const EdgeInsets.only(right: 14.0),
@@ -617,7 +749,7 @@ class MyRequestsScreen extends StatelessWidget {
           ),
         ),
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size(0, 35), // 👈 Height
+          minimumSize: const Size(0, 35),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           visualDensity: VisualDensity.compact,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),

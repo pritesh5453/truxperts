@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:truxperts/screens/Requests/payment_method_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
+import 'package:truxperts/utils/common_appbar.dart';
 
 class RequestTrackingScreen extends StatelessWidget {
   const RequestTrackingScreen({Key? key}) : super(key: key);
@@ -10,82 +11,7 @@ class RequestTrackingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
-      appBar: AppBar(
-        backgroundColor: AppColors.cardBg,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () {},
-        ),
-        centerTitle: true,
-        title: Column(
-          children: [
-            RichText(
-              text: const TextSpan(
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ), // reduced from 20
-                children: [
-                  TextSpan(
-                    text: 'Tru',
-                    style: TextStyle(color: AppColors.navy),
-                  ),
-                  TextSpan(
-                    text: 'Xperts',
-                    style: TextStyle(color: AppColors.orange),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 2),
-            const Text(
-              "— Trusted Professionals, One Tap Away. —",
-              style: TextStyle(
-                fontSize: 6, // reduced from 8
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  LucideIcons.bell,
-                  color: AppColors.textPrimary,
-                  size: 22,
-                ),
-                onPressed: () {},
-              ),
-              Positioned(
-                top: 12,
-                right: 10,
-                child: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '5',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize:
-                          8, // reduced from 8 (kept same as it's already small)
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
+      appBar: CommonAppBar(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

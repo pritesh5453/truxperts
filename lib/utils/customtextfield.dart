@@ -10,6 +10,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final TextInputType keyboardType;
   final Widget? trailing;
+  final TextEditingController? controller;   // ✅ NEW: controller parameter
 
   const CustomTextField({
     super.key,
@@ -19,6 +20,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.keyboardType = TextInputType.text,
     this.trailing,
+    this.controller,                         // ✅ include in constructor
   });
 
   @override
@@ -31,6 +33,7 @@ class CustomTextField extends StatelessWidget {
         border: Border.all(color: AppColors.fieldBorder, width: 1.2),
       ),
       child: TextField(
+        controller: controller,              // ✅ pass to TextField
         obscureText: obscureText,
         keyboardType: keyboardType,
         style: const TextStyle(fontSize: 14.5, color: AppColors.textPrimary),

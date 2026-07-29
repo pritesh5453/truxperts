@@ -16,6 +16,7 @@ dependencies:
   speech_to_text: ^7.4.0
   lucide_flutter: ^1.23.0
   image_picker: ^1.2.3
+  dio: ^5.11.0
 
 dev_dependencies:
   flutter_test:
