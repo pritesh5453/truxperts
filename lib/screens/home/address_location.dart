@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
+import 'package:geocoding/geocoding.dart' hide Location; // ✅ Location class conflict resolved
 import 'package:truxperts/screens/home/add_address_sheet.dart';
 import 'package:truxperts/utils/appcolors.dart';
 
@@ -6,7 +8,7 @@ class LocationSelectorSheet {
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // height control karne ke liye zaroori
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withOpacity(0.4),
       builder: (context) => const _LocationSheetContent(),
@@ -14,8 +16,126 @@ class LocationSelectorSheet {
   }
 }
 
-class _LocationSheetContent extends StatelessWidget {
+class _LocationSheetContent extends StatefulWidget {
   const _LocationSheetContent();
+
+  @override
+  State<_LocationSheetContent> createState() => _LocationSheetContentState();
+}
+
+class _LocationSheetContentState extends State<_LocationSheetContent> {
+  bool _isLoading = false;
+  String _locationStatus = '';
+  String _currentAddress = '';
+  double? _currentLat;
+  double? _currentLng;
+
+  // Reverse geocoding – lat/lng se address nikaalo
+  Future<String> _getAddressFromLatLng(double lat, double lng) async {
+    try {
+      // geocoding v5.0.0+ uses the Geocoding class instance API
+      final Geocoding geocoding = Geocoding();
+      List<Placemark> placemarks =
+          await geocoding.placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        String address = '';
+        if (place.street != null && place.street!.isNotEmpty) {
+          address += place.street!;
+        }
+        if (place.locality != null && place.locality!.isNotEmpty) {
+          address += (address.isNotEmpty ? ', ' : '') + place.locality!;
+        }
+        if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) {
+          address += (address.isNotEmpty ? ', ' : '') + place.administrativeArea!;
+        }
+        if (place.country != null && place.country!.isNotEmpty) {
+          address += (address.isNotEmpty ? ', ' : '') + place.country!;
+        }
+        return address.isNotEmpty ? address : 'Unknown location';
+      }
+      return 'Address not found';
+    } catch (e) {
+      print('❌ Reverse geocoding error: $e');
+      return 'Unable to fetch address';
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    setState(() {
+      _isLoading = true;
+      _locationStatus = 'Fetching location...';
+      _currentAddress = '';
+    });
+
+    try {
+      Location location = Location();
+
+      bool serviceEnabled = await location.serviceEnabled();
+      if (!serviceEnabled) {
+        serviceEnabled = await location.requestService();
+        if (!serviceEnabled) {
+          setState(() {
+            _isLoading = false;
+            _locationStatus = '⚠️ Please enable location services';
+          });
+          return;
+        }
+      }
+
+      PermissionStatus permissionGranted = await location.hasPermission();
+      if (permissionGranted == PermissionStatus.denied) {
+        permissionGranted = await location.requestPermission();
+        if (permissionGranted != PermissionStatus.granted) {
+          setState(() {
+            _isLoading = false;
+            _locationStatus = '⚠️ Location permission denied';
+          });
+          return;
+        }
+      }
+
+      LocationData locationData = await location.getLocation();
+
+      final lat = locationData.latitude;
+      final lng = locationData.longitude;
+
+      if (lat != null && lng != null) {
+        _currentLat = lat;
+        _currentLng = lng;
+
+        String address = await _getAddressFromLatLng(lat, lng);
+        _currentAddress = address;
+
+        setState(() {
+          _isLoading = false;
+          _locationStatus = '📍 $address';
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('📍 $address'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        print('✅ Latitude: $lat, Longitude: $lng');
+        print('✅ Address: $address');
+      } else {
+        setState(() {
+          _isLoading = false;
+          _locationStatus = '⚠️ Could not fetch location';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _locationStatus = '❌ Error: ${e.toString()}';
+      });
+      print('❌ Location error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +147,7 @@ class _LocationSheetContent extends StatelessWidget {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        height: screenHeight * 0.7, // 70% screen occupy karega
+        height: screenHeight * 0.7,
         decoration: const BoxDecoration(
           color: AppColors.scaffoldBg,
           borderRadius: BorderRadius.only(
@@ -97,30 +217,34 @@ class _LocationSheetContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 18),
 
+                    // Current Location Tile
                     _ActionTile(
                       icon: Icons.my_location_rounded,
                       iconColor: AppColors.primaryPurple,
                       iconBg: AppColors.lightPurple,
                       title: 'Use current location',
-                      subtitle:
-                          'Row, Shivaji Nagar, Satpur Colony,\nNashik, Maharashtra, India',
-                      onTap: () {},
+                      subtitle: _isLoading
+                          ? 'Fetching location...'
+                          : _locationStatus.isNotEmpty
+                              ? _locationStatus
+                              : 'Tap to get your current location',
+                      onTap: _getCurrentLocation,
+                      isLoading: _isLoading,
                     ),
                     Divider(color: AppColors.cardBorder, height: 28),
 
+                    // Add Address Tile
                     _ActionTile(
                       icon: Icons.add_rounded,
                       iconColor: AppColors.navy,
                       iconBg: AppColors.lightBlue,
                       title: 'Add Address',
                       onTap: () {
-                        Navigator.pop(context); // pehli sheet band karo
-                        AddAddressSheet.show(context); // nayi sheet kholo
+                        Navigator.pop(context);
+                        AddAddressSheet.show(context);
                       },
                     ),
                     Divider(color: AppColors.cardBorder, height: 28),
-
-                  
 
                     const SizedBox(height: 24),
                     Text(
@@ -134,13 +258,17 @@ class _LocationSheetContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
 
-                    _SavedAddressCard(
-                      label: 'Home',
-                      distance: '0 m',
-                      address:
-                          'Shivaji Nagar, Satpur Colony,\nNashik',
-                      phone: '+91-9876543210',
-                    ),
+                    // ✅ Current location card – dynamically shows fetched address
+                    if (_currentAddress.isNotEmpty)
+                      _SavedAddressCard(
+                        label: 'Current Location',
+                        distance: '0 m',
+                        address: _currentAddress,
+                        phone: 'Current location',
+                      ),
+
+                    // ✅ Hardcoded Home card (you can remove this if not needed)
+                    
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -153,6 +281,7 @@ class _LocationSheetContent extends StatelessWidget {
   }
 }
 
+// ========== Helper Widgets ==========
 class _ActionTile extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -160,6 +289,7 @@ class _ActionTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VoidCallback onTap;
+  final bool isLoading;
 
   const _ActionTile({
     required this.icon,
@@ -168,12 +298,13 @@ class _ActionTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     required this.onTap,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
       borderRadius: BorderRadius.circular(12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,7 +316,16 @@ class _ActionTile extends StatelessWidget {
               color: iconBg,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: iconColor, size: 22),
+            child: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: AppColors.primaryPurple,
+                    ),
+                  )
+                : Icon(icon, color: iconColor, size: 22),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -214,7 +354,8 @@ class _ActionTile extends StatelessWidget {
               ],
             ),
           ),
-          Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+          if (!isLoading)
+            Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
         ],
       ),
     );

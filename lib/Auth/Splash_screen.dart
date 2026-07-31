@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:truxperts/Auth/login_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/logowidget.dart';
 import 'package:truxperts/utils/maintenance_screen.dart';
-import 'login_screen.dart';
+import 'package:truxperts/utils/navbar.dart';         // ✅ import NavBarScreen
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:truxperts/utils/sharedPreference/apppreference.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,64 +20,83 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _controller;
 
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-  _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 3),
-  )..forward();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..forward();
 
-  _checkMaintenance();
-}
-
-  
-
-  Future<void> _checkMaintenance() async {
-  try {
-    await Future.delayed(const Duration(seconds: 3));
-
-    final doc = await FirebaseFirestore.instance
-        .collection('app_config')
-        .doc('maintenance')
-        .get();
-
-    final data = doc.data();
-
-    final enabled = data?['enabled'] ?? false;
-
-    if (!mounted) return;
-
-    if (enabled) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => MaintenanceScreen(
-            title: data?['title'] ?? 'Server Maintenance',
-            message:
-                data?['message'] ?? 'Please try again later.',
-          ),
-        ),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const LoginScreen(),
-        ),
-      );
-    }
-  } catch (e) {
-    if (!mounted) return;
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const LoginScreen(),
-      ),
-    );
+    _checkMaintenanceAndAuth();
   }
-}
+
+  Future<void> _checkMaintenanceAndAuth() async {
+    try {
+      await Future.delayed(const Duration(seconds: 3));
+
+      // 1. Check maintenance mode from Firestore
+      final doc = await FirebaseFirestore.instance
+          .collection('app_config')
+          .doc('maintenance')
+          .get();
+
+      final data = doc.data();
+      final enabled = data?['enabled'] ?? false;
+
+      if (!mounted) return;
+
+      if (enabled) {
+        // Maintenance mode – show maintenance screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MaintenanceScreen(
+              title: data?['title'] ?? 'Server Maintenance',
+              message: data?['message'] ?? 'Please try again later.',
+            ),
+          ),
+        );
+        return;
+      }
+
+      // 2. Maintenance OFF – check login status
+      final isLoggedIn = await AppPreferences.isLoggedIn();
+
+      if (!mounted) return;
+
+      if (isLoggedIn) {
+        // User is already logged in – go to home
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const NavBarScreen()),
+        );
+      } else {
+        // User not logged in – go to login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      }
+    } catch (e) {
+      // On error (e.g., Firestore fail), fallback to login
+      if (!mounted) return;
+
+      // Optional: try to check login status anyway, but if fails, go to login
+      final isLoggedIn = await AppPreferences.isLoggedIn().catchError((_) => false);
+      if (isLoggedIn) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const NavBarScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {

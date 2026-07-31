@@ -7,6 +7,7 @@ import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/customtextfield.dart';
 import 'package:truxperts/utils/logowidget.dart';
 import 'package:truxperts/utils/navbar.dart';
+import 'package:truxperts/utils/sharedPreference/apppreference.dart';
 import 'signup_screen.dart';
 import 'otp_screen.dart';
 
@@ -21,26 +22,23 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
 
-  // Controllers for text fields
+  // Controllers
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Dio and AuthService instances
+  // Dio and AuthService
   late final Dio _dio;
   late final AuthService _authService;
 
   @override
   void initState() {
     super.initState();
-    // Initialize Dio with base options
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiEndpoints.baseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       ),
     );
     _authService = AuthService(_dio);
@@ -53,9 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Login method
   Future<void> _login() async {
-    // Validate fields
     final mobile = _mobileController.text.trim();
     final password = _passwordController.text.trim();
 
@@ -63,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
       _showSnackBar('Please fill all fields');
       return;
     }
-
     if (mobile.length < 10) {
       _showSnackBar('Enter a valid mobile number');
       return;
@@ -77,11 +72,12 @@ class _LoginScreenState extends State<LoginScreen> {
         password: password,
       );
 
-      // Login successful
+      // ✅ Save token & user data using AppPreferences
+      await AppPreferences.saveToken(response.token);
+      await AppPreferences.saveUser(response.user.toJson());
+
       if (mounted) {
         setState(() => _isLoading = false);
-        // Optionally store token (shared_preferences etc.)
-        // For now, just navigate
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const NavBarScreen()),
@@ -90,18 +86,11 @@ class _LoginScreenState extends State<LoginScreen> {
     } on DioException catch (e) {
       setState(() => _isLoading = false);
       String errorMessage = 'Login failed';
-      if (e.response != null && e.response?.data != null) {
-        // Try to extract message from server response
+      if (e.response?.data != null) {
         try {
           final data = e.response?.data as Map<String, dynamic>;
-          if (data.containsKey('message')) {
-            errorMessage = data['message'] as String;
-          } else if (data.containsKey('error')) {
-            errorMessage = data['error'] as String;
-          }
-        } catch (_) {
-          // ignore
-        }
+          errorMessage = data['message'] ?? data['error'] ?? 'Login failed';
+        } catch (_) {}
       } else {
         errorMessage = e.message ?? 'Network error';
       }
@@ -161,7 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 26),
 
-              // Mobile Number field
               CustomTextField(
                 hint: 'Mobile Number',
                 icon: Icons.person_outline,
@@ -170,7 +158,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 14),
 
-              // Password field
               CustomTextField(
                 hint: 'Password',
                 icon: Icons.lock_outline,
@@ -216,7 +203,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 18),
 
-              // Login Button with loading indicator
               SizedBox(
                 height: 52,
                 child: ElevatedButton(
@@ -235,8 +221,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : const Text(
@@ -252,8 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               Row(
                 children: [
-                  const Expanded(
-                      child: Divider(color: AppColors.fieldBorder)),
+                  const Expanded(child: Divider(color: AppColors.fieldBorder)),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
@@ -264,8 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const Expanded(
-                      child: Divider(color: AppColors.fieldBorder)),
+                  const Expanded(child: Divider(color: AppColors.fieldBorder)),
                 ],
               ),
               const SizedBox(height: 20),
@@ -289,8 +274,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(width: 14),
                   Expanded(
                     child: _SocialButton(
-                      icon: const Icon(Icons.apple,
-                          size: 20, color: Colors.black),
+                      icon: const Icon(
+                        Icons.apple,
+                        size: 20,
+                        color: Colors.black,
+                      ),
                       label: 'Apple',
                       onTap: () {},
                     ),
@@ -318,7 +306,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ..onTap = () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                  builder: (_) => const SignupScreen()),
+                                builder: (_) => const SignupScreen(),
+                              ),
                             );
                           },
                       ),

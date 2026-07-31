@@ -34,9 +34,7 @@ class User {
   final String fullName;
   final String mobileNumber;
   final String email;
-  final String location;
-  final String latitude;
-  final String longitude;
+
 
   User({
     required this.id,
@@ -44,9 +42,7 @@ class User {
     required this.fullName,
     required this.mobileNumber,
     required this.email,
-    required this.location,
-    required this.latitude,
-    required this.longitude,
+
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -56,9 +52,7 @@ class User {
       fullName: json['full_name'] as String,
       mobileNumber: json['mobile_number'] as String,
       email: json['email'] as String,
-      location: json['location'] as String,
-      latitude: json['latitude'] as String,
-      longitude: json['longitude'] as String,
+
     );
   }
 
@@ -68,8 +62,5 @@ class User {
         'full_name': fullName,
         'mobile_number': mobileNumber,
         'email': email,
-        'location': location,
-        'latitude': latitude,
-        'longitude': longitude,
       };
 }

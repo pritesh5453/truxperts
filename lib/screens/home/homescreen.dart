@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
+import 'package:geocoding/geocoding.dart' hide Location;
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:truxperts/screens/Profile/profile_screen.dart';
@@ -13,6 +17,7 @@ import 'package:truxperts/screens/notification/notification_screen.dart';
 import 'package:truxperts/screens/post/post_requestScreen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
+import 'package:truxperts/utils/sharedPreference/apppreference.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -45,27 +50,29 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 12),
               _AdvanceBookingServices(),
               SizedBox(height: 20),
+              _SectionHeader(title: 'My Requests', showViewAll: false),
+              SizedBox(height: 12),
+              _MyRequestsSection(),
+              SizedBox(height: 20),
               _RewardsBanner(),
               SizedBox(height: 20),
-              // ------------------ Nearby Experts (View All -> NearbyExpertsScreen1) ------------------
               _SectionHeader(
                 title: 'Nearby Experts',
                 showViewAll: true,
-                onViewAll: _navigateToNearbyExperts1, // static function
+                onViewAll: _navigateToNearbyExperts1,
               ),
               SizedBox(height: 12),
               _NearbyProfessionalsRow(),
               SizedBox(height: 20),
-              // ------------------ Latest Posts (View All -> NearbyExpertsScreen) ------------------
               _SectionHeader(
                 title: 'Latest Posts from Professionals',
                 showViewAll: true,
-                onViewAll: _navigateToNearbyExperts2, // static function
+                onViewAll: _navigateToNearbyExperts2,
               ),
               SizedBox(height: 12),
               _LatestPostsGrid(),
               SizedBox(height: 20),
-              _StatsRow(),
+              
             ],
           ),
         ),
@@ -73,7 +80,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Navigation helpers (static so they can be used in const constructors)
   static void _navigateToNearbyExperts1(BuildContext context) {
     Navigator.push(
       context,
@@ -89,9 +95,127 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// ---------------------- TOP BAR ----------------------
-class _TopBar extends StatelessWidget {
+// ==============================
+// TOP BAR – AUTO LOCATION FETCH
+// ==============================
+class _TopBar extends StatefulWidget {
   const _TopBar();
+
+  @override
+  State<_TopBar> createState() => _TopBarState();
+}
+
+class _TopBarState extends State<_TopBar> {
+  String _locationAddress = 'Fetching location...';
+  bool _isLoading = true;
+  Timer? _timer;
+  final Location _location = Location();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAndUpdateLocation();
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _fetchAndUpdateLocation();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  // Auto-fetch location using Location plugin + Geocoding
+  Future<void> _fetchAndUpdateLocation() async {
+    try {
+      bool serviceEnabled = await _location.serviceEnabled();
+      if (!serviceEnabled) {
+        serviceEnabled = await _location.requestService();
+        if (!serviceEnabled) {
+          _setLocation('Location services disabled');
+          return;
+        }
+      }
+
+      PermissionStatus permissionGranted = await _location.hasPermission();
+      if (permissionGranted == PermissionStatus.denied) {
+        permissionGranted = await _location.requestPermission();
+        if (permissionGranted != PermissionStatus.granted) {
+          _setLocation('Location permission denied');
+          return;
+        }
+      }
+
+      LocationData locationData = await _location.getLocation();
+      final lat = locationData.latitude;
+      final lng = locationData.longitude;
+
+      if (lat == null || lng == null) {
+        _setLocation('Unable to get location');
+        return;
+      }
+
+      // Reverse geocode
+      final Geocoding geocoding = Geocoding();
+      List<Placemark> placemarks = await geocoding.placemarkFromCoordinates(lat, lng);
+      String address = 'Unknown location';
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        address = '';
+        if (place.street != null && place.street!.isNotEmpty) {
+          address += place.street!;
+        }
+        if (place.locality != null && place.locality!.isNotEmpty) {
+          address += (address.isNotEmpty ? ', ' : '') + place.locality!;
+        }
+        if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) {
+          address += (address.isNotEmpty ? ', ' : '') + place.administrativeArea!;
+        }
+        if (place.country != null && place.country!.isNotEmpty) {
+          address += (address.isNotEmpty ? ', ' : '') + place.country!;
+        }
+        if (address.isEmpty) address = 'Unknown location';
+      }
+
+      // Save to SharedPreferences
+      await AppPreferences.saveLocation(
+        address: address,
+        latitude: lat,
+        longitude: lng,
+      );
+
+      _setLocation(address);
+      print('✅ Auto-location updated: $address');
+    } catch (e) {
+      print('❌ Auto-location error: $e');
+      _setLocation('Error fetching location');
+    }
+  }
+
+  void _setLocation(String address) {
+    if (mounted) {
+      setState(() {
+        _locationAddress = address;
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Manual refresh after location sheet closes
+  Future<void> _refreshFromPreferences() async {
+    final location = await AppPreferences.getLocation();
+    if (mounted) {
+      setState(() {
+        if (location != null && location['address'] != null) {
+          _locationAddress = location['address'] as String;
+        } else {
+          _locationAddress = 'Select location';
+        }
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,30 +223,26 @@ class _TopBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
-          // Sirf location wale part pe tap -> bottom sheet khulega
           SizedBox(
             width: 300,
             child: InkWell(
               borderRadius: BorderRadius.circular(8),
-              onTap: () {
-                LocationSelectorSheet.show(context);
+              onTap: () async {
+                await LocationSelectorSheet.show(context);
+                _refreshFromPreferences();
               },
               child: Row(
                 children: [
                   const Icon(Icons.location_on, size: 20, color: Colors.black),
                   Expanded(
                     child: Text(
-                      'Shivajinagar, Satpur, Nashik, Maharashtra',
+                      _isLoading ? 'Loading...' : _locationAddress,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 20,
-                    color: Colors.black,
-                  ),
+                  const Icon(Icons.keyboard_arrow_down, size: 20, color: Colors.black),
                 ],
               ),
             ),
@@ -146,6 +266,7 @@ class _TopBar extends StatelessWidget {
   }
 }
 
+// ---------------------- ICON BADGE ----------------------
 class _IconBadge extends StatelessWidget {
   final IconData icon;
   final int badgeCount;
@@ -286,9 +407,7 @@ class _SearchBarState extends State<_SearchBar> {
                   hintStyle: TextStyle(color: AppColors.textGrey, fontSize: 12),
                 ),
                 style: const TextStyle(fontSize: 12),
-                onChanged: (value) {
-                  // You can trigger search here if needed
-                },
+                onChanged: (value) {},
               ),
             ),
             GestureDetector(
@@ -322,7 +441,6 @@ class _HeroBanner extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Banner image
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: AspectRatio(
@@ -333,7 +451,6 @@ class _HeroBanner extends StatelessWidget {
               ),
             ),
           ),
-          // Overlapping cards
           Positioned(
             left: 12,
             right: 12,
@@ -465,11 +582,11 @@ class _HeroBanner extends StatelessWidget {
   }
 }
 
-// ---------------------- SECTION HEADER (UPDATED WITH DYNAMIC onViewAll) ----------------------
+// ---------------------- SECTION HEADER ----------------------
 class _SectionHeader extends StatelessWidget {
   final String title;
   final bool showViewAll;
-  final void Function(BuildContext context)? onViewAll; // new callback
+  final void Function(BuildContext context)? onViewAll;
 
   const _SectionHeader({
     required this.title,
@@ -529,7 +646,7 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// ---------------------- SERVICE ITEM (data model) ----------------------
+// ---------------------- SERVICE ITEM ----------------------
 class _ServiceItem {
   final IconData icon;
   final String label;
@@ -730,6 +847,429 @@ class _AdvanceBookingServices extends StatelessWidget {
   }
 }
 
+// ==============================
+// MY REQUESTS – STATUS CARDS
+// ==============================
+
+// Data model for a single request card
+class _RequestItem {
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+  final String title;
+  final String status; // e.g. 'Assigned', 'Pending'
+  final Color statusBg;
+  final Color statusColor;
+  final String location;
+  final String dateTime;
+  final String description;
+  final int quotesCount;
+  final bool hasQuote;
+  final String? providerName;
+  final String? providerAvatarUrl;
+  final double? providerRating;
+
+  const _RequestItem({
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+    required this.title,
+    required this.status,
+    required this.statusBg,
+    required this.statusColor,
+    required this.location,
+    required this.dateTime,
+    required this.description,
+    required this.quotesCount,
+    required this.hasQuote,
+    this.providerName,
+    this.providerAvatarUrl,
+    this.providerRating,
+  });
+}
+
+class _MyRequestsSection extends StatelessWidget {
+  const _MyRequestsSection();
+
+  static const List<_RequestItem> _requests = [
+    _RequestItem(
+      icon: Icons.bolt,
+      iconBg: Color(0xFFEDE9FE),
+      iconColor: Color(0xFF7C6AE8),
+      title: 'Electrical Wiring Repair',
+      status: 'Assigned',
+      statusBg: Color(0xFFDCEBFF),
+      statusColor: Color(0xFF2F6FE0),
+      location: 'Kothrud, Pune',
+      dateTime: '08 Jul 2025 · 04:30 PM',
+      description: 'Need wiring repair in 2BHK flat.',
+      quotesCount: 1,
+      hasQuote: true,
+      providerName: 'Amit Elect...',
+      providerAvatarUrl: 'https://i.pravatar.cc/80?img=15',
+      providerRating: 4.7,
+    ),
+    _RequestItem(
+      icon: Icons.water_drop_outlined,
+      iconBg: Color(0xFFFFE9E1),
+      iconColor: Color(0xFFE8734A),
+      title: 'Plumbing Issue',
+      status: 'Pending',
+      statusBg: Color(0xFFFFF1D6),
+      statusColor: Color(0xFFC98A1B),
+      location: 'Baner, Pune',
+      dateTime: '07 Jul 2025 · 11:00 AM',
+      description: 'Tap leaking in bathroom.',
+      quotesCount: 0,
+      hasQuote: false,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: _requests
+            .map((r) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _RequestCard(item: r),
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
+
+class _RequestCard extends StatelessWidget {
+  final _RequestItem item;
+  const _RequestCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: item.iconBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(item.icon, color: item.iconColor, size: 18),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            item.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _StatusChip(
+                          label: item.status,
+                          bg: item.statusBg,
+                          color: item.statusColor,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined,
+                            size: 12, color: AppColors.textGrey),
+                        const SizedBox(width: 3),
+                        Text(
+                          item.location,
+                          style: const TextStyle(
+                              fontSize: 10.5, color: AppColors.textGrey),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_today_outlined,
+                            size: 11, color: AppColors.textGrey),
+                        const SizedBox(width: 3),
+                        Text(
+                          item.dateTime,
+                          style: const TextStyle(
+                              fontSize: 10.5, color: AppColors.textGrey),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      item.description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 11.5, color: AppColors.textDark),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Right-side block: provider info (assigned) or waiting note (pending)
+              if (item.hasQuote)
+                _ProviderMiniCard(item: item)
+              else
+                _WaitingForProfessionalsNote(),
+              const SizedBox(width: 2),
+              const Icon(Icons.chevron_right, size: 18, color: AppColors.textGrey),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                item.hasQuote
+                    ? '${item.quotesCount} Quote${item.quotesCount == 1 ? '' : 's'} Received'
+                    : '${item.quotesCount} Quotes Yet',
+                style: const TextStyle(fontSize: 11, color: AppColors.textGrey),
+              ),
+              if (item.hasQuote)
+                _ChatButton(onTap: () {})
+              else
+                _ViewDetailsLink(onTap: () {}),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Small status pill: "Assigned" / "Pending" etc.
+class _StatusChip extends StatelessWidget {
+  final String label;
+  final Color bg;
+  final Color color;
+  const _StatusChip({required this.label, required this.bg, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 9.5,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
+
+// Right-side provider avatar + name + rating (for assigned requests)
+class _ProviderMiniCard extends StatelessWidget {
+  final _RequestItem item;
+  const _ProviderMiniCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 68,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: const Color(0xFFE9ECFB),
+            backgroundImage: item.providerAvatarUrl != null
+                ? NetworkImage(item.providerAvatarUrl!)
+                : null,
+            onBackgroundImageError: (_, __) {},
+          ),
+          const SizedBox(height: 4),
+          Text(
+            item.providerName ?? '',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 9.5,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.star, size: 10, color: Color(0xFFFFC94A)),
+              const SizedBox(width: 2),
+              Text(
+                '${item.providerRating}',
+                style: const TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textDark,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Right-side "waiting for a professional" note (for pending requests)
+class _WaitingForProfessionalsNote extends StatelessWidget {
+  const _WaitingForProfessionalsNote();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 82,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 1),
+                child: Icon(Icons.access_time,
+                    size: 11, color: AppColors.textGrey),
+              ),
+              const SizedBox(width: 3),
+              const Flexible(
+                child: Text(
+                  'Looking for professionals...',
+                  textAlign: TextAlign.right,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          const Text(
+            "We'll notify you soon",
+            textAlign: TextAlign.right,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 8.5, color: AppColors.textGrey),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Outlined "Chat" pill button
+class _ChatButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _ChatButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFE0E0E6)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.chat_bubble_outline, size: 13, color: AppColors.navy),
+            SizedBox(width: 5),
+            Text(
+              'Chat',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.navy,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// "View Details >" text link
+class _ViewDetailsLink extends StatelessWidget {
+  final VoidCallback onTap;
+  const _ViewDetailsLink({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'View Details',
+            style: TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+              color: AppColors.navy,
+            ),
+          ),
+          SizedBox(width: 2),
+          Icon(Icons.arrow_forward_ios, size: 10, color: AppColors.navy),
+        ],
+      ),
+    );
+  }
+}
+
 // ---------------------- REWARDS BANNER ----------------------
 class _RewardsBanner extends StatelessWidget {
   const _RewardsBanner();
@@ -751,7 +1291,6 @@ class _RewardsBanner extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Left Section: Texts and Button
             Expanded(
               flex: 3,
               child: Column(
@@ -823,8 +1362,6 @@ class _RewardsBanner extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Center Section: Image
             Expanded(
               flex: 2,
               child: Center(
@@ -836,8 +1373,6 @@ class _RewardsBanner extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Right Section: Points
             Expanded(
               flex: 2,
               child: Column(
@@ -999,78 +1534,78 @@ class _NearbyProfessionalsRow extends StatelessWidget {
 }
 
 // ---------------------- STATS ROW ----------------------
-class _StatsRow extends StatelessWidget {
-  const _StatsRow();
+// class _StatsRow extends StatelessWidget {
+//   const _StatsRow();
 
-  @override
-  Widget build(BuildContext context) {
-    final stats = [
-      {
-        'icon': Icons.emoji_emotions,
-        'value': '50,000+',
-        'label': 'Happy Customers',
-      },
-      {
-        'icon': Icons.verified_user,
-        'value': '5,000+',
-        'label': 'Verified Professionals',
-      },
-      {'icon': Icons.category, 'value': '120+', 'label': 'Service Categories'},
-      {'icon': Icons.task_alt, 'value': '1L+', 'label': 'Service Completed'},
-    ];
+//   @override
+//   Widget build(BuildContext context) {
+//     final stats = [
+//       {
+//         'icon': Icons.emoji_emotions,
+//         'value': '50,000+',
+//         'label': 'Happy Customers',
+//       },
+//       {
+//         'icon': Icons.verified_user,
+//         'value': '5,000+',
+//         'label': 'Verified Professionals',
+//       },
+//       {'icon': Icons.category, 'value': '120+', 'label': 'Service Categories'},
+//       {'icon': Icons.task_alt, 'value': '1L+', 'label': 'Service Completed'},
+//     ];
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: stats.map((s) {
-            return Column(
-              children: [
-                Icon(s['icon'] as IconData, color: AppColors.navy, size: 16),
-                const SizedBox(height: 4),
-                Text(
-                  s['value'] as String,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                SizedBox(
-                  width: 60,
-                  child: Text(
-                    s['label'] as String,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 7,
-                      color: AppColors.textGrey,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-}
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(horizontal: 16),
+//       child: Container(
+//         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+//         decoration: BoxDecoration(
+//           color: Colors.white,
+//           borderRadius: BorderRadius.circular(16),
+//           boxShadow: [
+//             BoxShadow(
+//               color: Colors.black.withOpacity(0.04),
+//               blurRadius: 6,
+//               offset: const Offset(0, 2),
+//             ),
+//           ],
+//         ),
+//         child: Row(
+//           mainAxisAlignment: MainAxisAlignment.spaceAround,
+//           children: stats.map((s) {
+//             return Column(
+//               children: [
+//                 Icon(s['icon'] as IconData, color: AppColors.navy, size: 16),
+//                 const SizedBox(height: 4),
+//                 Text(
+//                   s['value'] as String,
+//                   style: const TextStyle(
+//                     fontSize: 11,
+//                     fontWeight: FontWeight.bold,
+//                     color: AppColors.textDark,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 2),
+//                 SizedBox(
+//                   width: 60,
+//                   child: Text(
+//                     s['label'] as String,
+//                     textAlign: TextAlign.center,
+//                     style: const TextStyle(
+//                       fontSize: 7,
+//                       color: AppColors.textGrey,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             );
+//           }).toList(),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-// ---------------------- LATEST POSTS (Nearby-Experts style image cards) ----------------------
+// ---------------------- LATEST POSTS ----------------------
 class _Post {
   final String author;
   final String category;
@@ -1095,8 +1630,6 @@ class _Post {
   });
 }
 
-// Sirf 4 posts home screen pe dikhte hain. Poori list dekhne ke liye
-// "View All" hai (upar wale _SectionHeader se already connected).
 class _LatestPostsGrid extends StatefulWidget {
   const _LatestPostsGrid();
 
