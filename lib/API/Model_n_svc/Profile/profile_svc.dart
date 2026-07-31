@@ -1,9 +1,7 @@
 // services/profile_service.dart
 import 'package:dio/dio.dart';
 import 'package:truxperts/API/Model_n_svc/Profile/profile_model.dart';
-import 'package:truxperts/API/baseurl/api_endpoint.dart';
-
-class ProfileService {
+import 'package:truxperts/API/baseurl/api_endpoint.dart';class ProfileService {
   final Dio _dio;
 
   ProfileService({Dio? dio}) : _dio = dio ?? Dio();

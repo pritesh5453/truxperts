@@ -1,12 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:truxperts/API/Model_n_svc/signup/Signup_individual/signup_Ind_model.dart';
 import 'package:truxperts/API/Model_n_svc/signup/Signup_individual/signup_ind_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/customtextfield.dart';
-import 'package:truxperts/utils/navbar.dart'; // Make sure NavBarScreen is imported
+import 'package:truxperts/utils/navbar.dart';
 
 enum _ServiceType { instant, advance, both }
 

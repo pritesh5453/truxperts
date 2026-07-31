@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:truxperts/API/Model_n_svc/Profile/profile_model.dart';
 import 'package:truxperts/API/Model_n_svc/Profile/profile_svc.dart';
 import 'package:truxperts/Auth/login_screen.dart';
 import 'package:truxperts/screens/cust_profile/edit_profile_screen.dart';
 import 'package:truxperts/screens/cust_profile/transaction_history_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
-import 'package:truxperts/API/Model_n_svc/Profile/profile_model.dart';
 import 'package:truxperts/utils/sharedPreference/apppreference.dart';
 
 class CustomerProfileScreen extends StatefulWidget {

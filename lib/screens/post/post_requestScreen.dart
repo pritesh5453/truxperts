@@ -459,7 +459,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                   child: Text(
                     title,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: selected ? Colors.deepPurple : Colors.black87,
                     ),

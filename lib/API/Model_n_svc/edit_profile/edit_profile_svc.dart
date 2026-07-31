@@ -20,7 +20,7 @@ class EditProfileService {
     required String state,
   }) async {
     try {
-      final response = await _dio.post(
+      final response = await _dio.put(
         ApiEndpoints.updateProfile,
         data: {
           'user_id': userId,

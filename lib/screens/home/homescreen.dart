@@ -1,12 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:geocoding/geocoding.dart' hide Location;
 import 'package:lucide_flutter/lucide_flutter.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:truxperts/screens/Profile/profile_screen.dart';
-import 'package:truxperts/screens/cust_profile/manage_address_screen.dart';
 import 'package:truxperts/screens/home/address_location.dart';
 import 'package:truxperts/screens/home/categories.dart';
 import 'package:truxperts/screens/home/categories_2.dart';
@@ -16,7 +14,6 @@ import 'package:truxperts/screens/home/nearby_professionals.dart';
 import 'package:truxperts/screens/notification/notification_screen.dart';
 import 'package:truxperts/screens/post/post_requestScreen.dart';
 import 'package:truxperts/utils/appcolors.dart';
-import 'package:truxperts/utils/common_appbar.dart';
 import 'package:truxperts/utils/sharedPreference/apppreference.dart';
 
 class HomeScreen extends StatelessWidget {

@@ -1,11 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:truxperts/Auth/login_screen.dart';
+import 'package:truxperts/utils/navbar.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/logowidget.dart';
 import 'package:truxperts/utils/maintenance_screen.dart';
-import 'package:truxperts/utils/navbar.dart';         // ✅ import NavBarScreen
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:truxperts/utils/sharedPreference/apppreference.dart';
 
 class SplashScreen extends StatefulWidget {

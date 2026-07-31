@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/API/Model_n_svc/Profile/profile_model.dart';
 import 'package:truxperts/API/Model_n_svc/Profile/profile_svc.dart';
+import 'package:truxperts/API/Model_n_svc/edit_profile/edit_profile_svc.dart';
 import 'package:truxperts/utils/appcolors.dart';
 
 void showEditProfileDialog(BuildContext context, int userId) {
@@ -15,7 +15,7 @@ void showEditProfileDialog(BuildContext context, int userId) {
 
 class EditProfileDialog extends StatefulWidget {
   final int userId;
-  const EditProfileDialog({Key? key, required this.userId}) : super(key: key);
+  const EditProfileDialog({super.key, required this.userId});
 
   @override
   State<EditProfileDialog> createState() => _EditProfileDialogState();
@@ -24,6 +24,7 @@ class EditProfileDialog extends StatefulWidget {
 class _EditProfileDialogState extends State<EditProfileDialog> {
   final _formKey = GlobalKey<FormState>();
   final ProfileService _profileService = ProfileService();
+  final EditProfileService _editProfileService = EditProfileService();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
@@ -88,7 +89,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
       final state = _stateController.text.trim();
       final location = '$city, $state'; // combine to location string
 
-      final apiResponse = await _profileService.updateProfile(
+      final apiResponse = await _editProfileService.updateProfile(
         userId: widget.userId,
         fullName: fullName,
         mobileNumber: mobile,
