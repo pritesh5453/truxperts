@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/screens/Requests/my_requests_screen.dart';
-import 'package:truxperts/screens/chat/chat_listScreen.dart';
-import 'package:truxperts/screens/cust_profile/cust_profile_screen.dart';
-import 'package:truxperts/screens/home/homescreen.dart';
-import 'package:truxperts/screens/post/post_requestScreen.dart';
+import 'package:truxperts/Customer/screen/Requests/my_requests_screen.dart';
+import 'package:truxperts/Customer/screen/chat/chat_listScreen.dart';
+import 'package:truxperts/Customer/screen/cust_profile/cust_profile_screen.dart';
+import 'package:truxperts/Customer/screen/home/homescreen.dart';
+import 'package:truxperts/Customer/screen/post/post_requestScreen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 
 class NavBarScreen extends StatefulWidget {

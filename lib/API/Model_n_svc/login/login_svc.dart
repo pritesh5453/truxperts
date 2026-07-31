@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:truxperts/API/Model_n_svc/login/login_model.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
@@ -9,13 +8,11 @@ class AuthService {
 
   AuthService(this._dio);
 
-  /// Login API call with full logging
   Future<LoginResponse> login({
     required String mobileNumber,
     required String password,
   }) async {
     try {
-      // Log request details
       print('🔷 LOGIN REQUEST');
       print('📍 URL: ${ApiEndpoints.login}');
       print('📦 Data: {"mobile_number": "$mobileNumber", "password": "********"}');
@@ -33,23 +30,20 @@ class AuthService {
         ),
       );
 
-      // Log response status
       print('🔶 LOGIN RESPONSE');
       print('📊 Status Code: ${response.statusCode}');
       
       if (response.statusCode == 200) {
-        // Log full response data
         print('✅ Success Response Data:');
-        print(response.data); // full JSON
+        print(response.data);
         
-        // Parse and log token separately
         final loginResponse = LoginResponse.fromJson(response.data);
         print('🔑 Token: ${loginResponse.token}');
-        print('👤 User: ${loginResponse.user.fullName} (${loginResponse.user.mobileNumber})');
+        print('👤 User: ${loginResponse.user.fullName ?? loginResponse.user.ownerName ?? 'N/A'} (${loginResponse.user.mobileNumber ?? 'N/A'})');
+        print('📋 Account Type: ${loginResponse.user.accountType}');
         
         return loginResponse;
       } else {
-        // Log error response
         print('❌ Error Response: ${response.data}');
         throw DioException(
           requestOptions: response.requestOptions,
@@ -58,17 +52,13 @@ class AuthService {
         );
       }
     } on DioException catch (e) {
-      // Log Dio error details
       print('❌ DIO EXCEPTION:');
       print('   Message: ${e.message}');
       print('   Status Code: ${e.response?.statusCode}');
       print('   Response Data: ${e.response?.data}');
-      throw e;
+      rethrow;
     } catch (e) {
-      // Catch any other unexpected errors
       print('❌ UNEXPECTED ERROR: $e');
-      print('❌ Parse error: $e');
-    print('📄 Response data: $json');
       rethrow;
     }
   }

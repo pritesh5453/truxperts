@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:truxperts/API/Model_n_svc/login/login_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
+import 'package:truxperts/Vendor/navbar/navbar.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/customtextfield.dart';
 import 'package:truxperts/utils/logowidget.dart';
@@ -78,10 +79,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (mounted) {
         setState(() => _isLoading = false);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const NavBarScreen()),
-        );
+
+        // 🚀 Navigate based on account_type
+        final String accountType = response.user.accountType ?? 'individual';
+        if (accountType.toLowerCase() == 'business') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const MainNavigation()), 
+          );
+        } else {
+          // individual or default
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const NavBarScreen()),
+          );
+        }
       }
     } on DioException catch (e) {
       setState(() => _isLoading = false);

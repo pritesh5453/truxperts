@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
-import 'package:truxperts/screens/notification/notification_screen.dart';
+import 'package:truxperts/Customer/screen/notification/notification_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {

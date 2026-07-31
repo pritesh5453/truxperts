@@ -122,4 +122,23 @@ class AppColors {
   static const Color instantBannerBg = Color(0xFFEFF9F0);
   static const Color advanceBannerBg = Color(0xFFF3EFFE);
   static const Color smartSearchBg = Color(0xFFEFF3FF);
+
+  // ─────────────────────────────────────────────────────────────
+  // --- Newly added for PartnerHomeScreen + MainNavigation ---
+  // ─────────────────────────────────────────────────────────────
+
+  // Header / earnings-card gradient (bright blue → deep navy)
+  static const Color primaryBlue = Color(0xFF3462F2);
+  static const Color darkBlue = Color(0xFF13235E);
+  static const List<Color> headerGradient = [primaryBlue, darkBlue];
+
+  // Extra status/accent colors used by request & job cards
+  static const Color red = Color(0xFFEB5757);
+  static const Color purple = Color(0xFF9B6BF2);
+  static const Color yellow = Color(0xFFFFC94A);
+
+  // Generic light divider/border used inside the new cards
+  // (kept distinct from cardBorder/borderLight above so existing
+  // screens are unaffected if this shade needs to change later)
+  static const Color border = Color(0xFFECEDF3);
 }
