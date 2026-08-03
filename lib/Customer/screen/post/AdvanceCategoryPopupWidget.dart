@@ -1,114 +1,63 @@
+// Customer/screen/post/AdvanceCategoryPopupWidget.dart
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:truxperts/API/Model_n_svc/categories/advance_category_model.dart';
+import 'package:truxperts/API/Model_n_svc/categories/advance_category_svc.dart';
+import 'package:truxperts/API/baseurl/api_endpoint.dart';
 
-// ---------------------------------------------------------------------
-// Internal ServiceItem model (duplicate to avoid imports)
-// ---------------------------------------------------------------------
-class _ServiceItem {
-  final String label;
-  final IconData icon;
-  final Color bg;
-  final Color fg;
-
-  const _ServiceItem({
-    required this.label,
-    required this.icon,
-    required this.bg,
-    required this.fg,
-  });
-}
-
-// ---------------------------------------------------------------------
-// Advance Category Popup Widget (fully self-contained)
-// ---------------------------------------------------------------------
 class AdvanceCategoryPopupWidget extends StatefulWidget {
   const AdvanceCategoryPopupWidget({Key? key}) : super(key: key);
 
   @override
-  State<AdvanceCategoryPopupWidget> createState() =>
-      _AdvanceCategoryPopupWidgetState();
+  State<AdvanceCategoryPopupWidget> createState() => _AdvanceCategoryPopupWidgetState();
 }
 
-class _AdvanceCategoryPopupWidgetState
-    extends State<AdvanceCategoryPopupWidget> {
-  // Advance services list – colors hardcoded
-  static const List<_ServiceItem> _advanceServices = [
-    _ServiceItem(
-      label: 'Photographer',
-      icon: Icons.camera_alt,
-      bg: Color(0xFFE3F2FD), // light blue
-      fg: Colors.blue,
-    ),
-    _ServiceItem(
-      label: 'Wedding Planner',
-      icon: Icons.favorite,
-      bg: Color(0xFFFFF3E0), // light orange
-      fg: Colors.deepOrange,
-    ),
-    _ServiceItem(
-      label: 'Decorator',
-      icon: Icons.celebration,
-      bg: Color(0xFFF3E5F5), // light purple
-      fg: Colors.purple,
-    ),
-    _ServiceItem(
-      label: 'Catering',
-      icon: Icons.restaurant,
-      bg: Color(0xFFE8F5E9), // light green
-      fg: Colors.green,
-    ),
-    _ServiceItem(
-      label: 'Makeup Artist',
-      icon: Icons.brush,
-      bg: Color(0xFFFFF8E1), // light amber
-      fg: Colors.amber,
-    ),
-    _ServiceItem(
-      label: 'DJ',
-      icon: Icons.music_note,
-      bg: Color(0xFFFCE4EC), // light pink
-      fg: Colors.pink,
-    ),
-    _ServiceItem(
-      label: 'Mehendi Artist',
-      icon: Icons.back_hand,
-      bg: Color(0xFFE0F7FA), // light cyan
-      fg: Colors.cyan,
-    ),
-    _ServiceItem(
-      label: 'Event Planner',
-      icon: Icons.mic,
-      bg: Color(0xFFEFEBE9), // light brown
-      fg: Colors.brown,
-    ),
-    _ServiceItem(
-      label: 'Tutor',
-      icon: Icons.menu_book,
-      bg: Color(0xFFE8EAF6), // light indigo
-      fg: Colors.indigo,
-    ),
-    _ServiceItem(
-      label: 'Pandit',
-      icon: Icons.star,
-      bg: Color(0xFFFFF8E1), // light amber
-      fg: Colors.amber,
-    ),
-    _ServiceItem(
-      label: 'Interior Designer',
-      icon: Icons.chair_alt,
-      bg: Color(0xFFFBE9E7), // light deep orange
-      fg: Colors.deepOrange,
-    ),
-  ];
-
+class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget> {
+  List<AdvanceCategory> _categories = [];
+  bool _isLoading = true;
+  bool _hasError = false;
   int _selectedIndex = 0;
   String _searchQuery = '';
 
-  List<_ServiceItem> get _filteredServices {
-    if (_searchQuery.isEmpty) return _advanceServices;
-    return _advanceServices
-        .where((item) =>
-            item.label.toLowerCase().contains(_searchQuery.toLowerCase()))
+  List<AdvanceCategory> get _filteredList {
+    if (_searchQuery.isEmpty) return _categories;
+    return _categories
+        .where((c) => c.name.toLowerCase().contains(_searchQuery.toLowerCase()))
         .toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    try {
+      final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+      final service = AdvanceCategoriesApiService(dio);
+      final response = await service.getAdvanceCategories();
+
+      if (response.success && response.data.isNotEmpty) {
+        setState(() {
+          _categories = response.data;
+          _isLoading = false;
+          _hasError = false;
+        });
+      } else {
+        setState(() {
+          _categories = [];
+          _isLoading = false;
+          _hasError = true;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _categories = [];
+        _isLoading = false;
+        _hasError = true;
+      });
+    }
   }
 
   @override
@@ -127,7 +76,6 @@ class _AdvanceCategoryPopupWidgetState
       ),
       child: Column(
         children: [
-          // Drag indicator
           const SizedBox(height: 12),
           Container(
             width: 40,
@@ -138,8 +86,6 @@ class _AdvanceCategoryPopupWidgetState
             ),
           ),
           const SizedBox(height: 16),
-
-          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -151,7 +97,7 @@ class _AdvanceCategoryPopupWidgetState
                 const Expanded(
                   child: Center(
                     child: Text(
-                      'Select Advance Service',
+                      'Advance Categories',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -165,8 +111,6 @@ class _AdvanceCategoryPopupWidgetState
             ),
           ),
           const SizedBox(height: 12),
-
-          // Search bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
@@ -180,7 +124,7 @@ class _AdvanceCategoryPopupWidgetState
                 onChanged: (value) => setState(() => _searchQuery = value),
                 decoration: const InputDecoration(
                   icon: Icon(Icons.search, color: Colors.grey, size: 22),
-                  hintText: 'Search services...',
+                  hintText: 'Search advance categories...',
                   hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                   border: InputBorder.none,
                 ),
@@ -189,29 +133,105 @@ class _AdvanceCategoryPopupWidgetState
           ),
           const SizedBox(height: 16),
 
-          // Grid
+          // Grid or Loading/Error/Empty
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.85,
-                ),
-                itemCount: _filteredServices.length,
-                itemBuilder: (context, index) {
-                  final item = _filteredServices[index];
-                  final originalIndex = _advanceServices.indexOf(item);
-                  final isSelected = originalIndex == _selectedIndex;
-                  return _buildTile(item, isSelected);
-                },
-              ),
-            ),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _hasError || _categories.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
+                            const SizedBox(height: 8),
+                            Text(
+                              _hasError ? 'Failed to load categories' : 'No categories available',
+                              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      )
+                    : GridView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 0.85,
+                        ),
+                        itemCount: _filteredList.length,
+                        itemBuilder: (context, index) {
+                          final item = _filteredList[index];
+                          final isSelected = _categories.indexOf(item) == _selectedIndex;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedIndex = _categories.indexOf(item);
+                              });
+                            },
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? const Color(0xFF3F3DFA)
+                                          : Colors.grey.shade200,
+                                      width: isSelected ? 2 : 1,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.03),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Container(
+                                      width: 34,
+                                      height: 34,
+                                      decoration: BoxDecoration(
+                                        color: item.parsedBgColor,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Image.network(
+                                        item.cleanIcon,
+                                        width: 20,
+                                        height: 20,
+                                        color: item.parsedIconColor,
+                                        errorBuilder: (_, __, ___) =>
+                                            Icon(Icons.category, color: item.parsedIconColor, size: 16),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  item.name,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: isSelected ? const Color(0xFF001A4E) : Colors.grey.shade700,
+                                    fontSize: 11,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    height: 1.15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
           ),
 
-          // Bottom button
+          // Bottom Button
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
@@ -228,7 +248,14 @@ class _AdvanceCategoryPopupWidgetState
               top: false,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context, _advanceServices[_selectedIndex].label);
+                  if (_categories.isNotEmpty) {
+                    final selected = _categories[_selectedIndex];
+                    // 🔥 Return Map with id and name
+                    Navigator.pop(context, {
+                      'id': selected.id,
+                      'name': selected.name,
+                    });
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF3F3DFA),
@@ -239,7 +266,7 @@ class _AdvanceCategoryPopupWidgetState
                   elevation: 0,
                 ),
                 child: const Text(
-                  'Select Service',
+                  'Select Category',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -247,64 +274,6 @@ class _AdvanceCategoryPopupWidgetState
                   ),
                 ),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTile(_ServiceItem item, bool isSelected) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = _advanceServices.indexOf(item);
-        });
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isSelected ? const Color(0xFF3F3DFA) : Colors.grey.shade200,
-                width: isSelected ? 2 : 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: item.bg,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(item.icon, color: item.fg, size: 18),
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            item.label,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF001A4E) : Colors.grey.shade700,
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              height: 1.15,
             ),
           ),
         ],

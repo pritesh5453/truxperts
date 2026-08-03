@@ -1,9 +1,15 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:truxperts/API/Model_n_svc/categories/categories_model.dart';
+import 'package:truxperts/API/Model_n_svc/categories/subcategory/subcategory_svc.dart';
+import 'package:truxperts/API/Model_n_svc/post_screen/post_model.dart';
+import 'package:truxperts/API/Model_n_svc/post_screen/post_svc.dart';
+import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'package:truxperts/Customer/customs/customappbar.dart';
 import 'package:truxperts/Customer/screen/home/address_location.dart';
 import 'package:truxperts/Customer/screen/post/AdvanceCategoryPopupWidget.dart';
 import 'package:truxperts/Customer/screen/post/category_popup.dart';
-import 'package:truxperts/Customer/screen/post/select_subcategory.dart';
+import 'package:truxperts/Customer/screen/post/select_advance_subcategory.dart';
 import 'package:truxperts/utils/navbar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -17,31 +23,61 @@ class PostRequestScreen extends StatefulWidget {
 
 class _PostRequestScreenState extends State<PostRequestScreen> {
   // ---------- State Variables ----------
+  String? selectedCategoryName;
+  int? selectedCategoryId;
+
   String selectedSubcategoryText = "Select a subcategory";
-  String selectedCategory = "Electrician"; // default for instant
+  int? selectedSubcategoryId;
+
   bool isInstantBooking = true;
 
-  // For location
   String selectedLocation = "Pune, Maharashtra";
 
-  // For date & time
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
 
-  // For budget (advance booking only)
   String budget = '';
 
-  // For photos
+  // ---------- PHOTOS ----------
   List<XFile> selectedImages = [];
+  static const int maxPhotos = 5;
+
+  // ---------- Text Controllers ----------
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _additionalNotesController = TextEditingController();
+  final TextEditingController _budgetController = TextEditingController();
 
   // ---------- Helpers ----------
   void _pickImages() async {
     final picker = ImagePicker();
     final List<XFile> images = await picker.pickMultiImage();
+
     if (images.isNotEmpty) {
-      setState(() {
-        selectedImages = images;
-      });
+      if (selectedImages.length + images.length > maxPhotos) {
+        final int available = maxPhotos - selectedImages.length;
+        if (available > 0) {
+          setState(() {
+            selectedImages.addAll(images.take(available));
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('You can only select up to $maxPhotos photos. Added $available more.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('You already have 5 photos. Remove some to add more.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        setState(() {
+          selectedImages.addAll(images);
+        });
+      }
     }
   }
 
@@ -49,6 +85,149 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
     setState(() {
       selectedImages.removeAt(index);
     });
+  }
+
+  // ---------- SUBMIT REQUEST ----------
+  Future<void> _submitRequest() async {
+    // ✅ Validation
+    if (selectedCategoryId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a category")),
+      );
+      return;
+    }
+    if (selectedSubcategoryId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a subcategory")),
+      );
+      return;
+    }
+    if (selectedDate == null || selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select date & time")),
+      );
+      return;
+    }
+    if (_descriptionController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please describe your requirement")),
+      );
+      return;
+    }
+
+    // Format date and time
+    final String formattedDate =
+        "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}";
+    final String formattedTime =
+        "${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}:00";
+
+    // Static location values (for now)
+    const String locationAddress = "123 Main Street, Pune, Maharashtra 411001";
+    const String latitude = "18.5204";
+    const String longitude = "73.8567";
+
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+
+      if (isInstantBooking) {
+        // ✅ INSTANT BOOKING
+        final request = InstantBookingRequest(
+        bookingType: 'instant',
+        categoryId: selectedCategoryId!,
+        categoryName: selectedCategoryName ?? '',
+        subcategoryId: selectedSubcategoryId!,
+        subcategoryName: selectedSubcategoryText,
+        description: _descriptionController.text.trim(),
+        budget: budget.isEmpty ? '0' : budget,
+        locationAddress: locationAddress,
+        latitude: latitude,
+        longitude: longitude,
+        preferredDate: formattedDate,
+        preferredTime: formattedTime,
+        additionalNotes: _additionalNotesController.text.trim(),
+        paymentAmount: budget.isEmpty ? '0' : budget,
+        advanceAmount: '0',
+        advancePaid: false,
+        userId: 1,
+      );
+
+         final service = InstantBookingApiService(dio);
+      // ✅ Pass images
+      final response = await service.createInstantBooking(request, selectedImages);
+
+        // Close loading
+        if (mounted) Navigator.pop(context);
+
+        if (response.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response.message),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) Navigator.pop(context);
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        // 🔜 ADVANCE BOOKING (will be updated later)
+        // For now, show a placeholder message
+        if (mounted) Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Advance booking feature coming soon!'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        // Uncomment when advance API is ready:
+        /*
+        final request = ServiceRequestRequest(
+          bookingType: 'advance',
+          categoryId: selectedCategoryId!,
+          categoryName: selectedCategoryName ?? '',
+          subcategoryId: selectedSubcategoryId!,
+          subcategoryName: selectedSubcategoryText,
+          description: _descriptionController.text.trim(),
+          locationAddress: locationAddress,
+          latitude: latitude,
+          longitude: longitude,
+          preferredDate: formattedDate,
+          preferredTime: formattedTime,
+          additionalNotes: _additionalNotesController.text.trim(),
+          paymentAmount: budget.isEmpty ? '0' : budget,
+          user: 'Sumit pathak',
+          userId: 1,
+        );
+        final service = ServiceRequestApiService(dio);
+        final response = await service.createServiceRequest(request);
+        // handle response...
+        */
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   // ---------- Build ----------
@@ -110,12 +289,11 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                   ),
                 ),
 
-                // ---------- 2. Select Service Category (conditional) ----------
+                // ---------- 2. Select Service Category ----------
                 _sectionTitle("2. Select a Service Category"),
                 GestureDetector(
                   onTap: () async {
-                    // Show appropriate popup based on booking type
-                    final result = await showModalBottomSheet<String>(
+                    final result = await showModalBottomSheet<Map<String, dynamic>>(
                       context: context,
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
@@ -129,7 +307,10 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                     );
                     if (result != null && mounted) {
                       setState(() {
-                        selectedCategory = result;
+                        selectedCategoryName = result['name'];
+                        selectedCategoryId = result['id'];
+                        selectedSubcategoryText = "Select a subcategory";
+                        selectedSubcategoryId = null;
                       });
                     }
                   },
@@ -143,11 +324,11 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          selectedCategory,
-                          style: const TextStyle(
+                          selectedCategoryName ?? "Select a category",
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF001A4E),
+                            color: selectedCategoryName == null ? Colors.grey : const Color(0xFF001A4E),
                           ),
                         ),
                         const Icon(Icons.chevron_right, color: Colors.grey),
@@ -161,15 +342,32 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                 _sectionTitle("3. Select a Subcategory"),
                 GestureDetector(
                   onTap: () async {
+                    if (selectedCategoryId == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please select a category first")),
+                      );
+                      return;
+                    }
                     final result = await showModalBottomSheet<Map<String, dynamic>>(
                       context: context,
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
-                      builder: (context) => const SubcategoryPopupWidget(),
+                      builder: (context) {
+                        if (isInstantBooking) {
+                          return SubcategoryPopupWidget(
+                            categoryId: selectedCategoryId!,
+                          );
+                        } else {
+                          return AdvanceSubcategoryPopupWidget(
+                            categoryId: selectedCategoryId!,
+                          );
+                        }
+                      },
                     );
                     if (result != null && mounted) {
                       setState(() {
-                        selectedSubcategoryText = result['title'];
+                        selectedSubcategoryText = result['name'] ?? "Select a subcategory";
+                        selectedSubcategoryId = result['id'];
                       });
                     }
                   },
@@ -206,7 +404,8 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                   "E.g. Need wiring repair in 2BHK flat. Switchboard issue and 3 tube lights not working.",
                   4,
                   "0/300",
-                  enabled: false,
+                  enabled: true,
+                  controller: _descriptionController,
                 ),
 
                 // ---------- 5. Add Photos ----------
@@ -321,7 +520,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                     1,
                     "",
                     enabled: true,
-                    controller: TextEditingController(text: budget),
+                    controller: _budgetController,
                     onChanged: (value) => setState(() => budget = value),
                   ),
                 ],
@@ -330,7 +529,13 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                 _sectionTitle(
                   isInstantBooking ? "8. Additional Notes (Optional)" : "9. Additional Notes (Optional)"
                 ),
-                _customTextField("Any additional information...", 2, "0/200", enabled: false),
+                _customTextField(
+                  "Any additional information...",
+                  2,
+                  "0/200",
+                  enabled: true,
+                  controller: _additionalNotesController,
+                ),
 
                 const SizedBox(height: 15),
                 // Info Banner
@@ -357,14 +562,14 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
             ),
           ),
 
-          // Bottom Fixed Button
+          // ---------- Bottom Fixed Button ----------
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
               padding: const EdgeInsets.all(16),
               color: Colors.white,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: _submitRequest,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF001A4E),
                   minimumSize: const Size(double.infinity, 52),
@@ -424,12 +629,10 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
       onTap: () {
         setState(() {
           isInstantBooking = isInstantOption;
-          // Reset category when switching to avoid confusion
-          if (isInstantOption) {
-            selectedCategory = "Electrician";
-          } else {
-            selectedCategory = "Photographer"; // first advance service
-          }
+          selectedCategoryName = null;
+          selectedCategoryId = null;
+          selectedSubcategoryText = "Select a subcategory";
+          selectedSubcategoryId = null;
         });
       },
       child: Container(
@@ -570,6 +773,279 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
             ),
           ),
           const Icon(Icons.chevron_right, color: Colors.grey),
+        ],
+      ),
+    );
+  }
+}
+
+// -------------------------------------------------
+// SUB-CATEGORY POPUP (unchanged - included for completeness)
+// -------------------------------------------------
+class SubcategoryPopupWidget extends StatefulWidget {
+  final int categoryId;
+  const SubcategoryPopupWidget({Key? key, required this.categoryId}) : super(key: key);
+
+  @override
+  State<SubcategoryPopupWidget> createState() => _SubcategoryPopupWidgetState();
+}
+
+class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
+  List<Subcategory> _subcategories = [];
+  bool _isLoading = true;
+  bool _hasError = false;
+  int _selectedIndex = 0;
+  String _searchQuery = '';
+
+  List<Subcategory> get _filteredList {
+    if (_searchQuery.isEmpty) return _subcategories;
+    return _subcategories
+        .where((s) => s.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSubcategories();
+  }
+
+  Future<void> _fetchSubcategories() async {
+    try {
+      final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+      final service = SubcategoriesApiService(dio);
+      final response = await service.getSubcategories(widget.categoryId);
+
+      if (response.success && response.data.isNotEmpty) {
+        setState(() {
+          _subcategories = response.data;
+          _isLoading = false;
+          _hasError = false;
+        });
+      } else {
+        setState(() {
+          _subcategories = [];
+          _isLoading = false;
+          _hasError = true;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _subcategories = [];
+        _isLoading = false;
+        _hasError = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.82,
+      margin: EdgeInsets.only(bottom: bottomInset),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Color(0xFF001A4E)),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const Expanded(
+                  child: Center(
+                    child: Text(
+                      'Select Subcategory',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF001A4E),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 48),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[500]!.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: TextField(
+                onChanged: (value) => setState(() => _searchQuery = value),
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.search, color: Colors.grey, size: 22),
+                  hintText: 'Search subcategories...',
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _hasError || _subcategories.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
+                            const SizedBox(height: 8),
+                            Text(
+                              _hasError ? 'Failed to load subcategories' : 'No subcategories available',
+                              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: _filteredList.length,
+                        separatorBuilder: (context, index) => const SizedBox(height: 16),
+                        itemBuilder: (context, index) {
+                          final item = _filteredList[index];
+                          final isSelected = _subcategories.indexOf(item) == _selectedIndex;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedIndex = _subcategories.indexOf(item);
+                              });
+                            },
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.deepPurple.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Icon(
+                                      Icons.category,
+                                      color: Colors.deepPurple,
+                                      size: 22,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.name,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF001A4E),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          item.description.isNotEmpty ? item.description : 'No description',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey[500],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? const Color(0xFF3F3DFA)
+                                            : Colors.grey.shade300,
+                                        width: isSelected ? 6 : 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+          ),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  offset: const Offset(0, -4),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_subcategories.isNotEmpty) {
+                    final selected = _subcategories[_selectedIndex];
+                    Navigator.pop(context, {
+                      'id': selected.id,
+                      'name': selected.name,
+                    });
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3F3DFA),
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Select Subcategory',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

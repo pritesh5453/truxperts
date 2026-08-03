@@ -1,4 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:truxperts/API/Model_n_svc/categories/categories_model.dart';
+import 'package:truxperts/API/Model_n_svc/categories/categories_svc.dart';
+import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
 
@@ -7,81 +11,144 @@ import 'package:truxperts/utils/common_appbar.dart';
 // -----------------------------------------------------------------------
 class ServiceItem {
   final String label;
-  final IconData icon;
+  final String iconUrl;
   final Color bg;
   final Color fg;
 
   const ServiceItem({
     required this.label,
-    required this.icon,
+    required this.iconUrl,
     required this.bg,
     required this.fg,
   });
 }
 
 // -----------------------------------------------------------------------
-// ChooseServiceScreen
+// ChooseServiceScreen (NOW WITH API DATA)
 // -----------------------------------------------------------------------
-class ChooseServiceScreen extends StatelessWidget {
+class ChooseServiceScreen extends StatefulWidget {
   const ChooseServiceScreen({super.key});
 
-  static const List<ServiceItem> instantServices = [
+  @override
+  State<ChooseServiceScreen> createState() => _ChooseServiceScreenState();
+}
+
+class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
+  late Future<List<ServiceItem>> _serviceItemsFuture;
+
+  // Static fallback list (agar API fail ho to dikhana hai)
+  static const List<ServiceItem> _fallbackServices = [
     ServiceItem(
-        label: 'Electrician',
-        icon: Icons.electric_bolt,
-        bg: AppColors.iconElectricianBg,
-        fg: AppColors.iconElectricianFg),
+      label: 'Electrician',
+      iconUrl: '',
+      bg: AppColors.iconElectricianBg,
+      fg: AppColors.iconElectricianFg,
+    ),
     ServiceItem(
-        label: 'Plumber',
-        icon: Icons.plumbing,
-        bg: AppColors.iconPlumberBg,
-        fg: AppColors.iconPlumberFg),
+      label: 'Plumber',
+      iconUrl: '',
+      bg: AppColors.iconPlumberBg,
+      fg: AppColors.iconPlumberFg,
+    ),
     ServiceItem(
-        label: 'AC Repair',
-        icon: Icons.ac_unit,
-        bg: AppColors.iconAcBg,
-        fg: AppColors.iconAcFg),
+      label: 'AC Repair',
+      iconUrl: '',
+      bg: AppColors.iconAcBg,
+      fg: AppColors.iconAcFg,
+    ),
     ServiceItem(
-        label: 'Carpenter',
-        icon: Icons.carpenter,
-        bg: AppColors.iconCarpenterBg,
-        fg: AppColors.iconCarpenterFg),
+      label: 'Carpenter',
+      iconUrl: '',
+      bg: AppColors.iconCarpenterBg,
+      fg: AppColors.iconCarpenterFg,
+    ),
     ServiceItem(
-        label: 'RO Service',
-        icon: Icons.water_drop,
-        bg: AppColors.iconRoBg,
-        fg: AppColors.iconRoFg),
+      label: 'RO Service',
+      iconUrl: '',
+      bg: AppColors.iconRoBg,
+      fg: AppColors.iconRoFg,
+    ),
     ServiceItem(
-        label: 'Cleaning',
-        icon: Icons.cleaning_services,
-        bg: AppColors.iconCleaningBg,
-        fg: AppColors.iconCleaningFg),
+      label: 'Cleaning',
+      iconUrl: '',
+      bg: AppColors.iconCleaningBg,
+      fg: AppColors.iconCleaningFg,
+    ),
     ServiceItem(
-        label: 'Grocery',
-        icon: Icons.shopping_basket,
-        bg: AppColors.iconGroceryBg,
-        fg: AppColors.iconGroceryFg),
+      label: 'Grocery',
+      iconUrl: '',
+      bg: AppColors.iconGroceryBg,
+      fg: AppColors.iconGroceryFg,
+    ),
     ServiceItem(
-        label: 'Medicine',
-        icon: Icons.medical_services,
-        bg: AppColors.iconMedicineBg,
-        fg: AppColors.iconMedicineFg),
+      label: 'Medicine',
+      iconUrl: '',
+      bg: AppColors.iconMedicineBg,
+      fg: AppColors.iconMedicineFg,
+    ),
     ServiceItem(
-        label: 'Pest Control',
-        icon: Icons.pest_control,
-        bg: AppColors.iconPestBg,
-        fg: AppColors.iconPestFg),
+      label: 'Pest Control',
+      iconUrl: '',
+      bg: AppColors.iconPestBg,
+      fg: AppColors.iconPestFg,
+    ),
     ServiceItem(
-        label: 'Auto / Cab',
-        icon: Icons.directions_car,
-        bg: AppColors.iconAutoBg,
-        fg: AppColors.iconAutoFg),
+      label: 'Auto / Cab',
+      iconUrl: '',
+      bg: AppColors.iconAutoBg,
+      fg: AppColors.iconAutoFg,
+    ),
     ServiceItem(
-        label: 'Courier',
-        icon: Icons.local_shipping,
-        bg: AppColors.iconCourierBg,
-        fg: AppColors.iconCourierFg),
+      label: 'Courier',
+      iconUrl: '',
+      bg: AppColors.iconCourierBg,
+      fg: AppColors.iconCourierFg,
+    ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _serviceItemsFuture = _fetchCategories();
+  }
+
+  // API se data laake ServiceItem list banayein
+  Future<List<ServiceItem>> _fetchCategories() async {
+    try {
+      final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+      final service = CategoriesApiService(dio);
+      final response = await service.getCategories();
+
+      if (response.success && response.data.isNotEmpty) {
+        return response.data.map((category) {
+          // 🔥 String se Color banayein (handle # or 0xff, remove backslash)
+          Color parseColor(String hex) {
+            String clean = hex.trim();
+            // Remove any backslash that might be present before #
+            clean = clean.replaceAll('\\', '');
+            if (clean.startsWith('#')) clean = clean.substring(1);
+            if (clean.length == 6) clean = 'ff$clean';
+            return Color(int.parse('0x$clean'));
+          }
+
+          // 🔥 Debug: print the clean icon URL
+          print('Icon URL for ${category.name}: ${category.cleanIcon}');
+
+          return ServiceItem(
+            label: category.name,
+            iconUrl: category.cleanIcon, // cleanIcon already replaces backslash
+            bg: parseColor(category.bgColor),
+            fg: parseColor(category.iconColor),
+          );
+        }).toList();
+      } else {
+        return _fallbackServices;
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+      return _fallbackServices;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,51 +157,65 @@ class ChooseServiceScreen extends StatelessWidget {
       appBar: CommonAppBar(),
       body: Column(
         children: [
-          // Scrollable content (everything except the footer)
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  _SectionCard(
-                    backgroundColor: AppColors.instantBannerBg,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _SectionHeader(
-                          icon: Icons.bolt,
-                          iconColor: AppColors.orange,
-                          title: 'INSTANT SERVICES',
-                          subtitleWidget: const Text(
-                            '        Available in minutes',
-                            style: TextStyle(
-                              color: AppColors.success,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          onViewAll: () {},
-                        ),
-                        const SizedBox(height: 16),
-                        _ServiceGrid(items: instantServices),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // You can add more sections here (e.g., Advance Booking)
-                  // ...
-                  const SizedBox(height: 16),
-                ],
-              ),
+            child: FutureBuilder<List<ServiceItem>>(
+              future: _serviceItemsFuture,
+              builder: (context, snapshot) {
+                // Loading
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                // Error / no data – fallback dikhao
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return _buildServiceGrid(_fallbackServices);
+                }
+                // ✅ Data mil gaya
+                return _buildServiceGrid(snapshot.data!);
+              },
             ),
           ),
           // Sticky footer: Smart Search Card
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: AppColors.bg, // same as scaffold background to blend
+            color: AppColors.bg,
             child: const _SmartSearchCard(),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceGrid(List<ServiceItem> items) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        children: [
+          const SizedBox(height: 16),
+          _SectionCard(
+            backgroundColor: AppColors.instantBannerBg,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SectionHeader(
+                  icon: Icons.bolt,
+                  iconColor: AppColors.orange,
+                  title: 'INSTANT SERVICES',
+                  subtitleWidget: const Text(
+                    '        Available in minutes',
+                    style: TextStyle(
+                      color: AppColors.success,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onViewAll: () {},
+                ),
+                const SizedBox(height: 16),
+                _ServiceGrid(items: items),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );
@@ -142,12 +223,12 @@ class ChooseServiceScreen extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------
-// Rounded section wrapper (instant / advance booking)
+// All the existing widgets (unchanged, but _ServiceTile updated for better image loading)
 // -----------------------------------------------------------------------
+
 class _SectionCard extends StatelessWidget {
   final Color backgroundColor;
   final Widget child;
-
   const _SectionCard({required this.backgroundColor, required this.child});
 
   @override
@@ -164,16 +245,12 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-// -----------------------------------------------------------------------
-// Section header: icon + title + subtitle on the left, "View All" on right
-// -----------------------------------------------------------------------
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final String title;
   final Widget subtitleWidget;
   final VoidCallback onViewAll;
-
   const _SectionHeader({
     required this.icon,
     required this.iconColor,
@@ -216,12 +293,8 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// -----------------------------------------------------------------------
-// 4-column grid of service tiles
-// -----------------------------------------------------------------------
 class _ServiceGrid extends StatelessWidget {
   final List<ServiceItem> items;
-
   const _ServiceGrid({required this.items});
 
   @override
@@ -244,19 +317,17 @@ class _ServiceGrid extends StatelessWidget {
   }
 }
 
-// -----------------------------------------------------------------------
-// Single service tile (icon box in white card + label)
-// -----------------------------------------------------------------------
 class _ServiceTile extends StatelessWidget {
   final ServiceItem item;
-
   const _ServiceTile({required this.item});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () {},
+      onTap: () {
+        // Handle tap
+      },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -283,7 +354,7 @@ class _ServiceTile extends StatelessWidget {
                   color: item.bg,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(item.icon, color: item.fg, size: 18),
+                child: _buildIcon(),
               ),
             ),
           ),
@@ -304,11 +375,39 @@ class _ServiceTile extends StatelessWidget {
       ),
     );
   }
+
+  // 🔥 Improved icon builder with placeholder and better error handling
+  Widget _buildIcon() {
+    if (item.iconUrl.isNotEmpty) {
+      return Image.network(
+        item.iconUrl,
+        width: 20,
+        height: 20,
+        color: item.fg, // Tint the image with the foreground color
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: item.fg,
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          // Log the error for debugging
+          print('Failed to load icon for ${item.label}: $error');
+          // Fallback to icon
+          return Icon(Icons.category, color: item.fg, size: 16);
+        },
+      );
+    } else {
+      return Icon(Icons.category, color: item.fg, size: 16);
+    }
+  }
 }
 
-// -----------------------------------------------------------------------
-// Bottom "Not sure which service?" + Smart Search card (sticky footer)
-// -----------------------------------------------------------------------
 class _SmartSearchCard extends StatelessWidget {
   const _SmartSearchCard();
 

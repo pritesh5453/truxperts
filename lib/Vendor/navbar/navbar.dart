@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:truxperts/Vendor/home/vendor_homescreen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 
-/// Hosts the bottom navigation bar and switches between the 5 tabs.
-/// Only Home is wired to a real screen for now — the rest are static
-/// placeholders (see placeholder_screens.dart).
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 

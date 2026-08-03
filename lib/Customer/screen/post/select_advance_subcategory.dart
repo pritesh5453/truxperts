@@ -1,65 +1,78 @@
-// Customer/screen/post/category_popup.dart
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:truxperts/API/Model_n_svc/categories/categories_model.dart';
-import 'package:truxperts/API/Model_n_svc/categories/categories_svc.dart';
+import 'package:truxperts/API/Model_n_svc/categories/subcategory/advance_subcategory_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 
-class CategoryPopupWidget extends StatefulWidget {
-  const CategoryPopupWidget({Key? key}) : super(key: key);
+// -------------------------------------------------
+// ADVANCE SUBCATEGORY POPUP – API Integrated
+// -------------------------------------------------
+class AdvanceSubcategoryPopupWidget extends StatefulWidget {
+  final int categoryId;
+  const AdvanceSubcategoryPopupWidget({Key? key, required this.categoryId})
+      : super(key: key);
 
   @override
-  State<CategoryPopupWidget> createState() => _CategoryPopupWidgetState();
+  State<AdvanceSubcategoryPopupWidget> createState() =>
+      _AdvanceSubcategoryPopupWidgetState();
 }
 
-class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
-  List<Category> _categories = [];
+class _AdvanceSubcategoryPopupWidgetState
+    extends State<AdvanceSubcategoryPopupWidget> {
+  List<Subcategory> _subcategories = [];
   bool _isLoading = true;
   bool _hasError = false;
   int _selectedIndex = 0;
   String _searchQuery = '';
 
-  List<Category> get _filteredList {
-    if (_searchQuery.isEmpty) return _categories;
-    return _categories
-        .where((c) => c.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+  List<Subcategory> get _filteredList {
+    if (_searchQuery.isEmpty) return _subcategories;
+    return _subcategories
+        .where((s) => s.name.toLowerCase().contains(_searchQuery.toLowerCase()))
         .toList();
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchCategories();
+    _fetchSubcategories();
   }
 
-  Future<void> _fetchCategories() async {
+  // -----------------------------------------------------------------------
+  // API CALL
+  // -----------------------------------------------------------------------
+  Future<void> _fetchSubcategories() async {
     try {
       final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
-      final service = CategoriesApiService(dio);
-      final response = await service.getCategories();
+      final service = AdvanceSubcategoriesApiService(dio);
+      final response =
+          await service.getAdvanceSubcategories(widget.categoryId);
 
       if (response.success && response.data.isNotEmpty) {
         setState(() {
-          _categories = response.data;
+          _subcategories = response.data;
           _isLoading = false;
           _hasError = false;
         });
       } else {
         setState(() {
-          _categories = [];
+          _subcategories = [];
           _isLoading = false;
           _hasError = true;
         });
       }
     } catch (e) {
       setState(() {
-        _categories = [];
+        _subcategories = [];
         _isLoading = false;
         _hasError = true;
       });
     }
   }
 
+  // -----------------------------------------------------------------------
+  // BUILD
+  // -----------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
@@ -76,6 +89,7 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
       ),
       child: Column(
         children: [
+          // Drag indicator
           const SizedBox(height: 12),
           Container(
             width: 40,
@@ -86,6 +100,8 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
             ),
           ),
           const SizedBox(height: 16),
+
+          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -97,7 +113,7 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
                 const Expanded(
                   child: Center(
                     child: Text(
-                      'Select Category',
+                      'Select Subcategory',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -111,6 +127,8 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
             ),
           ),
           const SizedBox(height: 12),
+
+          // Search Bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
@@ -124,7 +142,7 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
                 onChanged: (value) => setState(() => _searchQuery = value),
                 decoration: const InputDecoration(
                   icon: Icon(Icons.search, color: Colors.grey, size: 22),
-                  hintText: 'Search categories...',
+                  hintText: 'Search subcategories...',
                   hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                   border: InputBorder.none,
                 ),
@@ -133,98 +151,108 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
           ),
           const SizedBox(height: 16),
 
-          // Grid or Loading/Error/Empty
+          // List / Loading / Error / Empty
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _hasError || _categories.isEmpty
+                : _hasError || _subcategories.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
+                            Icon(Icons.error_outline,
+                                size: 48, color: Colors.grey[400]),
                             const SizedBox(height: 8),
                             Text(
-                              _hasError ? 'Failed to load categories' : 'No categories available',
-                              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                              _hasError
+                                  ? 'Failed to load subcategories'
+                                  : 'No subcategories available',
+                              style: TextStyle(
+                                  color: Colors.grey[600], fontSize: 14),
                             ),
                           ],
                         ),
                       )
-                    : GridView.builder(
+                    : ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 0.85,
-                        ),
                         itemCount: _filteredList.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
                         itemBuilder: (context, index) {
                           final item = _filteredList[index];
-                          final isSelected = _categories.indexOf(item) == _selectedIndex;
+                          final isSelected =
+                              _subcategories.indexOf(item) == _selectedIndex;
+
                           return GestureDetector(
                             onTap: () {
                               setState(() {
-                                _selectedIndex = _categories.indexOf(item);
+                                _selectedIndex = _subcategories.indexOf(item);
                               });
                             },
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: isSelected
-                                          ? const Color(0xFF3F3DFA)
-                                          : Colors.grey.shade200,
-                                      width: isSelected ? 2 : 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  // Icon Container – static icon (or we could show dynamic icon if available)
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.deepPurple.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.03),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: Container(
-                                      width: 34,
-                                      height: 34,
-                                      decoration: BoxDecoration(
-                                        color: _parseColor(item.bgColor),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Image.network(
-                                        item.cleanIcon,
-                                        width: 20,
-                                        height: 20,
-                                        color: _parseColor(item.iconColor),
-                                        errorBuilder: (_, __, ___) =>
-                                            Icon(Icons.category, color: _parseColor(item.iconColor), size: 16),
-                                      ),
+                                    child: const Icon(
+                                      Icons.category,
+                                      color: Colors.deepPurple,
+                                      size: 22,
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  item.name,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: isSelected ? const Color(0xFF001A4E) : Colors.grey.shade700,
-                                    fontSize: 11,
-                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                    height: 1.15,
+                                  const SizedBox(width: 14),
+
+                                  // Title & Description
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.name,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF001A4E),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          item.description.isNotEmpty
+                                              ? item.description
+                                              : 'No description',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey[500],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+
+                                  // Selection circle
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? const Color(0xFF3F3DFA)
+                                            : Colors.grey.shade300,
+                                        width: isSelected ? 6 : 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },
@@ -248,9 +276,9 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
               top: false,
               child: ElevatedButton(
                 onPressed: () {
-                  if (_categories.isNotEmpty) {
-                    final selected = _categories[_selectedIndex];
-                    // 🔥 Return Map with id and name
+                  if (_subcategories.isNotEmpty) {
+                    final selected = _subcategories[_selectedIndex];
+                    // Return Map with id and name (like other popups)
                     Navigator.pop(context, {
                       'id': selected.id,
                       'name': selected.name,
@@ -266,7 +294,7 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
                   elevation: 0,
                 ),
                 child: const Text(
-                  'Select Category',
+                  'Select Subcategory',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -279,12 +307,5 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
         ],
       ),
     );
-  }
-
-  Color _parseColor(String hex) {
-    String clean = hex.trim().replaceAll('\\', '');
-    if (clean.startsWith('#')) clean = clean.substring(1);
-    if (clean.length == 6) clean = 'ff$clean';
-    return Color(int.parse('0x$clean'));
   }
 }
