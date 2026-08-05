@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
 
-// Assuming AppColors is defined in app_colors.dart
-// import 'app_colors.dart';
-
 class TruXpertsRewardsScreen extends StatelessWidget {
   const TruXpertsRewardsScreen({Key? key}) : super(key: key);
 

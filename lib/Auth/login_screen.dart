@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:truxperts/API/Model_n_svc/login/login_svc.dart';
+import 'package:truxperts/Model_n_svc/login/login_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'package:truxperts/Vendor/navbar/navbar.dart';
 import 'package:truxperts/utils/appcolors.dart';

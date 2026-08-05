@@ -1,6 +1,6 @@
 // services/advance_categories_service.dart
 import 'package:dio/dio.dart';
-import 'package:truxperts/API/Model_n_svc/categories/advance_category_model.dart';
+import 'package:truxperts/Model_n_svc/categories/advance_category_model.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 
 class AdvanceCategoriesApiService {

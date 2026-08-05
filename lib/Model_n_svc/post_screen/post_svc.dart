@@ -1,7 +1,7 @@
 // services/post_screen/post_svc.dart
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:truxperts/API/Model_n_svc/post_screen/post_model.dart';
+import 'package:truxperts/Model_n_svc/post_screen/post_model.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'dart:io';
 

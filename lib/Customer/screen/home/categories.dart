@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:truxperts/API/Model_n_svc/categories/categories_model.dart';
-import 'package:truxperts/API/Model_n_svc/categories/categories_svc.dart';
+import 'package:shimmer/shimmer.dart'; // ✅ Added Shimmer package import
+import 'package:truxperts/Model_n_svc/categories/categories_model.dart';
+import 'package:truxperts/Model_n_svc/categories/categories_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
@@ -24,7 +25,7 @@ class ServiceItem {
 }
 
 // -----------------------------------------------------------------------
-// ChooseServiceScreen (NOW WITH API DATA)
+// ChooseServiceScreen WITH SHIMMER SKELETON
 // -----------------------------------------------------------------------
 class ChooseServiceScreen extends StatefulWidget {
   const ChooseServiceScreen({super.key});
@@ -121,22 +122,17 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
 
       if (response.success && response.data.isNotEmpty) {
         return response.data.map((category) {
-          // 🔥 String se Color banayein (handle # or 0xff, remove backslash)
           Color parseColor(String hex) {
             String clean = hex.trim();
-            // Remove any backslash that might be present before #
             clean = clean.replaceAll('\\', '');
             if (clean.startsWith('#')) clean = clean.substring(1);
             if (clean.length == 6) clean = 'ff$clean';
             return Color(int.parse('0x$clean'));
           }
 
-          // 🔥 Debug: print the clean icon URL
-          print('Icon URL for ${category.name}: ${category.cleanIcon}');
-
           return ServiceItem(
             label: category.name,
-            iconUrl: category.cleanIcon, // cleanIcon already replaces backslash
+            iconUrl: category.cleanIcon,
             bg: parseColor(category.bgColor),
             fg: parseColor(category.iconColor),
           );
@@ -150,6 +146,48 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
     }
   }
 
+  // ================== SKELETON WITH SHIMMER ==================
+  Widget _buildSkeletonTile() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          width: 50,
+          height: 10,
+          color: Colors.grey.shade300,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSkeletonGrid() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 8,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 14,
+          childAspectRatio: 0.78,
+        ),
+        itemBuilder: (context, index) => _buildSkeletonTile(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,14 +199,48 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
             child: FutureBuilder<List<ServiceItem>>(
               future: _serviceItemsFuture,
               builder: (context, snapshot) {
-                // Loading
+                // Loading → Show skeleton grid with shimmer
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 16),
+                        _SectionCard(
+                          backgroundColor: AppColors.instantBannerBg,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _SectionHeader(
+                                icon: Icons.bolt,
+                                iconColor: AppColors.orange,
+                                title: 'INSTANT SERVICES',
+                                subtitleWidget: const Text(
+                                  '        Available in minutes',
+                                  style: TextStyle(
+                                    color: AppColors.success,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                onViewAll: () {},
+                              ),
+                              const SizedBox(height: 16),
+                              _buildSkeletonGrid(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 }
+
                 // Error / no data – fallback dikhao
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return _buildServiceGrid(_fallbackServices);
                 }
+
                 // ✅ Data mil gaya
                 return _buildServiceGrid(snapshot.data!);
               },
@@ -223,7 +295,7 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
 }
 
 // -----------------------------------------------------------------------
-// All the existing widgets (unchanged, but _ServiceTile updated for better image loading)
+// All the existing widgets
 // -----------------------------------------------------------------------
 
 class _SectionCard extends StatelessWidget {
@@ -325,9 +397,7 @@ class _ServiceTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        // Handle tap
-      },
+      onTap: () {},
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -376,14 +446,13 @@ class _ServiceTile extends StatelessWidget {
     );
   }
 
-  // 🔥 Improved icon builder with placeholder and better error handling
   Widget _buildIcon() {
     if (item.iconUrl.isNotEmpty) {
       return Image.network(
         item.iconUrl,
         width: 20,
         height: 20,
-        color: item.fg, // Tint the image with the foreground color
+        color: item.fg,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
           return SizedBox(
@@ -396,9 +465,6 @@ class _ServiceTile extends StatelessWidget {
           );
         },
         errorBuilder: (context, error, stackTrace) {
-          // Log the error for debugging
-          print('Failed to load icon for ${item.label}: $error');
-          // Fallback to icon
           return Icon(Icons.category, color: item.fg, size: 16);
         },
       );

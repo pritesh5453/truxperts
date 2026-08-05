@@ -1,8 +1,8 @@
 // Customer/screen/post/AdvanceCategoryPopupWidget.dart
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:truxperts/API/Model_n_svc/categories/advance_category_model.dart';
-import 'package:truxperts/API/Model_n_svc/categories/advance_category_svc.dart';
+import 'package:truxperts/Model_n_svc/categories/advance_category_model.dart';
+import 'package:truxperts/Model_n_svc/categories/advance_category_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 
 class AdvanceCategoryPopupWidget extends StatefulWidget {

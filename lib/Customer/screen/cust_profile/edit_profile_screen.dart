@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/API/Model_n_svc/Profile/profile_svc.dart';
-import 'package:truxperts/API/Model_n_svc/edit_profile/edit_profile_svc.dart';
+import 'package:truxperts/Model_n_svc/Profile/profile_svc.dart';
+import 'package:truxperts/Model_n_svc/edit_profile/edit_profile_svc.dart';
 import 'package:truxperts/utils/appcolors.dart';
 
 void showEditProfileDialog(BuildContext context, int userId) {
@@ -21,7 +21,7 @@ class EditProfileDialog extends StatefulWidget {
   State<EditProfileDialog> createState() => _EditProfileDialogState();
 }
 
-class _EditProfileDialogState extends State<EditProfileDialog> {
+class _EditProfileDialogState extends State<EditProfileDialog> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final ProfileService _profileService = ProfileService();
   final EditProfileService _editProfileService = EditProfileService();
@@ -36,10 +36,26 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
   bool _isSaving = false;
   String? _errorMessage;
 
+  // Shimmer animation
+  late AnimationController _shimmerController;
+
   @override
   void initState() {
     super.initState();
+    _shimmerController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))
+      ..repeat();
     _fetchProfile();
+  }
+
+  @override
+  void dispose() {
+    _shimmerController.dispose();
+    _nameController.dispose();
+    _mobileController.dispose();
+    _emailController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchProfile() async {
@@ -118,16 +134,126 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
     }
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _mobileController.dispose();
-    _emailController.dispose();
-    _cityController.dispose();
-    _stateController.dispose();
-    super.dispose();
+  // ================== SHIMMER / SKELETON ==================
+  Widget _buildShimmer({required Widget child}) {
+    return AnimatedBuilder(
+      animation: _shimmerController,
+      builder: (context, _) {
+        final value = _shimmerController.value;
+        final gradient = LinearGradient(
+          colors: [
+            Colors.grey.shade300,
+            Colors.grey.shade100,
+            Colors.grey.shade300,
+          ],
+          stops: [0.0, 0.5, 1.0],
+          transform: GradientRotation(value * 2 * 3.14159),
+        );
+        return ShaderMask(
+          shaderCallback: (bounds) => gradient.createShader(bounds),
+          blendMode: BlendMode.srcATop,
+          child: child,
+        );
+      },
+    );
   }
 
+  Widget _buildSkeleton() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              height: 20,
+              width: 100,
+              color: Colors.grey.shade300,
+            ),
+            Container(
+              height: 20,
+              width: 20,
+              color: Colors.grey.shade300,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        // Full Name
+        _buildSkeletonField(),
+        const SizedBox(height: 14),
+
+        // Mobile
+        _buildSkeletonField(),
+        const SizedBox(height: 14),
+
+        // Email
+        _buildSkeletonField(),
+        const SizedBox(height: 14),
+
+        // City & State Row
+        Row(
+          children: [
+            Expanded(child: _buildSkeletonField()),
+            const SizedBox(width: 10),
+            Expanded(child: _buildSkeletonField()),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // Buttons
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSkeletonField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 12,
+          width: 60,
+          color: Colors.grey.shade300,
+        ),
+        const SizedBox(height: 6),
+        Container(
+          height: 42,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ================== BUILD ==================
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -152,10 +278,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
         ),
         child: SingleChildScrollView(
           child: _isLoading
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 60),
-                  child: Center(child: CircularProgressIndicator()),
-                )
+              ? _buildShimmer(child: _buildSkeleton())
               : _errorMessage != null && !_isSaving
                   ? Column(
                       mainAxisSize: MainAxisSize.min,

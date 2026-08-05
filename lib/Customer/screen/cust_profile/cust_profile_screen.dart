@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:truxperts/API/Model_n_svc/Profile/profile_model.dart';
-import 'package:truxperts/API/Model_n_svc/Profile/profile_svc.dart';
+import 'package:truxperts/Model_n_svc/Profile/profile_model.dart';
+import 'package:truxperts/Model_n_svc/Profile/profile_svc.dart';
 import 'package:truxperts/Auth/login_screen.dart';
 import 'package:truxperts/Customer/screen/cust_profile/edit_profile_screen.dart';
 import 'package:truxperts/Customer/screen/cust_profile/transaction_history_screen.dart';

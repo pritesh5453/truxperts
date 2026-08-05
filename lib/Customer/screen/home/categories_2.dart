@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:truxperts/API/Model_n_svc/categories/advance_category_svc.dart';
+import 'package:truxperts/Model_n_svc/categories/advance_category_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
+import 'package:shimmer/shimmer.dart'; // ✅ Add shimmer package
 
 // -----------------------------------------------------------------------
 // Simple model for a service item shown in the grid (unchanged)
@@ -23,7 +24,7 @@ class ServiceItem {
 }
 
 // -----------------------------------------------------------------------
-// ChooseServiceScreen2 (Advance Booking) - NOW WITH API DATA
+// ChooseServiceScreen2 (Advance Booking) - WITH SHIMMER LOADING
 // -----------------------------------------------------------------------
 class ChooseServiceScreen2 extends StatefulWidget {
   const ChooseServiceScreen2({super.key});
@@ -114,7 +115,6 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
             icon: Icons.category, // fallback icon agar image fail ho
             bg: category.parsedBgColor,
             fg: category.parsedIconColor,
-            // We'll handle icon image inside tile separately
           );
         }).toList();
       } else {
@@ -126,6 +126,49 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
     }
   }
 
+  // ================== SKELETON WITH SHIMMER ==================
+  Widget _buildSkeletonTile() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          width: 50,
+          height: 10,
+          color: Colors.grey.shade300,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSkeletonGrid() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 8, // show 8 skeleton items
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 14,
+          childAspectRatio: 0.78,
+        ),
+        itemBuilder: (context, index) => _buildSkeletonTile(),
+      ),
+    );
+  }
+
+  // ================== BUILD ==================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,15 +181,46 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
             child: FutureBuilder<List<ServiceItem>>(
               future: _advanceItemsFuture,
               builder: (context, snapshot) {
-                // Loading
+                // Loading → Show skeleton grid with shimmer
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 16),
+                        _SectionCard(
+                          backgroundColor: AppColors.advanceBannerBg,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _SectionHeader(
+                                icon: Icons.calendar_today,
+                                iconColor: AppColors.primaryPurple,
+                                title: 'ADVANCE BOOKING',
+                                subtitleWidget: const Text(
+                                  '        Book for future date & events',
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                onViewAll: () {},
+                              ),
+                              const SizedBox(height: 16),
+                              _buildSkeletonGrid(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 }
+
                 // Error / no data – fallback dikhao
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  // Fallback list se grid build karo
                   return _buildAdvanceGrid(_fallbackAdvanceBooking);
                 }
+
                 // ✅ Data mil gaya
                 return _buildAdvanceGrid(snapshot.data!);
               },
@@ -189,16 +263,7 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
                   onViewAll: () {},
                 ),
                 const SizedBox(height: 16),
-                _ServiceGrid(
-                  items: items,
-                  // We'll pass a flag to indicate we want to show images from API
-                  // But we can also just use the icon from ServiceItem.
-                  // Since we kept icon as IconData, we can show that.
-                  // However, we want to show API image if available.
-                  // We'll modify _ServiceTile to accept a network image URL.
-                  // To keep it simple, we'll add an optional imageUrl field.
-                  // But we don't have that in ServiceItem.
-                ),
+                _ServiceGrid(items: items),
               ],
             ),
           ),
@@ -210,7 +275,7 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
 }
 
 // -----------------------------------------------------------------------
-// All sub-widgets (unchanged, except _ServiceTile now supports network image)
+// All sub-widgets (unchanged)
 // -----------------------------------------------------------------------
 
 class _SectionCard extends StatelessWidget {
@@ -275,7 +340,6 @@ class _SectionHeader extends StatelessWidget {
             ],
           ),
         ),
-      
       ],
     );
   }

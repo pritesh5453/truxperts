@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:truxperts/API/Model_n_svc/login/login_model.dart';
+import 'package:truxperts/Model_n_svc/login/login_model.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 
 class AuthService {

@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:truxperts/API/Model_n_svc/categories/categories_model.dart';
-import 'package:truxperts/API/Model_n_svc/categories/subcategory/subcategory_svc.dart';
-import 'package:truxperts/API/Model_n_svc/post_screen/post_model.dart';
-import 'package:truxperts/API/Model_n_svc/post_screen/post_svc.dart';
+import 'package:truxperts/Model_n_svc/categories/categories_model.dart';
+import 'package:truxperts/Model_n_svc/categories/subcategory/subcategory_svc.dart';
+import 'package:truxperts/Model_n_svc/post_screen/post_model.dart';
+import 'package:truxperts/Model_n_svc/post_screen/post_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'package:truxperts/Customer/customs/customappbar.dart';
 import 'package:truxperts/Customer/screen/home/address_location.dart';
@@ -13,6 +13,8 @@ import 'package:truxperts/Customer/screen/post/select_advance_subcategory.dart';
 import 'package:truxperts/utils/navbar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:truxperts/Model_n_svc/address/address_model.dart'; // ✅ Address model
+import 'package:truxperts/utils/sharedPreference/apppreference.dart'; // ✅ For user ID
 
 class PostRequestScreen extends StatefulWidget {
   const PostRequestScreen({Key? key}) : super(key: key);
@@ -31,7 +33,8 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
 
   bool isInstantBooking = true;
 
-  String selectedLocation = "Pune, Maharashtra";
+  // ✅ Selected Address (instead of static location)
+  Address? _selectedAddress;
 
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
@@ -114,6 +117,12 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
       );
       return;
     }
+    if (_selectedAddress == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a location address")),
+      );
+      return;
+    }
 
     // Format date and time
     final String formattedDate =
@@ -121,10 +130,14 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
     final String formattedTime =
         "${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}:00";
 
-    // Static location values (for now)
-    const String locationAddress = "123 Main Street, Pune, Maharashtra 411001";
-    const String latitude = "18.5204";
-    const String longitude = "73.8567";
+    // ✅ Use selected address data
+    final String locationAddress = _selectedAddress!.fullAddress;
+    final String latitude = _selectedAddress!.latitude?.toString() ?? '0.0';
+    final String longitude = _selectedAddress!.longitude?.toString() ?? '0.0';
+
+    // ✅ Get user ID from shared preferences
+    final userData = await AppPreferences.getUser();
+    final userId = userData?['id'] as int? ?? 1; // fallback to 1 if not found
 
     // Show loading
     showDialog(
@@ -141,31 +154,29 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
       if (isInstantBooking) {
         // ✅ INSTANT BOOKING
         final request = InstantBookingRequest(
-        bookingType: 'instant',
-        categoryId: selectedCategoryId!,
-        categoryName: selectedCategoryName ?? '',
-        subcategoryId: selectedSubcategoryId!,
-        subcategoryName: selectedSubcategoryText,
-        description: _descriptionController.text.trim(),
-        budget: budget.isEmpty ? '0' : budget,
-        locationAddress: locationAddress,
-        latitude: latitude,
-        longitude: longitude,
-        preferredDate: formattedDate,
-        preferredTime: formattedTime,
-        additionalNotes: _additionalNotesController.text.trim(),
-        paymentAmount: budget.isEmpty ? '0' : budget,
-        advanceAmount: '0',
-        advancePaid: false,
-        userId: 1,
-      );
+          bookingType: 'instant',
+          categoryId: selectedCategoryId!,
+          categoryName: selectedCategoryName ?? '',
+          subcategoryId: selectedSubcategoryId!,
+          subcategoryName: selectedSubcategoryText,
+          description: _descriptionController.text.trim(),
+          budget: budget.isEmpty ? '0' : budget,
+          locationAddress: locationAddress,
+          latitude: latitude,
+          longitude: longitude,
+          preferredDate: formattedDate,
+          preferredTime: formattedTime,
+          additionalNotes: _additionalNotesController.text.trim(),
+          paymentAmount: budget.isEmpty ? '0' : budget,
+          advanceAmount: '0',
+          advancePaid: false,
+          userId: userId,
+        );
 
-         final service = InstantBookingApiService(dio);
-      // ✅ Pass images
-      final response = await service.createInstantBooking(request, selectedImages);
+        final service = InstantBookingApiService(dio);
+        final response = await service.createInstantBooking(request, selectedImages);
 
-        // Close loading
-        if (mounted) Navigator.pop(context);
+        if (mounted) Navigator.pop(context); // close loading
 
         if (response.success) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -186,8 +197,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
           );
         }
       } else {
-        // 🔜 ADVANCE BOOKING (will be updated later)
-        // For now, show a placeholder message
+        // 🔜 ADVANCE BOOKING (placeholder)
         if (mounted) Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -195,29 +205,6 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
             backgroundColor: Colors.orange,
           ),
         );
-        // Uncomment when advance API is ready:
-        /*
-        final request = ServiceRequestRequest(
-          bookingType: 'advance',
-          categoryId: selectedCategoryId!,
-          categoryName: selectedCategoryName ?? '',
-          subcategoryId: selectedSubcategoryId!,
-          subcategoryName: selectedSubcategoryText,
-          description: _descriptionController.text.trim(),
-          locationAddress: locationAddress,
-          latitude: latitude,
-          longitude: longitude,
-          preferredDate: formattedDate,
-          preferredTime: formattedTime,
-          additionalNotes: _additionalNotesController.text.trim(),
-          paymentAmount: budget.isEmpty ? '0' : budget,
-          user: 'Sumit pathak',
-          userId: 1,
-        );
-        final service = ServiceRequestApiService(dio);
-        final response = await service.createServiceRequest(request);
-        // handle response...
-        */
       }
     } catch (e) {
       if (mounted) Navigator.pop(context);
@@ -448,16 +435,68 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // ---------- 6. Location ----------
+                // ---------- 6. Location (UPDATED) ----------
                 _sectionTitle("6. Location"),
                 GestureDetector(
-                  onTap: () {
-                    LocationSelectorSheet.show(context);
+                  onTap: () async {
+                    // ✅ Open LocationSelectorSheet and wait for Address result
+                    final result = await LocationSelectorSheet.showWithResult(context);
+                    if (result != null && mounted) {
+                      setState(() {
+                        _selectedAddress = result;
+                      });
+                    }
                   },
-                  child: _customDropdownWithIcon(
-                    Icons.location_on,
-                    selectedLocation,
-                    "Tap to change location",
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.location_on, color: Color(0xFF001A4E)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _selectedAddress != null
+                                    ? _selectedAddress!.addressType
+                                    : "Select Location",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: _selectedAddress != null
+                                      ? const Color(0xFF001A4E)
+                                      : Colors.grey,
+                                ),
+                              ),
+                              if (_selectedAddress != null) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  _selectedAddress!.fullAddress,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ] else ...[
+                                const SizedBox(height: 2),
+                                const Text(
+                                  "Tap to select or add address",
+                                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right, color: Colors.grey),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -743,44 +782,10 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
       ),
     );
   }
-
-  Widget _customDropdownWithIcon(IconData icon, String title, String sub) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: const Color(0xFF001A4E)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  sub,
-                  style: const TextStyle(fontSize: 10, color: Colors.grey),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right, color: Colors.grey),
-        ],
-      ),
-    );
-  }
 }
 
 // -------------------------------------------------
-// SUB-CATEGORY POPUP (unchanged - included for completeness)
+// SUB-CATEGORY POPUP (unchanged)
 // -------------------------------------------------
 class SubcategoryPopupWidget extends StatefulWidget {
   final int categoryId;
@@ -1053,7 +1058,7 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
 }
 
 // -------------------------------------------------
-// LOCATION POPUP (unchanged)
+// LOCATION POPUP (unchanged - not used in new flow but kept)
 // -------------------------------------------------
 class LocationPopupWidget extends StatefulWidget {
   const LocationPopupWidget({Key? key}) : super(key: key);

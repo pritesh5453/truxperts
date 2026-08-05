@@ -1,8 +1,8 @@
 // Customer/screen/post/category_popup.dart
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:truxperts/API/Model_n_svc/categories/categories_model.dart';
-import 'package:truxperts/API/Model_n_svc/categories/categories_svc.dart';
+import 'package:truxperts/Model_n_svc/categories/categories_model.dart';
+import 'package:truxperts/Model_n_svc/categories/categories_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 
 class CategoryPopupWidget extends StatefulWidget {

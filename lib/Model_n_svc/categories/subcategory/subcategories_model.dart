@@ -1,5 +1,5 @@
 // models/subcategories_response.dart
-import 'package:truxperts/API/Model_n_svc/categories/categories_model.dart';
+import 'package:truxperts/Model_n_svc/categories/categories_model.dart';
 
 
 class SubcategoriesResponse {
