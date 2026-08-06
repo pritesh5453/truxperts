@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart'; // ✅ Added Shimmer package import
+import 'package:shimmer/shimmer.dart';
 import 'package:truxperts/Model_n_svc/categories/categories_model.dart';
 import 'package:truxperts/Model_n_svc/categories/categories_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
@@ -12,13 +12,13 @@ import 'package:truxperts/utils/common_appbar.dart';
 // -----------------------------------------------------------------------
 class ServiceItem {
   final String label;
-  final String iconUrl;
+  final String? iconUrl;
   final Color bg;
   final Color fg;
 
   const ServiceItem({
     required this.label,
-    required this.iconUrl,
+    this.iconUrl,
     required this.bg,
     required this.fg,
   });
@@ -37,83 +37,12 @@ class ChooseServiceScreen extends StatefulWidget {
 class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
   late Future<List<ServiceItem>> _serviceItemsFuture;
 
-  // Static fallback list (agar API fail ho to dikhana hai)
-  static const List<ServiceItem> _fallbackServices = [
-    ServiceItem(
-      label: 'Electrician',
-      iconUrl: '',
-      bg: AppColors.iconElectricianBg,
-      fg: AppColors.iconElectricianFg,
-    ),
-    ServiceItem(
-      label: 'Plumber',
-      iconUrl: '',
-      bg: AppColors.iconPlumberBg,
-      fg: AppColors.iconPlumberFg,
-    ),
-    ServiceItem(
-      label: 'AC Repair',
-      iconUrl: '',
-      bg: AppColors.iconAcBg,
-      fg: AppColors.iconAcFg,
-    ),
-    ServiceItem(
-      label: 'Carpenter',
-      iconUrl: '',
-      bg: AppColors.iconCarpenterBg,
-      fg: AppColors.iconCarpenterFg,
-    ),
-    ServiceItem(
-      label: 'RO Service',
-      iconUrl: '',
-      bg: AppColors.iconRoBg,
-      fg: AppColors.iconRoFg,
-    ),
-    ServiceItem(
-      label: 'Cleaning',
-      iconUrl: '',
-      bg: AppColors.iconCleaningBg,
-      fg: AppColors.iconCleaningFg,
-    ),
-    ServiceItem(
-      label: 'Grocery',
-      iconUrl: '',
-      bg: AppColors.iconGroceryBg,
-      fg: AppColors.iconGroceryFg,
-    ),
-    ServiceItem(
-      label: 'Medicine',
-      iconUrl: '',
-      bg: AppColors.iconMedicineBg,
-      fg: AppColors.iconMedicineFg,
-    ),
-    ServiceItem(
-      label: 'Pest Control',
-      iconUrl: '',
-      bg: AppColors.iconPestBg,
-      fg: AppColors.iconPestFg,
-    ),
-    ServiceItem(
-      label: 'Auto / Cab',
-      iconUrl: '',
-      bg: AppColors.iconAutoBg,
-      fg: AppColors.iconAutoFg,
-    ),
-    ServiceItem(
-      label: 'Courier',
-      iconUrl: '',
-      bg: AppColors.iconCourierBg,
-      fg: AppColors.iconCourierFg,
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
     _serviceItemsFuture = _fetchCategories();
   }
 
-  // API se data laake ServiceItem list banayein
   Future<List<ServiceItem>> _fetchCategories() async {
     try {
       final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
@@ -122,7 +51,8 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
 
       if (response.success && response.data.isNotEmpty) {
         return response.data.map((category) {
-          Color parseColor(String hex) {
+          Color parseColor(String? hex) {
+            if (hex == null || hex.isEmpty) return Colors.grey;
             String clean = hex.trim();
             clean = clean.replaceAll('\\', '');
             if (clean.startsWith('#')) clean = clean.substring(1);
@@ -130,23 +60,26 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
             return Color(int.parse('0x$clean'));
           }
 
+          final iconUrl = category.cleanIcon;
+          final bgColor = category.bgColor ?? '#E0E0E0';
+          final fgColor = category.iconColor ?? '#000000';
+
           return ServiceItem(
             label: category.name,
-            iconUrl: category.cleanIcon,
-            bg: parseColor(category.bgColor),
-            fg: parseColor(category.iconColor),
+            iconUrl: iconUrl,
+            bg: parseColor(bgColor),
+            fg: parseColor(fgColor),
           );
         }).toList();
       } else {
-        return _fallbackServices;
+        return [];
       }
     } catch (e) {
       print('Error fetching categories: $e');
-      return _fallbackServices;
+      return [];
     }
   }
 
-  // ================== SKELETON WITH SHIMMER ==================
   Widget _buildSkeletonTile() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -199,11 +132,9 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
             child: FutureBuilder<List<ServiceItem>>(
               future: _serviceItemsFuture,
               builder: (context, snapshot) {
-                // Loading → Show skeleton grid with shimmer
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Column(
                       children: [
                         const SizedBox(height: 16),
@@ -236,21 +167,46 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
                   );
                 }
 
-                // Error / no data – fallback dikhao
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return _buildServiceGrid(_fallbackServices);
+                if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                  return _buildEmptyState();
                 }
 
-                // ✅ Data mil gaya
                 return _buildServiceGrid(snapshot.data!);
               },
             ),
           ),
-          // Sticky footer: Smart Search Card
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             color: AppColors.bg,
             child: const _SmartSearchCard(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 48, color: AppColors.textSecondary),
+          SizedBox(height: 12),
+          Text(
+            'No services available',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'Please try again later',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+            ),
           ),
         ],
       ),
@@ -295,7 +251,7 @@ class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
 }
 
 // -----------------------------------------------------------------------
-// All the existing widgets
+// Sub‑widgets
 // -----------------------------------------------------------------------
 
 class _SectionCard extends StatelessWidget {
@@ -389,6 +345,7 @@ class _ServiceGrid extends StatelessWidget {
   }
 }
 
+// ✅ UPDATED _ServiceTile – removed color tint, fixed image loading
 class _ServiceTile extends StatelessWidget {
   final ServiceItem item;
   const _ServiceTile({required this.item});
@@ -418,8 +375,8 @@ class _ServiceTile extends StatelessWidget {
             ),
             child: Center(
               child: Container(
-                width: 34,
-                height: 34,
+                width: double.infinity,
+                height: double.infinity,
                 decoration: BoxDecoration(
                   color: item.bg,
                   borderRadius: BorderRadius.circular(10),
@@ -447,33 +404,33 @@ class _ServiceTile extends StatelessWidget {
   }
 
   Widget _buildIcon() {
-    if (item.iconUrl.isNotEmpty) {
-      return Image.network(
-        item.iconUrl,
-        width: 20,
-        height: 20,
-        color: item.fg,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: item.fg,
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return Icon(Icons.category, color: item.fg, size: 16);
-        },
-      );
-    } else {
-      return Icon(Icons.category, color: item.fg, size: 16);
+    if (item.iconUrl == null || item.iconUrl!.isEmpty) {
+      return const SizedBox.shrink();
     }
+
+    return Image.network(
+      item.iconUrl!,
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.cover, // ✅ image pura container cover karega
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: item.fg,
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        print('❌ Image load error for ${item.label}: $error');
+        return const SizedBox.shrink();
+      },
+    );
   }
 }
-
 class _SmartSearchCard extends StatelessWidget {
   const _SmartSearchCard();
 

@@ -9,7 +9,7 @@ import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
 import 'package:dio/dio.dart';
 import 'package:truxperts/utils/sharedPreference/apppreference.dart';
-import 'package:shimmer/shimmer.dart'; // ✅ Shimmer import
+import 'package:shimmer/shimmer.dart';
 
 class MyRequestsScreen extends StatefulWidget {
   const MyRequestsScreen({Key? key}) : super(key: key);
@@ -28,6 +28,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
   String? _selectedStatus;
 
   Map<String, dynamic> _stats = {};
+  int? _userId;
 
   late InstantBookingService _bookingService;
 
@@ -71,6 +72,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
       if (userId == null) {
         throw Exception('User ID not found. Please login again.');
       }
+      _userId = userId;
 
       await _fetchStats(userId);
 
@@ -134,7 +136,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     };
   }
 
-  // ================== SKELETON CARD (card-shaped) ==================
+  // ================== SKELETON ==================
   Widget _buildSkeletonCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -158,7 +160,6 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icon/avatar skeleton
                 Container(
                   width: 48,
                   height: 48,
@@ -172,7 +173,6 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title + status skeleton
                       Row(
                         children: [
                           Expanded(
@@ -193,21 +193,18 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                         ],
                       ),
                       const SizedBox(height: 6),
-                      // Location skeleton
                       Container(
                         height: 10,
                         width: 120,
                         color: Colors.grey.shade300,
                       ),
                       const SizedBox(height: 4),
-                      // Date skeleton
                       Container(
                         height: 10,
                         width: 100,
                         color: Colors.grey.shade300,
                       ),
                       const SizedBox(height: 8),
-                      // Description skeleton
                       Container(
                         height: 10,
                         width: double.infinity,
@@ -222,7 +219,6 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                     ],
                   ),
                 ),
-                // Right side placeholder (avatar + rating)
                 const SizedBox(width: 12),
                 Column(
                   children: [
@@ -251,7 +247,6 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
               ],
             ),
           ),
-          // Footer skeleton
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: const BoxDecoration(
@@ -280,7 +275,6 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     );
   }
 
-  // ================== SKELETON LIST ==================
   Widget _buildSkeletonList() {
     return Column(
       children: List.generate(3, (index) => _buildSkeletonCard()),
@@ -635,10 +629,9 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     );
   }
 
-  // ================== INSTANT LIST (with shimmer) ==================
+  // ================== INSTANT LIST ==================
   Widget _buildInstantList() {
     if (_isLoading) {
-      // Show shimmer skeleton
       return Shimmer.fromColors(
         baseColor: Colors.grey.shade300,
         highlightColor: Colors.grey.shade100,
@@ -681,14 +674,15 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
           statusText: 'Assigned',
           statusBg: const Color(0xffE0EFFF),
           statusTextColor: const Color(0xff007AFF),
-          icon: LucideIcons.zap,
-          iconColor: AppColors.navy,
+          categoryImage: 'https://cdn-icons-png.flaticon.com/512/180/180506.png',
           iconBg: const Color(0xffEAE4FF),
           footerLeftText: '1 Quote Received',
           actionWidget: _buildChatButton(),
           providerName: 'Amit Electricals',
           providerRating: '4.7',
           providerImage: 'https://i.imgur.com/8Km9tLL.png',
+          bookingId: 123,
+          userId: 1,
         ),
         const SizedBox(height: 16),
         _buildStaticRequestCard(
@@ -700,8 +694,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
           statusText: 'Pending',
           statusBg: const Color(0xffFFECC7),
           statusTextColor: const Color(0xffFF9F00),
-          icon: LucideIcons.pipette,
-          iconColor: const Color(0xffE65F2B),
+          categoryImage: 'https://cdn-icons-png.flaticon.com/512/109/109590.png',
           iconBg: const Color(0xffFFEFEA),
           footerLeftText: '0 Quotes Yet',
           actionWidget: _buildViewDetailsButton(),
@@ -727,6 +720,8 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
               const Icon(Icons.chevron_right, color: Color(0xffA0AEC0)),
             ],
           ),
+          bookingId: 124,
+          userId: 1,
         ),
         const SizedBox(height: 16),
         _buildStaticRequestCard(
@@ -738,14 +733,15 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
           statusText: 'In Progress',
           statusBg: const Color(0xffEAE4FF),
           statusTextColor: AppColors.navy,
-          icon: LucideIcons.airplay,
-          iconColor: const Color(0xff007AFF),
+          categoryImage: 'https://cdn-icons-png.flaticon.com/512/2962/2962786.png',
           iconBg: const Color(0xffE0EFFF),
           footerLeftText: 'Work in Progress',
           actionWidget: _buildChatButton(),
           providerName: 'CoolTech Solutions',
           providerRating: '4.8',
           providerImage: 'https://i.imgur.com/8Km9tLL.png',
+          bookingId: 125,
+          userId: 1,
         ),
         const SizedBox(height: 16),
         _buildStaticRequestCard(
@@ -757,8 +753,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
           statusText: 'Completed',
           statusBg: const Color(0xffE2F6EA),
           statusTextColor: const Color(0xff27AE60),
-          icon: LucideIcons.paintBucket,
-          iconColor: const Color(0xff27AE60),
+          categoryImage: 'https://cdn-icons-png.flaticon.com/512/2962/2962791.png',
           iconBg: const Color(0xffE2F6EA),
           footerLeftText: 'Completed on 03 Jul 2025',
           actionWidget: TextButton(
@@ -778,6 +773,8 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
           providerName: 'ColorCraft Painters',
           providerRating: '4.6',
           providerImage: 'https://i.imgur.com/8Km9tLL.png',
+          bookingId: 126,
+          userId: 1,
         ),
         const SizedBox(height: 16),
         _buildStaticRequestCard(
@@ -789,8 +786,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
           statusText: 'Cancelled',
           statusBg: const Color(0xffE9ECEF),
           statusTextColor: const Color(0xff6C757D),
-          icon: LucideIcons.wrench,
-          iconColor: const Color(0xffE63946),
+          categoryImage: 'https://cdn-icons-png.flaticon.com/512/3018/3018433.png',
           iconBg: const Color(0xffFAD2E1),
           footerLeftText: '',
           actionWidget: _buildViewDetailsButton(),
@@ -814,6 +810,8 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
               const Icon(Icons.chevron_right, color: Color(0xffA0AEC0)),
             ],
           ),
+          bookingId: 127,
+          userId: 1,
         ),
         const SizedBox(height: 80),
       ],
@@ -822,21 +820,25 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
 
   // ================== DYNAMIC CARD ==================
   Widget _buildRequestCardFromBooking(Booking booking) {
-    IconData getIcon(String category) {
+    // Map icon from category name (fallback)
+    String? getCategoryImage(String category) {
+      // If your Booking model has a categoryImage field, use it:
+      // return booking.categoryImage;
+      // Otherwise, fallback to a static mapping
       switch (category.toLowerCase()) {
         case 'electrician':
-          return LucideIcons.zap;
+          return 'https://cdn-icons-png.flaticon.com/512/180/180506.png';
         case 'plumber':
-          return LucideIcons.pipette;
+          return 'https://cdn-icons-png.flaticon.com/512/109/109590.png';
         case 'ac repair':
         case 'air conditioner':
-          return LucideIcons.airplay;
+          return 'https://cdn-icons-png.flaticon.com/512/2962/2962786.png';
         case 'carpenter':
-          return LucideIcons.hammer;
+          return 'https://cdn-icons-png.flaticon.com/512/180/180507.png';
         case 'painter':
-          return LucideIcons.paintBucket;
+          return 'https://cdn-icons-png.flaticon.com/512/2962/2962791.png';
         default:
-          return LucideIcons.wrench;
+          return null;
       }
     }
 
@@ -860,7 +862,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     }
 
     final statusStyle = getStatusStyle(booking.status);
-    final icon = getIcon(booking.categoryName);
+    final categoryImage = booking.categoryImage ?? getCategoryImage(booking.categoryName);
 
     final dateStr = _formatDate(booking.preferredDate);
     final timeStr = _formatTime(booking.preferredTime);
@@ -984,8 +986,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
       statusText: statusStyle['label'] as String,
       statusBg: statusStyle['bg'] as Color,
       statusTextColor: statusStyle['text'] as Color,
-      icon: icon,
-      iconColor: statusStyle['text'] as Color,
+      categoryImage: categoryImage,
       iconBg: (statusStyle['bg'] as Color).withOpacity(0.3),
       footerLeftText: footerText,
       actionWidget: actionWidget,
@@ -993,6 +994,8 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
       providerRating: '4.5',
       providerImage: 'https://i.imgur.com/8Km9tLL.png',
       middleWidget: rightWidget,
+      bookingId: booking.id,
+      userId: _userId ?? 0,
     );
   }
 
@@ -1006,8 +1009,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     required String statusText,
     required Color statusBg,
     required Color statusTextColor,
-    required IconData icon,
-    required Color iconColor,
+    required String? categoryImage, // ✅ new parameter
     required Color iconBg,
     required String footerLeftText,
     required Widget actionWidget,
@@ -1015,8 +1017,24 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
     String? providerRating,
     String? providerImage,
     Widget? middleWidget,
+    int? bookingId,
+    int? userId,
     VoidCallback? onTap,
   }) {
+    if (bookingId != null && userId != null && onTap == null) {
+      onTap = () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RequestTrackingScreen(
+              bookingId: bookingId,
+              userId: userId,
+            ),
+          ),
+        );
+      };
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1046,10 +1064,30 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // ✅ Category Icon – now uses image if available
                     CircleAvatar(
                       radius: 24,
                       backgroundColor: iconBg,
-                      child: Icon(icon, color: iconColor, size: 22),
+                      child: categoryImage != null && categoryImage.isNotEmpty
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.network(
+                                categoryImage,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Icon(
+                                  LucideIcons.zap,
+                                  color: statusTextColor,
+                                  size: 20,
+                                ),
+                              ),
+                            )
+                          : Icon(
+                              LucideIcons.zap,
+                              color: statusTextColor,
+                              size: 20,
+                            ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -1224,8 +1262,27 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
               ),
             ),
           ),
-          // Footer
-         
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: const BoxDecoration(
+              border: Border(
+                top: BorderSide(color: Color(0xffF1F3F5), width: 1),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  footerLeftText,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Color(0xff6C757D),
+                  ),
+                ),
+                actionWidget,
+              ],
+            ),
+          ),
         ],
       ),
     );

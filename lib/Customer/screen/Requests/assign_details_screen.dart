@@ -1,45 +1,717 @@
+import 'dart:math' as math;
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_flutter/lucide_flutter.dart';
+import 'package:shimmer/shimmer.dart'; // ✅ Shimmer import
+import 'package:truxperts/Model_n_svc/cancel_request/cancel_request_model.dart';
+import 'package:truxperts/Model_n_svc/cancel_request/cancel_svc.dart';
+import 'package:truxperts/Model_n_svc/tracking/tracking_model.dart';
+import 'package:truxperts/Model_n_svc/tracking/tracking_svc.dart';
 import 'package:truxperts/Customer/screen/Requests/payment_method_screen.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
-class RequestTrackingScreen extends StatelessWidget {
-  const RequestTrackingScreen({Key? key}) : super(key: key);
+import 'package:truxperts/API/baseurl/api_endpoint.dart';
+
+class RequestTrackingScreen extends StatefulWidget {
+  final int bookingId;
+  final int userId;
+
+  const RequestTrackingScreen({
+    Key? key,
+    required this.bookingId,
+    required this.userId,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: CommonAppBar(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildBriefJobSummaryCard(),
-              const SizedBox(height: 16),
-              _buildServiceOtpCard(),
-              const SizedBox(height: 16),
-              _buildVendorAssignmentCard(),
-              const SizedBox(height: 16),
-              _buildLiveLocationMapCard(),
-              const SizedBox(height: 16),
-              _buildRequestStatusTracker(),
-              const SizedBox(height: 16),
-              _buildRequestDetailsGrid(),
-              const SizedBox(height: 24),
-              _buildBottomActionButtons(context),
-              const SizedBox(height: 24),
-            ],
-          ),
+  State<RequestTrackingScreen> createState() => _RequestTrackingScreenState();
+}
+
+class _RequestTrackingScreenState extends State<RequestTrackingScreen>
+    with SingleTickerProviderStateMixin {
+  bool _isLoading = true;
+  bool _hasError = false;
+  String _errorMessage = '';
+  TrackingData? _trackingData;
+
+  late final AnimationController _searchAnimController;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTrackingData();
+    _searchAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _searchAnimController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchTrackingData() async {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+
+    try {
+      final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+      final service = InstantTrackingService(dio);
+      final response = await service.fetchTracking(
+        bookingId: widget.bookingId,
+        userId: widget.userId,
+      );
+
+      if (response.success) {
+        setState(() {
+          _trackingData = response.data;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+          _errorMessage = response.message;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+        _errorMessage = e.toString();
+      });
+    }
+  }
+
+  // ================== STATUS HELPERS ==================
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return AppColors.warningBg;
+      case 'assigned':
+        return AppColors.lightBlue;
+      case 'ontheway':
+      case 'in_progress':
+        return AppColors.lightPurple;
+      case 'completed':
+        return AppColors.successBg;
+      case 'cancelled':
+        return AppColors.errorBg;
+      default:
+        return AppColors.warningBg;
+    }
+  }
+
+  Color _getStatusTextColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return AppColors.warningText;
+      case 'assigned':
+        return AppColors.blueAccent;
+      case 'ontheway':
+      case 'in_progress':
+        return AppColors.navy;
+      case 'completed':
+        return AppColors.successText;
+      case 'cancelled':
+        return AppColors.errorText;
+      default:
+        return AppColors.warningText;
+    }
+  }
+
+  String _getStatusDisplay(String status) {
+    switch (status.toLowerCase()) {
+      case 'ontheway':
+        return 'On The Way';
+      case 'in_progress':
+        return 'In Progress';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day} ${_getMonth(date.month)}, ${date.year}';
+  }
+
+  String _getMonth(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
+  }
+
+  // ================== SKELETON WIDGETS ==================
+  Widget _buildSkeletonContent() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSkeletonJobSummaryCard(),
+            const SizedBox(height: 16),
+            _buildSkeletonVendorCard(),
+            const SizedBox(height: 16),
+            _buildSkeletonStatusTracker(),
+            const SizedBox(height: 16),
+            _buildSkeletonRequestDetails(),
+            const SizedBox(height: 24),
+            _buildSkeletonActionButtons(),
+          ],
         ),
       ),
     );
   }
 
-  // --- 1. Top Brief Job Summary Card ---
-  Widget _buildBriefJobSummaryCard() {
+  Widget _buildSkeletonJobSummaryCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 14,
+                  width: double.infinity,
+                  color: Colors.grey.shade300,
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  height: 18,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  height: 10,
+                  width: 120,
+                  color: Colors.grey.shade300,
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  height: 10,
+                  width: double.infinity,
+                  color: Colors.grey.shade300,
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  height: 10,
+                  width: 150,
+                  color: Colors.grey.shade300,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonVendorCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 10,
+            width: 120,
+            color: Colors.grey.shade300,
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 12,
+                      width: 100,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      height: 10,
+                      width: 80,
+                      color: Colors.grey.shade300,
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      height: 10,
+                      width: 120,
+                      color: Colors.grey.shade300,
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    height: 8,
+                    width: 30,
+                    color: Colors.grey.shade300,
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    height: 14,
+                    width: 40,
+                    color: Colors.grey.shade300,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 35,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  height: 35,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonStatusTracker() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 12,
+            width: 100,
+            color: Colors.grey.shade300,
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(5, (index) {
+              return Column(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    height: 8,
+                    width: 40,
+                    color: Colors.grey.shade300,
+                  ),
+                ],
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonRequestDetails() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 12,
+            width: 100,
+            color: Colors.grey.shade300,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ================== BUILD ==================
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.bg,
+      appBar: CommonAppBar(),
+      body: _isLoading
+          ? _buildSkeletonContent() // ✅ Skeleton with shimmer
+          : _hasError
+              ? _buildErrorState()
+              : _buildContent(),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 48, color: AppColors.textSecondary),
+          const SizedBox(height: 12),
+          Text(
+            'Failed to load tracking details',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _errorMessage,
+            style: TextStyle(
+              color: AppColors.textGrey,
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _fetchTrackingData,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryPurple,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    final data = _trackingData!;
+    final actions = data.actions;
+    final vendor = data.vendor;
+    final otp = data.serviceOtp;
+    final bool isCancelled = data.status.toLowerCase() == 'cancelled';
+    final bool isPending = data.status.toLowerCase() == 'pending';
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildBriefJobSummaryCard(data),
+            const SizedBox(height: 16),
+
+            // 🔍 If pending, show the "Searching for Vendor" animation
+            if (isPending) ...[
+              _buildSearchingVendorCard(),
+              const SizedBox(height: 16),
+            ],
+
+            // ✅ If cancelled, show cancellation message and skip all other sections
+            if (isCancelled) ...[
+              _buildCancelledMessage(),
+              const SizedBox(height: 16),
+            ],
+
+            // OTP Card – show only if showServiceOtp is true AND not cancelled
+            if (!isCancelled && actions.showServiceOtp)
+              _buildServiceOtpCard(otp.otp),
+
+            if (!isCancelled && actions.showServiceOtp) const SizedBox(height: 16),
+
+            // Vendor Card – show only if showVendor is true AND not cancelled
+            if (!isCancelled && actions.showVendor && vendor != null)
+              _buildVendorAssignmentCard(vendor),
+
+            if (!isCancelled && actions.showVendor && vendor != null) const SizedBox(height: 16),
+
+            // Live Location – show only if showLiveLocation is true AND not cancelled
+            if (!isCancelled && actions.showLiveLocation)
+              _buildLiveLocationMapCard(data),
+
+            if (!isCancelled && actions.showLiveLocation) const SizedBox(height: 16),
+
+            // Status Tracker (always show, but timeline will show cancellation)
+            _buildRequestStatusTracker(data.timeline),
+            const SizedBox(height: 16),
+
+            // Request Details
+            _buildRequestDetailsGrid(data.requestDetails),
+            const SizedBox(height: 24),
+
+            // Action Buttons – only if not cancelled
+            if (!isCancelled)
+              _buildBottomActionButtons(
+                showCancel: actions.showCancelButton,
+                showMarkDone: actions.showMarkDoneButton,
+              ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ================== SEARCHING FOR VENDOR ==================
+  Widget _buildSearchingVendorCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 110,
+            width: double.infinity,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final double a = math.min(constraints.maxWidth / 2 - 30, 90);
+                const double b = 30;
+
+                return AnimatedBuilder(
+                  animation: _searchAnimController,
+                  builder: (context, child) {
+                    final double t = _searchAnimController.value * 2 * math.pi;
+                    final double sinT = math.sin(t);
+                    final double cosT = math.cos(t);
+                    final double denom = 1 + (sinT * sinT);
+                    final double x = a * cosT / denom;
+                    final double y = b * sinT * cosT / denom;
+
+                    return Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Transform.translate(
+                          offset: Offset(x, y),
+                          child: Image.asset(
+                            'assets/icons/magnifying_glass.png',
+                            width: 150,
+                            height: 150,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Searching for Vendor',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Please wait while we find the best vendor for you',
+            style: TextStyle(
+              fontSize: 10,
+              color: AppColors.textGrey,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== CANCELLED MESSAGE ==================
+  Widget _buildCancelledMessage() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.errorBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.errorText.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.cancel, color: AppColors.errorText, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Request Cancelled',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: AppColors.errorText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'This request has been cancelled and is no longer active.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textGrey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== BRIEF JOB SUMMARY ==================
+  Widget _buildBriefJobSummaryCard(TrackingData data) {
+    final summary = data.jobSummary;
+    final statusDisplay = _getStatusDisplay(data.status);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -70,11 +742,11 @@ class RequestTrackingScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Electrical Wiring Repair',
-                      style: TextStyle(
+                    Text(
+                      summary.title,
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 13, // reduced from 16
+                        fontSize: 13,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -85,43 +757,43 @@ class RequestTrackingScreen extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.lightBlue,
+                        color: _getStatusColor(data.status),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text(
-                        'Assigned',
+                      child: Text(
+                        statusDisplay.toUpperCase(),
                         style: TextStyle(
-                          color: AppColors.blueAccent,
-                          fontSize: 8, // reduced from 10
+                          color: _getStatusTextColor(data.status),
+                          fontSize: 8,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Row(
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           LucideIcons.calendar,
                           size: 14,
                           color: AppColors.hintText,
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Text(
-                          '08 Jul 2025  •  04:30 PM',
-                          style: TextStyle(
-                            fontSize: 10, // reduced from 12
+                          '${_formatDate(summary.bookingDate)}  •  ${summary.bookingTime}',
+                          style: const TextStyle(
+                            fontSize: 10,
                             color: AppColors.textGrey,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      'Need wiring repair in 2BHK flat.',
-                      style: TextStyle(
+                    Text(
+                      summary.description,
+                      style: const TextStyle(
                         fontSize: 10,
                         color: AppColors.textDark,
-                      ), // reduced from 12
+                      ),
                     ),
                   ],
                 ),
@@ -136,7 +808,7 @@ class RequestTrackingScreen extends StatelessWidget {
                 label: const Text(
                   'Need Help?',
                   style: TextStyle(
-                    fontSize: 8, // reduced from 10
+                    fontSize: 8,
                     fontWeight: FontWeight.bold,
                     color: AppColors.navy,
                   ),
@@ -159,9 +831,9 @@ class RequestTrackingScreen extends StatelessWidget {
     );
   }
 
-  // --- OTP Verification Card ---
-  Widget _buildServiceOtpCard() {
-    final List<String> otpDigits = ['7', '2', '8', '4', '6', '1'];
+  // ================== OTP CARD ==================
+  Widget _buildServiceOtpCard(String otp) {
+    final List<String> otpDigits = otp.split('');
 
     return Container(
       width: double.infinity,
@@ -174,7 +846,6 @@ class RequestTrackingScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Header: Text and Shield Icon
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -203,7 +874,6 @@ class RequestTrackingScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              // Graphic Shield Badge
               SizedBox(
                 width: 60,
                 height: 60,
@@ -250,8 +920,6 @@ class RequestTrackingScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Inner Gray OTP Box Container
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
@@ -271,8 +939,6 @@ class RequestTrackingScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-
-                // OTP Digits Display
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: otpDigits.map((digit) {
@@ -305,8 +971,11 @@ class RequestTrackingScreen extends StatelessWidget {
     );
   }
 
-  // --- 2. Vendor Assignment Card ---
-  Widget _buildVendorAssignmentCard() {
+  // ================== VENDOR ASSIGNMENT CARD ==================
+  Widget _buildVendorAssignmentCard(VendorInfo vendor) {
+    final eta = vendor.etaMinutes != null ? '${vendor.etaMinutes} min' : 'N/A';
+    final distance = vendor.distanceKm != null ? '${vendor.distanceKm} km' : 'N/A';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -317,10 +986,10 @@ class RequestTrackingScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Your request has been assigned to',
-            style: TextStyle(
-              fontSize: 10, // reduced from 12
+            style: const TextStyle(
+              fontSize: 10,
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,
             ),
@@ -330,11 +999,11 @@ class RequestTrackingScreen extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 28,
-                    backgroundImage: NetworkImage(
-                      'https://randomuser.me/api/portraits/men/32.jpg',
-                    ),
+                    backgroundImage: vendor.profileImage.isNotEmpty
+                        ? NetworkImage(vendor.profileImage)
+                        : const NetworkImage('https://randomuser.me/api/portraits/men/32.jpg') as ImageProvider,
                   ),
                   Positioned(
                     bottom: 0,
@@ -345,9 +1014,9 @@ class RequestTrackingScreen extends StatelessWidget {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.check_circle,
-                        color: AppColors.navy,
+                      child: Icon(
+                        vendor.verified ? Icons.check_circle : Icons.circle,
+                        color: vendor.verified ? AppColors.navy : Colors.grey,
                         size: 16,
                       ),
                     ),
@@ -360,55 +1029,59 @@ class RequestTrackingScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: const [
+                      children: [
                         Text(
-                          'Amit Electricals',
-                          style: TextStyle(
+                          vendor.businessName.isNotEmpty ? vendor.businessName : vendor.name,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 12, // reduced from 15
+                            fontSize: 12,
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        SizedBox(width: 4),
-                        Icon(Icons.verified, color: AppColors.navy, size: 16),
+                        if (vendor.verified) ...[
+                          const SizedBox(width: 4),
+                          const Icon(Icons.verified, color: AppColors.navy, size: 16),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 4),
                     Row(
-                      children: const [
-                        Icon(Icons.star, color: AppColors.star, size: 14),
-                        SizedBox(width: 2),
+                      children: [
+                        const Icon(Icons.star, color: AppColors.star, size: 14),
+                        const SizedBox(width: 2),
                         Text(
-                          '4.7',
-                          style: TextStyle(
-                            fontSize: 10, // reduced from 12
+                          vendor.rating > 0 ? vendor.rating.toString() : 'New',
+                          style: const TextStyle(
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        SizedBox(width: 4),
-                        Text(
-                          '(128 Reviews)',
-                          style: TextStyle(
-                            fontSize: 9, // reduced from 11
-                            color: AppColors.textGrey,
+                        if (vendor.reviews > 0) ...[
+                          const SizedBox(width: 4),
+                          Text(
+                            '(${vendor.reviews} Reviews)',
+                            style: const TextStyle(
+                              fontSize: 9,
+                              color: AppColors.textGrey,
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 4),
                     Row(
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           LucideIcons.phone,
                           size: 12,
                           color: AppColors.textGrey,
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Text(
-                          '+91 xxxxxxxxxx',
-                          style: TextStyle(
-                            fontSize: 10, // reduced from 12
+                          vendor.mobile.isNotEmpty ? vendor.mobile : '+91 xxxxxxxxxx',
+                          style: const TextStyle(
+                            fontSize: 10,
                             color: AppColors.textGrey,
                           ),
                         ),
@@ -423,15 +1096,15 @@ class RequestTrackingScreen extends StatelessWidget {
                   const Text(
                     'ETA',
                     style: TextStyle(
-                      fontSize: 8, // reduced from 10
+                      fontSize: 8,
                       color: AppColors.hintText,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Text(
-                    '18 min',
-                    style: TextStyle(
-                      fontSize: 14, // reduced from 18
+                  Text(
+                    eta,
+                    style: const TextStyle(
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: AppColors.navy,
                     ),
@@ -442,12 +1115,12 @@ class RequestTrackingScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 7,
                       color: Colors.grey.shade500,
-                    ), // reduced from 9
+                    ),
                   ),
-                  const Text(
-                    '1.2 km',
-                    style: TextStyle(
-                      fontSize: 9, // reduced from 11
+                  Text(
+                    distance,
+                    style: const TextStyle(
+                      fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
@@ -472,7 +1145,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     style: TextStyle(
                       color: AppColors.navy,
                       fontWeight: FontWeight.bold,
-                      fontSize: 12, // added explicit size
+                      fontSize: 12,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
@@ -487,7 +1160,9 @@ class RequestTrackingScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    // Make phone call
+                  },
                   icon: const Icon(
                     LucideIcons.phone,
                     size: 16,
@@ -498,7 +1173,7 @@ class RequestTrackingScreen extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: 12, // added explicit size
+                      fontSize: 12,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -517,8 +1192,20 @@ class RequestTrackingScreen extends StatelessWidget {
     );
   }
 
-  // --- 3. Live Location Map Card ---
-  Widget _buildLiveLocationMapCard() {
+  // ================== LIVE LOCATION ==================
+  Widget _buildLiveLocationMapCard(TrackingData data) {
+    final location = data.liveLocation;
+    final status = data.status.toLowerCase();
+
+    String statusText = 'Awaiting vendor assignment';
+    if (status == 'assigned') {
+      statusText = 'Vendor is on the way';
+    } else if (status == 'ontheway' || status == 'in_progress') {
+      statusText = 'Vendor is working';
+    } else if (status == 'completed') {
+      statusText = 'Service completed';
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.cardBg,
@@ -538,7 +1225,7 @@ class RequestTrackingScreen extends StatelessWidget {
                       'Live Location',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 10, // reduced from 13
+                        fontSize: 10,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -552,17 +1239,17 @@ class RequestTrackingScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Text(
-                      'Amit is on the way',
-                      style: TextStyle(
+                    Text(
+                      statusText,
+                      style: const TextStyle(
                         fontSize: 9,
                         color: AppColors.textGrey,
-                      ), // reduced from 11
+                      ),
                     ),
                   ],
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: _fetchTrackingData,
                   child: Row(
                     children: const [
                       Icon(
@@ -574,7 +1261,7 @@ class RequestTrackingScreen extends StatelessWidget {
                       Text(
                         'Refresh',
                         style: TextStyle(
-                          fontSize: 10, // reduced from 12
+                          fontSize: 10,
                           color: AppColors.navy,
                           fontWeight: FontWeight.bold,
                         ),
@@ -621,10 +1308,10 @@ class RequestTrackingScreen extends StatelessWidget {
                             BoxShadow(color: Colors.black12, blurRadius: 4),
                           ],
                         ),
-                        child: const Text(
-                          'Your Location\nKothrud, Pune',
-                          style: TextStyle(
-                            fontSize: 6, // reduced from 8
+                        child: Text(
+                          'Your Location\n${data.requestDetails.location}',
+                          style: const TextStyle(
+                            fontSize: 6,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -638,37 +1325,40 @@ class RequestTrackingScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                Positioned(
-                  top: 70,
-                  right: 60,
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
-                          boxShadow: [
-                            BoxShadow(color: Colors.black12, blurRadius: 4),
-                          ],
-                        ),
-                        child: const Text(
-                          'Vendor Location\n18 min away',
-                          style: TextStyle(
-                            fontSize: 6, // reduced from 8
-                            fontWeight: FontWeight.bold,
+                if (location != null && status != 'pending' && status != 'cancelled')
+                  Positioned(
+                    top: 70,
+                    right: 60,
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            boxShadow: [
+                              BoxShadow(color: Colors.black12, blurRadius: 4),
+                            ],
                           ),
-                          textAlign: TextAlign.center,
+                          child: Text(
+                            status == 'completed'
+                                ? 'Service Completed'
+                                : 'Vendor Location\n${_trackingData?.vendor?.etaMinutes ?? ''} min away',
+                            style: const TextStyle(
+                              fontSize: 6,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                      const Icon(
-                        Icons.motorcycle,
-                        color: AppColors.orange,
-                        size: 28,
-                      ),
-                    ],
+                        Icon(
+                          status == 'completed' ? Icons.check_circle : Icons.motorcycle,
+                          color: status == 'completed' ? Colors.green : AppColors.orange,
+                          size: 28,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -677,8 +1367,8 @@ class RequestTrackingScreen extends StatelessWidget {
     );
   }
 
-  // --- 4. Request Status Timeline Tracker ---
-  Widget _buildRequestStatusTracker() {
+  // ================== STATUS TRACKER ==================
+  Widget _buildRequestStatusTracker(List<TimelineItem> timeline) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -695,7 +1385,7 @@ class RequestTrackingScreen extends StatelessWidget {
                 'Request Status',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 11, // reduced from 14
+                  fontSize: 11,
                   color: AppColors.textPrimary,
                 ),
               ),
@@ -705,47 +1395,49 @@ class RequestTrackingScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTimelineStep(
-                'Request\nPlaced',
-                '08 Jul, 04:30 PM',
-                LucideIcons.fileText,
-                isCompleted: true,
-              ),
-              _buildTimelineDivider(isSolid: true),
-              _buildTimelineStep(
-                'Assigned',
-                '08 Jul, 04:35 PM',
-                LucideIcons.users,
-                isCompleted: true,
-              ),
-              _buildTimelineDivider(isSolid: true),
-              _buildTimelineStep(
-                'Vendor on\nthe Way',
-                '08 Jul, 04:40 PM',
-                LucideIcons.bike,
-                isCompleted: true,
-                isActive: true,
-              ),
-              _buildTimelineDivider(isSolid: false),
-              _buildTimelineStep(
-                'In Progress',
-                '--',
-                LucideIcons.wrench,
-                isCompleted: false,
-              ),
-              _buildTimelineDivider(isSolid: false),
-              _buildTimelineStep(
-                'Completed',
-                '--',
-                LucideIcons.checkSquare,
-                isCompleted: false,
-              ),
-            ],
+            children: timeline.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final bool isLast = index == timeline.length - 1;
+
+              return Expanded(
+                child: Column(
+                  children: [
+                    _buildTimelineStep(
+                      item.title,
+                      item.completed ? 'Completed' : '--',
+                      _getTimelineIcon(item.title),
+                      isCompleted: item.completed,
+                      isActive: item.active,
+                    ),
+                    if (!isLast)
+                      _buildTimelineDivider(
+                        isSolid: timeline[index + 1].completed,
+                      ),
+                  ],
+                ),
+              );
+            }).toList().expand((widget) => [widget]).toList(),
           ),
         ],
       ),
     );
+  }
+
+  IconData _getTimelineIcon(String title) {
+    final lower = title.toLowerCase();
+    if (lower.contains('placed') || lower.contains('request')) {
+      return LucideIcons.fileText;
+    } else if (lower.contains('assign')) {
+      return LucideIcons.users;
+    } else if (lower.contains('vendor') || lower.contains('way')) {
+      return LucideIcons.bike;
+    } else if (lower.contains('progress')) {
+      return LucideIcons.wrench;
+    } else if (lower.contains('complete')) {
+      return LucideIcons.checkSquare;
+    }
+    return LucideIcons.circle;
   }
 
   Widget _buildTimelineStep(
@@ -755,48 +1447,46 @@ class RequestTrackingScreen extends StatelessWidget {
     bool isCompleted = false,
     bool isActive = false,
   }) {
-    Color primaryColor = isCompleted ? AppColors.navy : AppColors.hintText;
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isActive
-                  ? AppColors.navy
-                  : (isCompleted
-                        ? AppColors.lightPurple
-                        : AppColors.chipUnselected),
-              shape: BoxShape.circle,
-              border: Border.all(color: primaryColor, width: isActive ? 2 : 1),
-            ),
-            child: Icon(
-              icon,
-              color: isActive ? Colors.white : primaryColor,
-              size: 16,
-            ),
+    Color primaryColor = isCompleted || isActive ? AppColors.navy : AppColors.hintText;
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isActive
+                ? AppColors.navy
+                : (isCompleted
+                    ? AppColors.lightPurple
+                    : AppColors.chipUnselected),
+            shape: BoxShape.circle,
+            border: Border.all(color: primaryColor, width: isActive ? 2 : 1),
           ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 7, // reduced from 9
-              fontWeight: isCompleted ? FontWeight.bold : FontWeight.w500,
-              color: AppColors.textPrimary,
-            ),
+          child: Icon(
+            icon,
+            color: isActive ? Colors.white : primaryColor,
+            size: 16,
           ),
-          const SizedBox(height: 4),
-          Text(
-            time,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 6,
-              color: AppColors.textGrey,
-            ), // reduced from 8
+        ),
+        const SizedBox(height: 8),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 7,
+            fontWeight: isCompleted || isActive ? FontWeight.bold : FontWeight.w500,
+            color: AppColors.textPrimary,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          time,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 6,
+            color: AppColors.textGrey,
+          ),
+        ),
+      ],
     );
   }
 
@@ -819,8 +1509,10 @@ class RequestTrackingScreen extends StatelessWidget {
     );
   }
 
-  // --- 5. Request Details Grid Section ---
-  Widget _buildRequestDetailsGrid() {
+  // ================== REQUEST DETAILS ==================
+  Widget _buildRequestDetailsGrid(RequestDetails details) {
+    final paymentMethod = details.paymentMethod == 'full' ? 'Cash on Completion' : 'Advance Payment';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -837,7 +1529,7 @@ class RequestTrackingScreen extends StatelessWidget {
                 'Request Details',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 11, // reduced from 14
+                  fontSize: 11,
                   color: AppColors.textPrimary,
                 ),
               ),
@@ -846,12 +1538,12 @@ class RequestTrackingScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              _buildDetailItem(LucideIcons.zap, 'Category', 'Electrician'),
+              _buildDetailItem(LucideIcons.zap, 'Category', details.category),
               const SizedBox(width: 12),
               _buildDetailItem(
                 LucideIcons.mapPin,
                 'Location',
-                'Kothrud, Pune, Maharashtra',
+                details.location,
               ),
             ],
           ),
@@ -861,13 +1553,13 @@ class RequestTrackingScreen extends StatelessWidget {
               _buildDetailItem(
                 LucideIcons.calendar,
                 'Preferred Time',
-                '08 Jul 2025, 4:30 PM',
+                details.preferredTime,
               ),
               const SizedBox(width: 12),
               _buildDetailItem(
                 LucideIcons.creditCard,
                 'Payment',
-                'Cash on Completion',
+                paymentMethod,
               ),
             ],
           ),
@@ -897,7 +1589,7 @@ class RequestTrackingScreen extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 8, // reduced from 10
+                      fontSize: 8,
                       color: AppColors.hintText,
                       fontWeight: FontWeight.w500,
                     ),
@@ -906,7 +1598,7 @@ class RequestTrackingScreen extends StatelessWidget {
                   Text(
                     value,
                     style: const TextStyle(
-                      fontSize: 9, // reduced from 11
+                      fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textDark,
                     ),
@@ -922,64 +1614,214 @@ class RequestTrackingScreen extends StatelessWidget {
     );
   }
 
-  // --- 6. Action Bottom Buttons Row ---
-  Widget _buildBottomActionButtons(BuildContext context) {
+  // ================== ACTION BUTTONS ==================
+  Widget _buildBottomActionButtons({
+    required bool showCancel,
+    required bool showMarkDone,
+  }) {
+    if (!showCancel && !showMarkDone) {
+      return const SizedBox.shrink();
+    }
+
     return Row(
       children: [
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(LucideIcons.xCircle, size: 16, color: Colors.red),
-            label: const Text(
-              'Cancel Request',
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-                fontSize: 10, // reduced from 13
+        if (showCancel)
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () => _showCancelDialog(context),
+              icon: const Icon(LucideIcons.xCircle, size: 16, color: Colors.red),
+              label: const Text(
+                'Cancel Request',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                ),
               ),
-            ),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.borderLight),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppColors.borderLight),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                backgroundColor: Colors.white,
               ),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              backgroundColor: Colors.white,
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ServicePaymentScreen()),
-              );
-            },
-            icon: const Icon(
-              LucideIcons.checkCircle,
-              size: 16,
-              color: Colors.white,
-            ),
-            label: const Text(
-              'Mark as Done',
-              style: TextStyle(
+
+        if (showCancel && showMarkDone) const SizedBox(width: 12),
+
+        if (showMarkDone)
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ServicePaymentScreen()),
+                );
+              },
+              icon: const Icon(
+                LucideIcons.checkCircle,
+                size: 16,
                 color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 10, // reduced from 13
               ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.navy,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+              label: const Text(
+                'Mark as Done',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                ),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.navy,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
             ),
           ),
-        ),
       ],
     );
+  }
+
+  // ================== CANCEL DIALOG ==================
+  void _showCancelDialog(BuildContext context) {
+    final TextEditingController reasonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel Request'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Please tell us why you want to cancel this request:',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonController,
+              decoration: InputDecoration(
+                hintText: 'e.g. Changed my mind',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('No, Go Back'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final reason = reasonController.text.trim();
+              if (reason.isEmpty) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a cancellation reason'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              Navigator.pop(ctx);
+              setState(() => _isLoading = true);
+
+              try {
+                final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+                final service = CancelBookingService(dio);
+
+                final request = CancelBookingRequest(
+                  userId: widget.userId,
+                  cancellationReason: reason,
+                );
+
+                await service.cancelBooking(
+                  bookingId: widget.bookingId,
+                  request: request,
+                );
+
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Request cancelled successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+
+                await _fetchTrackingData();
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error cancelling: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              } finally {
+                if (mounted) setState(() => _isLoading = false);
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Yes, Cancel Request'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ================== INFINITY TRACK PAINTER ==================
+class _InfinityTrackPainter extends CustomPainter {
+  final double a;
+  final double b;
+
+  _InfinityTrackPainter({required this.a, required this.b});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final paint = Paint()
+      ..color = AppColors.navy.withOpacity(0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
+    final path = Path();
+    const int steps = 200;
+    for (int i = 0; i <= steps; i++) {
+      final double t = (i / steps) * 2 * math.pi;
+      final double sinT = math.sin(t);
+      final double cosT = math.cos(t);
+      final double denom = 1 + (sinT * sinT);
+      final double x = a * cosT / denom;
+      final double y = b * sinT * cosT / denom;
+      final Offset point = center + Offset(x, y);
+      if (i == 0) {
+        path.moveTo(point.dx, point.dy);
+      } else {
+        path.lineTo(point.dx, point.dy);
+      }
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _InfinityTrackPainter oldDelegate) {
+    return oldDelegate.a != a || oldDelegate.b != b;
   }
 }

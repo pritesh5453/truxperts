@@ -17,8 +17,15 @@ class InstantBookingApiService {
     try {
       final formData = FormData();
 
-      // Add all text fields – convert everything to string safely
-      request.toJson().forEach((key, value) {
+      // ✅ Print request payload for debugging
+      final Map<String, dynamic> payload = request.toJson();
+      print('📤 Instant Booking Request Payload:');
+      payload.forEach((key, value) {
+        print('   $key: $value');
+      });
+
+      // Add all text fields
+      payload.forEach((key, value) {
         formData.fields.add(MapEntry(key, value.toString()));
       });
 
@@ -32,8 +39,12 @@ class InstantBookingApiService {
         formData.files.add(MapEntry('images', multipartFile));
       }
 
+      // ✅ Print request URL
+      final String url = ApiEndpoints.instantPost;
+      print('🌐 POST URL: $url');
+
       final response = await _dio.post(
-        ApiEndpoints.instantBookings,
+        url,
         data: formData,
         options: Options(
           headers: {
@@ -42,11 +53,15 @@ class InstantBookingApiService {
         ),
       );
 
+      // ✅ Print response details
+      print('📡 Response Status: ${response.statusCode}');
+      print('📡 Response Data: ${response.data}');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Safe parsing with try-catch
         try {
           return InstantBookingResponse.fromJson(response.data);
         } catch (e) {
+          print('❌ Failed to parse response: $e');
           throw Exception('Failed to parse response: $e');
         }
       } else {
@@ -57,15 +72,22 @@ class InstantBookingApiService {
         );
       }
     } on DioException catch (e) {
-      // Print detailed error
-      print('DioError: ${e.message}');
+      // ✅ Full error logging
+      print('❌ DioError: ${e.message}');
       if (e.response != null) {
-        print('Response data: ${e.response?.data}');
-        print('Response status: ${e.response?.statusCode}');
+        print('   Status: ${e.response?.statusCode}');
+        print('   Headers: ${e.response?.headers}');
+        print('   Data: ${e.response?.data}');
+        if (e.response?.data is Map) {
+          print('   Message: ${(e.response?.data as Map)['message']}');
+        }
+      } else if (e.error != null) {
+        print('   Error: ${e.error}');
       }
+      print('   StackTrace: ${e.stackTrace}');
       throw Exception('Network Error: ${e.message}');
     } catch (e) {
-      print('Unexpected error: $e');
+      print('❌ Unexpected error: $e');
       rethrow;
     }
   }

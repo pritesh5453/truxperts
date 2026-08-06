@@ -9,10 +9,12 @@ class AdvanceCategoryPopupWidget extends StatefulWidget {
   const AdvanceCategoryPopupWidget({Key? key}) : super(key: key);
 
   @override
-  State<AdvanceCategoryPopupWidget> createState() => _AdvanceCategoryPopupWidgetState();
+  State<AdvanceCategoryPopupWidget> createState() =>
+      _AdvanceCategoryPopupWidgetState();
 }
 
-class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget> {
+class _AdvanceCategoryPopupWidgetState
+    extends State<AdvanceCategoryPopupWidget> {
   List<AdvanceCategory> _categories = [];
   bool _isLoading = true;
   bool _hasError = false;
@@ -33,10 +35,17 @@ class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget>
   }
 
   Future<void> _fetchCategories() async {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+
     try {
       final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
       final service = AdvanceCategoriesApiService(dio);
       final response = await service.getAdvanceCategories();
+
+      print('📦 AdvanceCategoryPopup: Received ${response.data.length} categories');
 
       if (response.success && response.data.isNotEmpty) {
         setState(() {
@@ -45,13 +54,17 @@ class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget>
           _hasError = false;
         });
       } else {
+        print('⚠️ AdvanceCategoryPopup: Success but data empty');
         setState(() {
           _categories = [];
           _isLoading = false;
           _hasError = true;
         });
       }
-    } catch (e) {
+    } catch (e, stack) {
+      print('❌ AdvanceCategoryPopup: Error fetching categories');
+      print('   Error: $e');
+      print('   Stack: $stack');
       setState(() {
         _categories = [];
         _isLoading = false;
@@ -142,18 +155,29 @@ class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
+                            Icon(Icons.error_outline, size: 48,
+                                color: Colors.grey[400]),
                             const SizedBox(height: 8),
                             Text(
-                              _hasError ? 'Failed to load categories' : 'No categories available',
-                              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                              _hasError
+                                  ? 'Failed to load categories'
+                                  : 'No categories available',
+                              style: TextStyle(
+                                  color: Colors.grey[600], fontSize: 14),
                             ),
+                            const SizedBox(height: 8),
+                            if (_hasError)
+                              TextButton(
+                                onPressed: _fetchCategories,
+                                child: const Text('Retry'),
+                              ),
                           ],
                         ),
                       )
                     : GridView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 16,
@@ -162,7 +186,14 @@ class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget>
                         itemCount: _filteredList.length,
                         itemBuilder: (context, index) {
                           final item = _filteredList[index];
-                          final isSelected = _categories.indexOf(item) == _selectedIndex;
+                          final isSelected =
+                              _categories.indexOf(item) == _selectedIndex;
+
+                          // ✅ Safe colors
+                          final Color bgColor = item.parsedBgColor;
+                          final Color fgColor = item.parsedIconColor;
+                          final String? iconUrl = item.cleanIcon;
+
                           return GestureDetector(
                             onTap: () {
                               setState(() {
@@ -194,20 +225,13 @@ class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget>
                                   ),
                                   child: Center(
                                     child: Container(
-                                      width: 34,
-                                      height: 34,
+                                      width: double.infinity,
+                                      height: double.infinity,
                                       decoration: BoxDecoration(
-                                        color: item.parsedBgColor,
+                                        color: bgColor,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Image.network(
-                                        item.cleanIcon,
-                                        width: 20,
-                                        height: 20,
-                                        color: item.parsedIconColor,
-                                        errorBuilder: (_, __, ___) =>
-                                            Icon(Icons.category, color: item.parsedIconColor, size: 16),
-                                      ),
+                                      child: _buildIcon(iconUrl, fgColor),
                                     ),
                                   ),
                                 ),
@@ -218,9 +242,13 @@ class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget>
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color: isSelected ? const Color(0xFF001A4E) : Colors.grey.shade700,
+                                    color: isSelected
+                                        ? const Color(0xFF001A4E)
+                                        : Colors.grey.shade700,
                                     fontSize: 11,
-                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
                                     height: 1.15,
                                   ),
                                 ),
@@ -250,7 +278,6 @@ class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget>
                 onPressed: () {
                   if (_categories.isNotEmpty) {
                     final selected = _categories[_selectedIndex];
-                    // 🔥 Return Map with id and name
                     Navigator.pop(context, {
                       'id': selected.id,
                       'name': selected.name,
@@ -278,6 +305,35 @@ class _AdvanceCategoryPopupWidgetState extends State<AdvanceCategoryPopupWidget>
           ),
         ],
       ),
+    );
+  }
+
+  // ✅ Null‑safe icon builder – full container cover, fallback to category icon
+  Widget _buildIcon(String? iconUrl, Color color) {
+    if (iconUrl == null || iconUrl.isEmpty) {
+      return Icon(Icons.category, color: color, size: 24);
+    }
+
+    return Image.network(
+      iconUrl,
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: color,
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        print('❌ Advance image load error: $error');
+        return Icon(Icons.category, color: color, size: 24);
+      },
     );
   }
 }

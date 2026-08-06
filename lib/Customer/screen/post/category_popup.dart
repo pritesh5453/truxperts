@@ -33,10 +33,17 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
   }
 
   Future<void> _fetchCategories() async {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+
     try {
       final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
       final service = CategoriesApiService(dio);
       final response = await service.getCategories();
+
+      print('📦 CategoryPopup: Received ${response.data.length} categories');
 
       if (response.success && response.data.isNotEmpty) {
         setState(() {
@@ -45,19 +52,32 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
           _hasError = false;
         });
       } else {
+        print('⚠️ CategoryPopup: Success but data empty');
         setState(() {
           _categories = [];
           _isLoading = false;
           _hasError = true;
         });
       }
-    } catch (e) {
+    } catch (e, stack) {
+      print('❌ CategoryPopup: Error fetching categories');
+      print('   Error: $e');
+      print('   Stack: $stack');
       setState(() {
         _categories = [];
         _isLoading = false;
         _hasError = true;
       });
     }
+  }
+
+  // ✅ Null‑safe color parser
+  Color _parseColor(String? hex) {
+    if (hex == null || hex.isEmpty) return Colors.grey;
+    String clean = hex.trim().replaceAll('\\', '');
+    if (clean.startsWith('#')) clean = clean.substring(1);
+    if (clean.length == 6) clean = 'ff$clean';
+    return Color(int.parse('0x$clean'));
   }
 
   @override
@@ -133,7 +153,6 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
           ),
           const SizedBox(height: 16),
 
-          // Grid or Loading/Error/Empty
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -148,6 +167,12 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
                               _hasError ? 'Failed to load categories' : 'No categories available',
                               style: TextStyle(color: Colors.grey[600], fontSize: 14),
                             ),
+                            const SizedBox(height: 8),
+                            if (_hasError)
+                              TextButton(
+                                onPressed: _fetchCategories,
+                                child: const Text('Retry'),
+                              ),
                           ],
                         ),
                       )
@@ -163,6 +188,11 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
                         itemBuilder: (context, index) {
                           final item = _filteredList[index];
                           final isSelected = _categories.indexOf(item) == _selectedIndex;
+
+                          final String? iconUrl = item.cleanIcon;
+                          final Color bgColor = _parseColor(item.bgColor);
+                          final Color fgColor = _parseColor(item.iconColor);
+
                           return GestureDetector(
                             onTap: () {
                               setState(() {
@@ -194,20 +224,13 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
                                   ),
                                   child: Center(
                                     child: Container(
-                                      width: 34,
-                                      height: 34,
+                                      width: double.infinity,
+                                      height: double.infinity,
                                       decoration: BoxDecoration(
-                                        color: _parseColor(item.bgColor),
+                                        color: bgColor,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Image.network(
-                                        item.cleanIcon,
-                                        width: 20,
-                                        height: 20,
-                                        color: _parseColor(item.iconColor),
-                                        errorBuilder: (_, __, ___) =>
-                                            Icon(Icons.category, color: _parseColor(item.iconColor), size: 16),
-                                      ),
+                                      child: _buildIcon(iconUrl, fgColor),
                                     ),
                                   ),
                                 ),
@@ -250,7 +273,6 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
                 onPressed: () {
                   if (_categories.isNotEmpty) {
                     final selected = _categories[_selectedIndex];
-                    // 🔥 Return Map with id and name
                     Navigator.pop(context, {
                       'id': selected.id,
                       'name': selected.name,
@@ -281,10 +303,33 @@ class _CategoryPopupWidgetState extends State<CategoryPopupWidget> {
     );
   }
 
-  Color _parseColor(String hex) {
-    String clean = hex.trim().replaceAll('\\', '');
-    if (clean.startsWith('#')) clean = clean.substring(1);
-    if (clean.length == 6) clean = 'ff$clean';
-    return Color(int.parse('0x$clean'));
+  // ✅ FIXED: NO color tint – original image shows
+  Widget _buildIcon(String? iconUrl, Color color) {
+    if (iconUrl == null || iconUrl.isEmpty) {
+      return Icon(Icons.category, color: color, size: 24);
+    }
+
+    return Image.network(
+      iconUrl,
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.cover,
+      // 🔥 REMOVED color: color – so original image shows
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: color,
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        print('❌ Category image load error: $error');
+        return Icon(Icons.category, color: color, size: 24);
+      },
+    );
   }
 }

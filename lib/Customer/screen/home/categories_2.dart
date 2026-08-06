@@ -4,27 +4,27 @@ import 'package:truxperts/Model_n_svc/categories/advance_category_svc.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
 import 'package:truxperts/utils/appcolors.dart';
 import 'package:truxperts/utils/common_appbar.dart';
-import 'package:shimmer/shimmer.dart'; // ✅ Add shimmer package
+import 'package:shimmer/shimmer.dart';
 
 // -----------------------------------------------------------------------
-// Simple model for a service item shown in the grid (unchanged)
+// Simple model for a service item shown in the grid
 // -----------------------------------------------------------------------
 class ServiceItem {
   final String label;
-  final IconData icon; // We'll use this as fallback, but API provides image
+  final String? iconUrl;
   final Color bg;
   final Color fg;
 
   const ServiceItem({
     required this.label,
-    required this.icon,
+    this.iconUrl,
     required this.bg,
     required this.fg,
   });
 }
 
 // -----------------------------------------------------------------------
-// ChooseServiceScreen2 (Advance Booking) - WITH SHIMMER LOADING
+// ChooseServiceScreen2 (Advance Booking) - WITH SHIMMER + IMAGE SUPPORT
 // -----------------------------------------------------------------------
 class ChooseServiceScreen2 extends StatefulWidget {
   const ChooseServiceScreen2({super.key});
@@ -36,65 +36,6 @@ class ChooseServiceScreen2 extends StatefulWidget {
 class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
   late Future<List<ServiceItem>> _advanceItemsFuture;
 
-  // Static fallback list (same as before)
-  static const List<ServiceItem> _fallbackAdvanceBooking = [
-    ServiceItem(
-        label: 'Photographer',
-        icon: Icons.camera_alt,
-        bg: AppColors.iconPhotographerBg,
-        fg: AppColors.iconPhotographerFg),
-    ServiceItem(
-        label: 'Wedding Planner',
-        icon: Icons.favorite,
-        bg: AppColors.iconWeddingBg,
-        fg: AppColors.iconWeddingFg),
-    ServiceItem(
-        label: 'Decorator',
-        icon: Icons.celebration,
-        bg: AppColors.iconDecoratorBg,
-        fg: AppColors.iconDecoratorFg),
-    ServiceItem(
-        label: 'Catering',
-        icon: Icons.restaurant,
-        bg: AppColors.iconCateringBg,
-        fg: AppColors.iconCateringFg),
-    ServiceItem(
-        label: 'Makeup Artist',
-        icon: Icons.brush,
-        bg: AppColors.iconMakeupBg,
-        fg: AppColors.iconMakeupFg),
-    ServiceItem(
-        label: 'DJ',
-        icon: Icons.music_note,
-        bg: AppColors.iconDjBg,
-        fg: AppColors.iconDjFg),
-    ServiceItem(
-        label: 'Mehendi Artist',
-        icon: Icons.back_hand,
-        bg: AppColors.iconMehendiBg,
-        fg: AppColors.iconMehendiFg),
-    ServiceItem(
-        label: 'Event Planner',
-        icon: Icons.mic,
-        bg: AppColors.iconEventBg,
-        fg: AppColors.iconEventFg),
-    ServiceItem(
-        label: 'Tutor',
-        icon: Icons.menu_book,
-        bg: AppColors.iconTutorBg,
-        fg: AppColors.iconTutorFg),
-    ServiceItem(
-        label: 'Pandit',
-        icon: Icons.star,
-        bg: AppColors.iconPanditBg,
-        fg: AppColors.iconPanditFg),
-    ServiceItem(
-        label: 'Interior Designer',
-        icon: Icons.chair_alt,
-        bg: AppColors.iconInteriorBg,
-        fg: AppColors.iconInteriorFg),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -104,25 +45,58 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
   // API se data laao aur ServiceItem list banao
   Future<List<ServiceItem>> _fetchAdvanceCategories() async {
     try {
+      print('🔷 FETCHING ADVANCE CATEGORIES...');
+      
       final dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
       final service = AdvanceCategoriesApiService(dio);
       final response = await service.getAdvanceCategories();
 
+      print('📦 Advance Response Success: ${response.success}');
+      print('📦 Advance Data Count: ${response.data.length}');
+      print('📦 Advance Total: ${response.total}');
+
       if (response.success && response.data.isNotEmpty) {
-        return response.data.map((category) {
+        print('✅ Mapping ${response.data.length} advance categories...');
+        
+        final items = response.data.map((category) {
+          // ✅ Color parser (handles null)
+          Color parseColor(String? hex) {
+            if (hex == null || hex.isEmpty) return Colors.grey;
+            String clean = hex.trim().replaceAll('\\', '');
+            if (clean.startsWith('#')) clean = clean.substring(1);
+            if (clean.length == 6) clean = 'ff$clean';
+            return Color(int.parse('0x$clean'));
+          }
+
+          // ✅ icon URL – use cleanIcon if available, else null
+          final iconUrl = category.cleanIcon?.isNotEmpty == true
+              ? category.cleanIcon
+              : null;
+
+          final bgColor = category.bgColor ?? '#E0E0E0';
+          final fgColor = category.iconColor ?? '#000000';
+
+          print('   📍 Category: ${category.name}, Icon: ${iconUrl ?? 'null'}');
+
           return ServiceItem(
             label: category.name,
-            icon: Icons.category, // fallback icon agar image fail ho
-            bg: category.parsedBgColor,
-            fg: category.parsedIconColor,
+            iconUrl: iconUrl,
+            bg: parseColor(bgColor),
+            fg: parseColor(fgColor),
           );
         }).toList();
+        
+        print('✅ Successfully mapped ${items.length} advance categories');
+        return items;
       } else {
-        return _fallbackAdvanceBooking;
+        print('⚠️ Advance categories response empty or unsuccessful');
+        return [];
       }
-    } catch (e) {
-      // Agar error aaya to fallback
-      return _fallbackAdvanceBooking;
+    } catch (e, stack) {
+      print('❌ Error fetching advance categories:');
+      print('   Error: $e');
+      print('   Stack: $stack');
+      return [];
     }
   }
 
@@ -156,7 +130,7 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: 8, // show 8 skeleton items
+        itemCount: 8,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
           crossAxisSpacing: 10,
@@ -176,12 +150,11 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
       appBar: CommonAppBar(),
       body: Column(
         children: [
-          // Scrollable content
           Expanded(
             child: FutureBuilder<List<ServiceItem>>(
               future: _advanceItemsFuture,
               builder: (context, snapshot) {
-                // Loading → Show skeleton grid with shimmer
+                // Loading → skeleton grid with shimmer
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -216,17 +189,22 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
                   );
                 }
 
-                // Error / no data – fallback dikhao
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return _buildAdvanceGrid(_fallbackAdvanceBooking);
+                // Error / no data → empty state
+                if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                  print('❌ Empty state triggered:');
+                  print('   hasError: ${snapshot.hasError}');
+                  print('   hasData: ${snapshot.hasData}');
+                  print('   data length: ${snapshot.data?.length ?? 0}');
+                  return _buildEmptyState();
                 }
 
                 // ✅ Data mil gaya
+                print('✅ Rendering ${snapshot.data!.length} advance categories');
                 return _buildAdvanceGrid(snapshot.data!);
               },
             ),
           ),
-          // Sticky footer: Smart Search Card (unchanged)
+          // Sticky footer: Smart Search Card
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             color: AppColors.bg,
@@ -237,7 +215,51 @@ class _ChooseServiceScreen2State extends State<ChooseServiceScreen2> {
     );
   }
 
-  // Grid builder – same UI, but we pass the list
+  // ✅ Empty state with retry button
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 48, color: AppColors.textSecondary),
+          const SizedBox(height: 12),
+          Text(
+            'No services available',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Please try again later',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _advanceItemsFuture = _fetchAdvanceCategories();
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryPurple,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Grid builder
   Widget _buildAdvanceGrid(List<ServiceItem> items) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -369,6 +391,7 @@ class _ServiceGrid extends StatelessWidget {
   }
 }
 
+// ✅ UPDATED _ServiceTile – full image with cover
 class _ServiceTile extends StatelessWidget {
   final ServiceItem item;
   const _ServiceTile({required this.item});
@@ -398,13 +421,13 @@ class _ServiceTile extends StatelessWidget {
             ),
             child: Center(
               child: Container(
-                width: 34,
-                height: 34,
+                width: double.infinity,
+                height: double.infinity,
                 decoration: BoxDecoration(
                   color: item.bg,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(item.icon, color: item.fg, size: 18),
+                child: _buildIcon(),
               ),
             ),
           ),
@@ -423,6 +446,34 @@ class _ServiceTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildIcon() {
+    if (item.iconUrl == null || item.iconUrl!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Image.network(
+      item.iconUrl!,
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: item.fg,
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        print('❌ Image load error for ${item.label}: $error');
+        return const SizedBox.shrink();
+      },
     );
   }
 }

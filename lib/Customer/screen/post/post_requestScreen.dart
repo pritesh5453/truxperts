@@ -13,8 +13,8 @@ import 'package:truxperts/Customer/screen/post/select_advance_subcategory.dart';
 import 'package:truxperts/utils/navbar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:truxperts/Model_n_svc/address/address_model.dart'; // ✅ Address model
-import 'package:truxperts/utils/sharedPreference/apppreference.dart'; // ✅ For user ID
+import 'package:truxperts/Model_n_svc/address/address_model.dart';
+import 'package:truxperts/utils/sharedPreference/apppreference.dart';
 
 class PostRequestScreen extends StatefulWidget {
   const PostRequestScreen({Key? key}) : super(key: key);
@@ -33,7 +33,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
 
   bool isInstantBooking = true;
 
-  // ✅ Selected Address (instead of static location)
+  // ✅ Selected Address
   Address? _selectedAddress;
 
   DateTime? selectedDate;
@@ -134,10 +134,11 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
     final String locationAddress = _selectedAddress!.fullAddress;
     final String latitude = _selectedAddress!.latitude?.toString() ?? '0.0';
     final String longitude = _selectedAddress!.longitude?.toString() ?? '0.0';
+    final int locationId = _selectedAddress!.id!; // ✅ location ID
 
-    // ✅ Get user ID from shared preferences
+    // ✅ Get user ID
     final userData = await AppPreferences.getUser();
-    final userId = userData?['id'] as int? ?? 1; // fallback to 1 if not found
+    final userId = userData?['id'] as int? ?? 1;
 
     // Show loading
     showDialog(
@@ -171,6 +172,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
           advanceAmount: '0',
           advancePaid: false,
           userId: userId,
+          locationId: locationId, // ✅ pass ID
         );
 
         final service = InstantBookingApiService(dio);
@@ -197,7 +199,7 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
           );
         }
       } else {
-        // 🔜 ADVANCE BOOKING (placeholder)
+        // Advance booking placeholder
         if (mounted) Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -435,11 +437,10 @@ class _PostRequestScreenState extends State<PostRequestScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // ---------- 6. Location (UPDATED) ----------
+                // ---------- 6. Location ----------
                 _sectionTitle("6. Location"),
                 GestureDetector(
                   onTap: () async {
-                    // ✅ Open LocationSelectorSheet and wait for Address result
                     final result = await LocationSelectorSheet.showWithResult(context);
                     if (result != null && mounted) {
                       setState(() {
@@ -1058,7 +1059,7 @@ class _SubcategoryPopupWidgetState extends State<SubcategoryPopupWidget> {
 }
 
 // -------------------------------------------------
-// LOCATION POPUP (unchanged - not used in new flow but kept)
+// LOCATION POPUP (unchanged)
 // -------------------------------------------------
 class LocationPopupWidget extends StatefulWidget {
   const LocationPopupWidget({Key? key}) : super(key: key);

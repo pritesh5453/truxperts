@@ -2,7 +2,7 @@ class ApiEndpoints {
   static const String baseUrl = 'https://api.aakarcanvassing.com/';
 
   // Auth
-  static const String login = '${baseUrl}api/auth/login';
+  static const String login = '${baseUrl}api/auth/customer/login';
   static const String signup = '${baseUrl}api/auth/signup';
 
   // Profile
@@ -20,8 +20,13 @@ class ApiEndpoints {
       '${baseUrl}api/advance_category/$categoryId/subcategories';
 
   // Instant Bookings
+  static const String instantPost = '${baseUrl}api/instant-bookings/instant_post'; 
   static const String instantBookings = '${baseUrl}api/instant-bookings';
   static const String instantBookingsStats = '${baseUrl}api/instant-bookings/stats';
+
+  // ✅ Tracking: GET /api/instant-bookings/{bookingId}?user_id={userId}
+  static String instantBookingTracking(int bookingId) => 
+      '${baseUrl}api/instant-bookings/$bookingId';
 
   // ========== CUSTOMER ADDRESS ==========
   static const String customerAddressBase = '${baseUrl}api/admin/customer-address';
@@ -37,4 +42,8 @@ class ApiEndpoints {
 
   // Delete address (DELETE /customer-address/{addressId})
   static String deleteAddress(int addressId) => '$customerAddressBase/$addressId';
+
+   // ✅ Cancel booking
+  static String cancelInstantBooking(int bookingId) => 
+      '${baseUrl}api/instant-bookings/$bookingId/cancel';
 }

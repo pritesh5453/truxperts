@@ -30,18 +30,22 @@ class Subcategory {
   });
 
   factory Subcategory.fromJson(Map<String, dynamic> json) => Subcategory(
-        id: json['id'] as int,
-        categoryId: json['category_id'] as int,
-        name: json['name'] as String,
-        description: json['description'] as String,
-        status: json['status'] as String,
-        commissionType: json['commission_type'] as String,
-        commissionValue: json['commission_value'] as String,
-        minCommission: json['min_commission'] as String,
-        maxCommission: json['max_commission'] as String,
-        serviceCount: json['service_count'] as int,
-        createdAt: DateTime.parse(json['created_at'] as String),
-        updatedAt: DateTime.parse(json['updated_at'] as String),
+        id: json['id'] as int? ?? 0,
+        categoryId: json['category_id'] as int? ?? 0,
+        name: json['name'] as String? ?? '',
+        description: json['description'] as String? ?? '',
+        status: json['status'] as String? ?? '',
+        commissionType: json['commission_type'] as String? ?? '',
+        commissionValue: json['commission_value'] as String? ?? '0',
+        minCommission: json['min_commission'] as String? ?? '0',
+        maxCommission: json['max_commission'] as String? ?? '0',
+        serviceCount: json['service_count'] as int? ?? 0,
+        createdAt: json['created_at'] != null
+            ? DateTime.parse(json['created_at'] as String)
+            : DateTime.now(),
+        updatedAt: json['updated_at'] != null
+            ? DateTime.parse(json['updated_at'] as String)
+            : DateTime.now(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -63,9 +67,9 @@ class Subcategory {
 class Category {
   final int id;
   final String name;
-  final String icon;
-  final String iconColor;
-  final String bgColor;
+  final String? icon;
+  final String? iconColor;
+  final String? bgColor;
   final String description;
   final int featured;
   final String status;
@@ -83,9 +87,9 @@ class Category {
   Category({
     required this.id,
     required this.name,
-    required this.icon,
-    required this.iconColor,
-    required this.bgColor,
+    this.icon,
+    this.iconColor,
+    this.bgColor,
     required this.description,
     required this.featured,
     required this.status,
@@ -101,27 +105,33 @@ class Category {
     this.subcategories,
   });
 
-  // 🔥 Ye getter automatically backslash ko forward slash mein badal dega
-  String get cleanIcon => icon.replaceAll('\\', '/');
+  String? get cleanIcon => icon?.replaceAll('\\', '/');
+
+  String get defaultIconColor => iconColor ?? '#000000';
+  String get defaultBgColor => bgColor ?? '#FFFFFF';
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
-        id: json['id'] as int,
-        name: json['name'] as String,
-        icon: json['icon'] as String,
-        iconColor: json['icon_color'] as String,
-        bgColor: json['bg_color'] as String,
-        description: json['description'] as String,
-        featured: json['featured'] as int,
-        status: json['status'] as String,
-        commissionType: json['commission_type'] as String,
-        commissionValue: json['commission_value'] as String,
-        minCommission: json['min_commission'] as String,
-        maxCommission: json['max_commission'] as String,
-        serviceCount: json['service_count'] as int,
-        createdAt: DateTime.parse(json['created_at'] as String),
-        updatedAt: DateTime.parse(json['updated_at'] as String),
-        subcategoryCount: json['subcategory_count'] as int,
-        totalSubcategories: json['total_subcategories'] as int,
+        id: json['id'] as int? ?? 0,
+        name: json['name'] as String? ?? '',
+        icon: json['icon'] as String?, // null allowed
+        iconColor: json['icon_color'] as String?,
+        bgColor: json['bg_color'] as String?,
+        description: json['description'] as String? ?? '',
+        featured: json['featured'] as int? ?? 0,
+        status: json['status'] as String? ?? '',
+        commissionType: json['commission_type'] as String? ?? '',
+        commissionValue: json['commission_value'] as String? ?? '0',
+        minCommission: json['min_commission'] as String? ?? '0',
+        maxCommission: json['max_commission'] as String? ?? '0',
+        serviceCount: json['service_count'] as int? ?? 0,
+        createdAt: json['created_at'] != null
+            ? DateTime.parse(json['created_at'] as String)
+            : DateTime.now(),
+        updatedAt: json['updated_at'] != null
+            ? DateTime.parse(json['updated_at'] as String)
+            : DateTime.now(),
+        subcategoryCount: json['subcategory_count'] as int? ?? 0,
+        totalSubcategories: json['total_subcategories'] as int? ?? 0,
         subcategories: (json['subcategories'] as List<dynamic>?)
             ?.map((e) => Subcategory.fromJson(e as Map<String, dynamic>))
             .toList(),
@@ -162,11 +172,12 @@ class CategoriesResponse {
 
   factory CategoriesResponse.fromJson(Map<String, dynamic> json) =>
       CategoriesResponse(
-        success: json['success'] as bool,
-        data: (json['data'] as List<dynamic>)
-            .map((e) => Category.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        total: json['total'] as int,
+        success: json['success'] as bool? ?? false,
+        data: (json['data'] as List<dynamic>?)
+                ?.map((e) => Category.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [],
+        total: json['total'] as int? ?? 0,
       );
 
   Map<String, dynamic> toJson() => {

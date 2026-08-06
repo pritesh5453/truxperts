@@ -32,18 +32,22 @@ class AdvanceSubcategory {
 
   factory AdvanceSubcategory.fromJson(Map<String, dynamic> json) =>
       AdvanceSubcategory(
-        id: json['id'] as int,
-        categoryId: json['category_id'] as int,
-        name: json['name'] as String,
-        description: json['description'] as String,
-        status: json['status'] as String,
-        commissionType: json['commission_type'] as String,
-        commissionValue: json['commission_value'] as String,
-        minCommission: json['min_commission'] as String,
-        maxCommission: json['max_commission'] as String,
-        serviceCount: json['service_count'] as int,
-        createdAt: DateTime.parse(json['created_at'] as String),
-        updatedAt: DateTime.parse(json['updated_at'] as String),
+        id: json['id'] as int? ?? 0,
+        categoryId: json['category_id'] as int? ?? 0,
+        name: json['name'] as String? ?? '',
+        description: json['description'] as String? ?? '',
+        status: json['status'] as String? ?? '',
+        commissionType: json['commission_type'] as String? ?? '',
+        commissionValue: json['commission_value'] as String? ?? '0',
+        minCommission: json['min_commission'] as String? ?? '0',
+        maxCommission: json['max_commission'] as String? ?? '0',
+        serviceCount: json['service_count'] as int? ?? 0,
+        createdAt: json['created_at'] != null
+            ? DateTime.parse(json['created_at'] as String)
+            : DateTime.now(),
+        updatedAt: json['updated_at'] != null
+            ? DateTime.parse(json['updated_at'] as String)
+            : DateTime.now(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -65,9 +69,9 @@ class AdvanceSubcategory {
 class AdvanceCategory {
   final int id;
   final String name;
-  final String icon;
-  final String iconColor;
-  final String bgColor;
+  final String? icon;
+  final String? iconColor;
+  final String? bgColor;
   final String description;
   final int featured;
   final String status;
@@ -79,15 +83,15 @@ class AdvanceCategory {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int subcategoryCount;
-  final int totalAdvanceSubcategories; // 👈 ye field alag hai
+  final int totalAdvanceSubcategories;
   final List<AdvanceSubcategory>? subcategories;
 
   AdvanceCategory({
     required this.id,
     required this.name,
-    required this.icon,
-    required this.iconColor,
-    required this.bgColor,
+    this.icon,
+    this.iconColor,
+    this.bgColor,
     required this.description,
     required this.featured,
     required this.status,
@@ -103,14 +107,13 @@ class AdvanceCategory {
     this.subcategories,
   });
 
-  // Clean icon (backslash → forward slash)
-  String get cleanIcon => icon.replaceAll('\\', '/');
+  String? get cleanIcon => icon?.replaceAll('\\', '/');
 
-  // Clean color string (remove backslash and parse)
   Color get parsedIconColor => _parseColor(iconColor);
   Color get parsedBgColor => _parseColor(bgColor);
 
-  Color _parseColor(String hex) {
+  Color _parseColor(String? hex) {
+    if (hex == null || hex.isEmpty) return Colors.grey;
     String clean = hex.trim().replaceAll('\\', '');
     if (clean.startsWith('#')) clean = clean.substring(1);
     if (clean.length == 6) clean = 'ff$clean';
@@ -118,23 +121,27 @@ class AdvanceCategory {
   }
 
   factory AdvanceCategory.fromJson(Map<String, dynamic> json) => AdvanceCategory(
-        id: json['id'] as int,
-        name: json['name'] as String,
-        icon: json['icon'] as String,
-        iconColor: json['icon_color'] as String,
-        bgColor: json['bg_color'] as String,
-        description: json['description'] as String,
-        featured: json['featured'] as int,
-        status: json['status'] as String,
-        commissionType: json['commission_type'] as String,
-        commissionValue: json['commission_value'] as String,
-        minCommission: json['min_commission'] as String,
-        maxCommission: json['max_commission'] as String,
-        serviceCount: json['service_count'] as int,
-        createdAt: DateTime.parse(json['created_at'] as String),
-        updatedAt: DateTime.parse(json['updated_at'] as String),
-        subcategoryCount: json['subcategory_count'] as int,
-        totalAdvanceSubcategories: json['total_advance_subcategories'] as int,
+        id: json['id'] as int? ?? 0,
+        name: json['name'] as String? ?? '',
+        icon: json['icon'] as String?, // ✅ nullable
+        iconColor: json['icon_color'] as String?,
+        bgColor: json['bg_color'] as String?,
+        description: json['description'] as String? ?? '',
+        featured: json['featured'] as int? ?? 0,
+        status: json['status'] as String? ?? '',
+        commissionType: json['commission_type'] as String? ?? '',
+        commissionValue: json['commission_value'] as String? ?? '0',
+        minCommission: json['min_commission'] as String? ?? '0',
+        maxCommission: json['max_commission'] as String? ?? '0',
+        serviceCount: json['service_count'] as int? ?? 0,
+        createdAt: json['created_at'] != null
+            ? DateTime.parse(json['created_at'] as String)
+            : DateTime.now(),
+        updatedAt: json['updated_at'] != null
+            ? DateTime.parse(json['updated_at'] as String)
+            : DateTime.now(),
+        subcategoryCount: json['subcategory_count'] as int? ?? 0,
+        totalAdvanceSubcategories: json['total_advance_subcategories'] as int? ?? 0,
         subcategories: (json['subcategories'] as List<dynamic>?)
             ?.map((e) => AdvanceSubcategory.fromJson(e as Map<String, dynamic>))
             .toList(),
@@ -175,11 +182,12 @@ class AdvanceCategoriesResponse {
 
   factory AdvanceCategoriesResponse.fromJson(Map<String, dynamic> json) =>
       AdvanceCategoriesResponse(
-        success: json['success'] as bool,
-        data: (json['data'] as List<dynamic>)
-            .map((e) => AdvanceCategory.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        total: json['total'] as int,
+        success: json['success'] as bool? ?? false,
+        data: (json['data'] as List<dynamic>?)
+                ?.map((e) => AdvanceCategory.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [],
+        total: json['total'] as int? ?? 0,
       );
 
   Map<String, dynamic> toJson() => {

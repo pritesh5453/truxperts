@@ -22,6 +22,7 @@ class InstantBookingRequest {
   final String advanceAmount;
   final bool advancePaid;
   final int userId;
+  final int? locationId; // ✅ NEW FIELD – location address ID
 
   InstantBookingRequest({
     required this.bookingType,
@@ -41,27 +42,37 @@ class InstantBookingRequest {
     required this.advanceAmount,
     required this.advancePaid,
     required this.userId,
+    this.locationId, // ✅ optional
   });
 
-  Map<String, dynamic> toJson() => {
-        'booking_type': bookingType,
-        'category_id': categoryId,
-        'category_name': categoryName,
-        'subcategory_id': subcategoryId,
-        'subcategory_name': subcategoryName,
-        'description': description,
-        'budget': budget,
-        'location_address': locationAddress,
-        'latitude': latitude,
-        'longitude': longitude,
-        'preferred_date': preferredDate,
-        'preferred_time': preferredTime,
-        'additional_notes': additionalNotes,
-        'payment_amount': paymentAmount,
-        'advance_amount': advanceAmount,
-        'advance_paid': advancePaid,
-        'user_id': userId,
-      };
+  Map<String, dynamic> toJson() {
+    final map = {
+      'booking_type': bookingType,
+      'category_id': categoryId,
+      'category_name': categoryName,
+      'subcategory_id': subcategoryId,
+      'subcategory_name': subcategoryName,
+      'description': description,
+      'budget': budget,
+      'location_address': locationAddress,
+      'latitude': latitude,
+      'longitude': longitude,
+      'preferred_date': preferredDate,
+      'preferred_time': preferredTime,
+      'additional_notes': additionalNotes,
+      'payment_amount': paymentAmount,
+      'advance_amount': advanceAmount,
+      'advance_paid': advancePaid,
+      'user_id': userId,
+    };
+    
+    // ✅ Add location_id only if not null
+    if (locationId != null) {
+      map['location_id'] = locationId as Object;
+    }
+    
+    return map;
+  }
 }
 
 // --------------------------------------------
@@ -233,7 +244,6 @@ class InstantBookingData {
   }
 
   factory InstantBookingData.fromJson(Map<String, dynamic> json) {
-    // Safely parse each field with default values
     return InstantBookingData(
       id: _safeCast<int>(json['id']) ?? 0,
       bookingType: _safeCast<String>(json['booking_type']) ?? '',

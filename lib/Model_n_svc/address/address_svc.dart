@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:truxperts/Model_n_svc/address/address_model.dart';
 import 'package:truxperts/API/baseurl/api_endpoint.dart';
+import 'package:truxperts/utils/sharedPreference/apppreference.dart';
 
 class AddressService {
   final Dio dio;
@@ -10,10 +11,19 @@ class AddressService {
   // ==================== GET ALL ADDRESSES ====================
   Future<List<Address>> getAddresses(int customerId) async {
     try {
-      final response = await dio.get(
-        ApiEndpoints.customerAddresses(customerId),
-      );
+      // ✅ Add token if available
+      final token = await AppPreferences.getToken();
+      if (token != null) {
+        dio.options.headers['Authorization'] = 'Bearer $token';
+      }
+
+      final url = ApiEndpoints.customerAddresses(customerId);
+      print('🔍 GET Addresses URL: $url');
+      print('🔍 Headers: ${dio.options.headers}');
+
+      final response = await dio.get(url);
       _logResponse(response);
+
       if (response.statusCode == 200 && response.data['success'] == true) {
         final List data = response.data['data'] ?? [];
         return data.map((json) => Address.fromJson(json)).toList();
@@ -21,6 +31,13 @@ class AddressService {
         throw Exception(response.data['message'] ?? 'Failed to fetch addresses');
       }
     } on DioException catch (e) {
+      // 🔥 Detailed error log
+      print('❌ Dio error: ${e.message}');
+      if (e.response != null) {
+        print('   Status: ${e.response?.statusCode}');
+        print('   Data: ${e.response?.data}');
+        print('   Headers: ${e.response?.headers}');
+      }
       throw _handleDioError(e);
     }
   }
@@ -28,21 +45,27 @@ class AddressService {
   // ==================== ADD NEW ADDRESS ====================
   Future<int> addAddress(Map<String, dynamic> addressData) async {
     try {
+      // ✅ Add token if available
+      final token = await AppPreferences.getToken();
+      if (token != null) {
+        dio.options.headers['Authorization'] = 'Bearer $token';
+      }
+
+      print('📤 POST Address URL: ${ApiEndpoints.addAddress}');
+      print('📤 Body: $addressData');
+
       final response = await dio.post(
         ApiEndpoints.addAddress,
         data: addressData,
       );
       _logResponse(response);
-      
-      // ✅ Check if response is valid
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data;
         if (data is Map && data['success'] == true) {
-          // ✅ Return address_id if present
           if (data.containsKey('address_id')) {
             return data['address_id'] as int;
           } else {
-            // If no address_id but success is true, return 0 (or throw)
             return 0;
           }
         } else {
@@ -61,11 +84,21 @@ class AddressService {
   // ==================== UPDATE ADDRESS ====================
   Future<void> updateAddress(int addressId, Map<String, dynamic> addressData) async {
     try {
+      final token = await AppPreferences.getToken();
+      if (token != null) {
+        dio.options.headers['Authorization'] = 'Bearer $token';
+      }
+
+      final url = ApiEndpoints.updateAddress(addressId);
+      print('📤 PUT Address URL: $url');
+      print('📤 Body: $addressData');
+
       final response = await dio.put(
-        ApiEndpoints.updateAddress(addressId),
+        url,
         data: addressData,
       );
       _logResponse(response);
+
       if (response.statusCode == 200 && response.data['success'] == true) {
         return;
       } else {
@@ -79,10 +112,17 @@ class AddressService {
   // ==================== DELETE ADDRESS ====================
   Future<void> deleteAddress(int addressId) async {
     try {
-      final response = await dio.delete(
-        ApiEndpoints.deleteAddress(addressId),
-      );
+      final token = await AppPreferences.getToken();
+      if (token != null) {
+        dio.options.headers['Authorization'] = 'Bearer $token';
+      }
+
+      final url = ApiEndpoints.deleteAddress(addressId);
+      print('🗑️ DELETE Address URL: $url');
+
+      final response = await dio.delete(url);
       _logResponse(response);
+
       if (response.statusCode == 200 && response.data['success'] == true) {
         return;
       } else {

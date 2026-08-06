@@ -54,12 +54,20 @@ class AppColors {
   static const Color lightBlue = Color(0xFFE0EFFF);
   static const Color scaffoldLightBg = Color(0xFFF8F9FA);
 
-
+  // ─────────────────────────────────────────────────────────────
+  // Status colors (used for pending / completed badges)
+  // ─────────────────────────────────────────────────────────────
+  static const Color warningBg = Color(0xFFFFEDD5);     // pending background
+  static const Color warningText = Color(0xFFEA7C1F);   // pending text
+  static const Color successBg = Color(0xFFDCFCE7);     // completed background
+  static const Color successText = Color(0xFF16A34A);   // completed text
+  static const Color errorBg = Color(0xFFFEE2E2);       // error/cancelled background (optional)
+  static const Color errorText = Color(0xFFDC2626);     // error/cancelled text (optional)
 
   // ─────────────────────────────────────────────────────────────
-// ADD THESE INSIDE YOUR EXISTING AppColors CLASS
-// (paste just above the closing brace `}` of AppColors)
-// ─────────────────────────────────────────────────────────────
+  // ADD THESE INSIDE YOUR EXISTING AppColors CLASS
+  // (paste just above the closing brace `}` of AppColors)
+  // ─────────────────────────────────────────────────────────────
 
   // --- Newly added for ChooseServiceScreen ---
   static const Color iconAcBg = Color(0xFFE3E9F5);
